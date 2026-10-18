@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import Link from "@/components/ui/app-link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, Download, Eye } from "lucide-react";
 import { buttonClasses } from "@/components/ui/button";

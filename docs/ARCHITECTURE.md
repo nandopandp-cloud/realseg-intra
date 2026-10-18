@@ -11,7 +11,7 @@ flowchart LR
   app --> pg[(PostgreSQL 18)]
   app --> fs[(Armazenamento privado\nde arquivos)]
   app -->|SMTP| mail[[Provedor de e-mail\n— a definir]]
-  cron[[Agendador\n(pnpm jobs:run)]] --> app
+  cron[[Vercel Cron diário\n/api/cron/daily]] --> app
   app -.->|hook| av[[Antimalware\n— a definir]]
 ```
 

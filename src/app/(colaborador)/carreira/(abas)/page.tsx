@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import Link from "@/components/ui/app-link";
 import { ArrowRight, ChevronRight, Circle, CircleCheck, Play, Star, UsersRound } from "lucide-react";
 import { ButtonLink } from "@/components/ui/button";
 import { iconFor, toTone, TONE } from "@/components/ui/icons";

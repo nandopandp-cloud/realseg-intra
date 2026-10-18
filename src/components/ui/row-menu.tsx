@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import Link from "@/components/ui/app-link";
 import { useEffect, useId, useRef, useState } from "react";
 import { EllipsisVertical } from "lucide-react";
 

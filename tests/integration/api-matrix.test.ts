@@ -3,7 +3,7 @@ import { apiRequest, resetDatabase, sessionCookie, type People } from "../suppor
 
 /** Todos os Route Handlers de /api/v1 (descobertos automaticamente). */
 const modules = import.meta.glob("../../src/app/api/v1/**/route.ts");
-const PUBLIC = ["/auth/login/", "/auth/password/forgot/", "/auth/password/reset/"];
+const PUBLIC = ["/auth/login/", "/auth/password/forgot/", "/auth/password/reset/", "/cron/"]; // cron: autenticado por CRON_SECRET (teste próprio)
 const METHODS = ["GET", "POST", "PUT", "PATCH", "DELETE"] as const;
 const FAKE = { id: "00000000-0000-4000-8000-000000000000", fileId: "00000000-0000-4000-8000-000000000001", number: "999999", slug: "inexistente" };
 

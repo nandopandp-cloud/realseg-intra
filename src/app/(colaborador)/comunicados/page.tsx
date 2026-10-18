@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import Link from "next/link";
+import Link from "@/components/ui/app-link";
 import { ArrowRight, MessageSquareMore, Megaphone } from "lucide-react";
 import { PageBody, PageHero } from "@/components/layout/page-hero";
 import { ButtonLink } from "@/components/ui/button";
@@ -52,8 +52,8 @@ export default async function AnnouncementsPage({ searchParams }: PageProps<"/co
         title="Comunicados"
         subtitle="Fique por dentro das novidades, avisos e informações importantes da REALSEG."
         breadcrumb={[{ label: "Início", href: "/" }, { label: "Comunicados" }]}
-        image="/images/hero-comunicados.jpg"
-        mobileImage="/images/mhero-comunicados.jpg"
+        image="/images/hero-comunicados.webp"
+        mobileImage="/images/mhero-comunicados.webp"
       />
       <PageBody>
         <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
@@ -107,7 +107,7 @@ export default async function AnnouncementsPage({ searchParams }: PageProps<"/co
               <Card className="p-4">
                 <h2 className="mb-3 text-lg font-bold text-ink">Destaque da semana</h2>
                 <div className="relative overflow-hidden rounded-xl bg-navy-950 p-5 text-white">
-                  <Image src="/images/destaque-guard.jpg" alt="" width={130} height={172} className="pointer-events-none absolute right-0 bottom-0 h-full w-auto object-cover opacity-90" aria-hidden />
+                  <Image src="/images/destaque-guard.webp" alt="" width={130} height={172} className="pointer-events-none absolute right-0 bottom-0 h-full w-auto object-cover opacity-90" aria-hidden />
                   <div className="absolute inset-0 bg-gradient-to-r from-navy-950 via-navy-950/80 to-transparent" aria-hidden />
                   <div className="relative max-w-[70%]">
                     <p className="text-xl leading-tight font-bold">{featured.title}</p>

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import Link from "@/components/ui/app-link";
 import { ChevronRight, KeyRound, ShieldCheck } from "lucide-react";
 import { PageBody, PageHero } from "@/components/layout/page-hero";
 import { Avatar, Card } from "@/components/ui/primitives";

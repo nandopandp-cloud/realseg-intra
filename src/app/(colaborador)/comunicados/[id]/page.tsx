@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import Link from "@/components/ui/app-link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, Download, Paperclip } from "lucide-react";
 import { Breadcrumbs, CategoryLabel } from "@/components/ui/primitives";

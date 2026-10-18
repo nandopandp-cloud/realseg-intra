@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import Link from "next/link";
+import Link from "@/components/ui/app-link";
 import { ArrowRight, BookOpen, ChevronRight, Download, FileText, Headphones, Plus } from "lucide-react";
 import { MegaphoneSolid } from "@/components/ui/solid-icons";
 import { ButtonLink } from "@/components/ui/button";
@@ -31,8 +31,8 @@ export default async function HomePage() {
         className="relative -mx-4 -mt-4 overflow-hidden bg-gradient-to-br from-canvas to-surface sm:mx-0 sm:mt-0 sm:rounded-[var(--radius-card)] lg:border lg:border-line lg:shadow-[var(--shadow-card)]"
       >
         <div className="pointer-events-none absolute inset-y-0 right-0 w-[52%] lg:w-[62%]" aria-hidden>
-          <Image src="/images/mhero-home.jpg" alt="" fill priority sizes="50vw" className="object-cover object-left lg:hidden" />
-          <Image src="/images/hero-home.jpg" alt="" fill priority sizes="60vw" className="hidden object-cover object-right lg:block" />
+          <Image src="/images/mhero-home.webp" alt="" fill priority sizes="50vw" className="object-cover object-left lg:hidden" />
+          <Image src="/images/hero-home.webp" alt="" fill priority sizes="60vw" className="hidden object-cover object-right lg:block" />
           <div className="absolute inset-0 bg-gradient-to-r from-surface via-surface/40 to-transparent lg:via-transparent" />
         </div>
         <div className="relative px-6 pt-7 pb-7 sm:px-6 lg:px-10 lg:pt-9 lg:pb-6">
@@ -100,7 +100,7 @@ export default async function HomePage() {
       {data.highlight && (
         <section aria-labelledby="comunicado-importante" className="relative mt-4 overflow-hidden rounded-[var(--radius-card)] border border-line bg-gradient-to-br from-brand-50 to-surface lg:mt-5 lg:from-surface">
           <div className="pointer-events-none absolute right-0 bottom-0 h-[58%] w-[44%] sm:inset-y-0 sm:h-auto" aria-hidden>
-            <Image src={data.highlight.category.slug === "operacoes" ? "/images/banner-uniforme.jpg" : "/images/mhero-comunicados.jpg"} alt="" fill sizes="45vw" className="object-cover object-right" />
+            <Image src={data.highlight.category.slug === "operacoes" ? "/images/banner-uniforme.webp" : "/images/mhero-comunicados.webp"} alt="" fill sizes="45vw" className="object-cover object-right" />
             <div className="absolute inset-0 bg-gradient-to-r from-surface via-surface/10 to-transparent" />
           </div>
           <div className="relative p-5 sm:max-w-[62%] sm:px-8 sm:py-7 lg:pr-0 lg:pl-11">

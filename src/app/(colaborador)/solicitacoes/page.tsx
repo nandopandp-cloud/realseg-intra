@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import Link from "@/components/ui/app-link";
 import { ArrowLeft, ArrowRight, BookOpen, ChevronRight, FilePen, Headphones, Lightbulb, MessageCircle, Plus, PlusCircle } from "lucide-react";
 import { z } from "zod";
 import { Breadcrumbs } from "@/components/ui/primitives";

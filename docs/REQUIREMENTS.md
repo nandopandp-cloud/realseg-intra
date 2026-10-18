@@ -13,7 +13,7 @@ Legenda de status: ✅ implementado e testado nesta fase · 🟡 parcial · ⏳ 
 | RNF-06 | Proteções web | CSRF por Origin, CSP com nonce, rate limit, validação Zod, uploads verificados por conteúdo | ✅ |
 | RNF-07 | Auditoria | Login, downloads/visualizações de documentos sensíveis, ciência, transições de ticket | ✅ |
 | RNF-08 | Logs sem dados sensíveis | Logger com redação de campos; metadados de auditoria sem conteúdo | ✅ |
-| RNF-09 | Desempenho | Listas paginadas (máx. 50), consultas com índices, imagens otimizadas (AVIF/WebP) | ✅ |
+| RNF-09 | Desempenho | Listas paginadas (máx. 50), consultas com índices, imagens pré-otimizadas em WebP com cache de 30 dias, sem prefetch automático de rotas dinâmicas (ver `COST_OPTIMIZATION.md`) | ✅ |
 
 ## RF-AUTH — Autenticação e conta
 - Login por e-mail **ou** matrícula; mensagem genérica de erro; bloqueio após 5 falhas por 15 min (mesma resposta para contas inexistentes).

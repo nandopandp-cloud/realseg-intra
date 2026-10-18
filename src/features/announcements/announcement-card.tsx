@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from "@/components/ui/app-link";
 import { BookOpen, ChevronRight, CircleCheck, Megaphone } from "lucide-react";
 import { IconByKey, toTone, TONE } from "@/components/ui/icons";
 import { CategoryLabel } from "@/components/ui/primitives";

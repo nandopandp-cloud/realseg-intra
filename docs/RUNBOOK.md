@@ -7,15 +7,16 @@
 4. `pnpm db:migrate` (antes de subir a nova versão; migrações são aditivas — ver Reversão).
 5. `pnpm db:seed` (somente dados de referência; idempotente). **Nunca** `db:seed:demo` em produção (bloqueado).
 6. `pnpm start` (porta via `PORT`). Atrás de proxy com HTTPS e HSTS.
-7. Agendar `pnpm jobs:run` a cada 5 minutos (cron/k8s CronJob).
+7. Manutenção diária: na Vercel já agendada por `vercel.json` (`/api/cron/daily`, requer `CRON_SECRET`). Em outra hospedagem, agende `pnpm jobs:run` 1x por dia. Não aumente a frequência sem ler `docs/COST_OPTIMIZATION.md` §7.
 8. Verificar: `/login` responde 200 com header `Content-Security-Policy`; login com usuário de teste; logs `http.request` chegando.
 
 ## Deploy na Vercel + Neon (homologação atual)
 - Projeto Vercel `realseg-intra` (conta `realsegintra-9920`), publicado a partir do branch `main` do GitHub. URL: https://realseg-intra-seven.vercel.app
 - A integração Neon cria `DATABASE_URL` (pooler) e `DATABASE_URL_UNPOOLED` (direta) como variáveis **Sensitive** — não são legíveis pela CLI, por isso migrações rodam **no build**.
-- O script `vercel-build` (usado automaticamente pela Vercel) executa: `scripts/migrate.ts` (conexão direta) → `seed deploy` (referência sempre; demonstração somente se `SEED_DEMO=true`, `APP_ENV` ≠ `production` e a base ainda não tiver colaboradores) → `next build`. É idempotente.
-- Variáveis configuradas (Production e Preview): `IP_HASH_SECRET` e `DEMO_PASSWORD` (Sensitive), `APP_ENV=staging`, `MAIL_DRIVER=outbox`, `SEED_DEMO=true`, `TRUST_PROXY=true`; `APP_URL` somente em Production.
-- **Atenção — Preview usa o mesmo banco**: um build de branch aplica suas migrações no banco compartilhado. Antes de criar migrações em branches, habilite na integração Neon a criação de um branch de banco por Preview.
+- O script `vercel-build` (`scripts/vercel-build.mjs`, usado automaticamente pela Vercel) executa em **Production**: `scripts/migrate.ts` (conexão direta) → `seed deploy` (referência sempre; demonstração somente se `SEED_DEMO=true`, `APP_ENV` ≠ `production` e a base ainda não tiver colaboradores) → `next build`. Em **Preview** só compila (sem tocar no banco), salvo `PREVIEW_DB_TASKS=true`. É idempotente.
+- Commits só de documentação/testes não geram deploy (`ignoreCommand` em `vercel.json`).
+- Variáveis configuradas (Production e Preview): `IP_HASH_SECRET` e `DEMO_PASSWORD` (Sensitive), `APP_ENV=staging`, `MAIL_DRIVER=outbox`, `SEED_DEMO=true`, `TRUST_PROXY=true`; somente em Production: `APP_URL` e `CRON_SECRET` (Sensitive).
+- **Preview usa o mesmo banco**: por isso o build de Preview não aplica migrações. Para testar migrações em branches, habilite na integração Neon o branch de banco por Preview e defina `PREVIEW_DB_TASKS=true` no ambiente Preview.
 - **Região**: Neon em São Paulo (`aws-sa-east-1`) e funções da Vercel em São Paulo (`gru1`), definido em `vercel.json` (plano Hobby permite uma região). Mantenha os dois na mesma região para evitar latência em cada consulta.
 - **Arquivos**: até o driver R2 existir, uploads ficam em `/tmp` da função (efêmero) e downloads de documentos de demonstração respondem "Arquivo indisponível".
 - Ao migrar para produção real: `APP_ENV=production`, SMTP configurado, `SEED_DEMO` removido e base recriada sem dados de demonstração.

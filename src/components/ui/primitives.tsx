@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from "@/components/ui/app-link";
 import type { ReactNode } from "react";
 import { ArrowRight, ChevronRight, CircleAlert, CircleCheck, Info, TriangleAlert, type LucideIcon } from "lucide-react";
 import { cn } from "@/lib/cn";

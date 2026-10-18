@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import Link from "@/components/ui/app-link";
 import { Award, CircleCheck, Circle, GraduationCap } from "lucide-react";
 import { iconFor, toTone, TONE } from "@/components/ui/icons";
 import { Badge, Card, EmptyState, ProgressBar } from "@/components/ui/primitives";

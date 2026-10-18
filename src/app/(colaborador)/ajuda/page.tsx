@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import Link from "@/components/ui/app-link";
 import { ArrowRight, BookOpen, ChevronRight, Clock, FileText, Headphones, Lightbulb, MessageSquareMore, SearchX } from "lucide-react";
 import { z } from "zod";
 import { PageBody, PageHero } from "@/components/layout/page-hero";
@@ -42,8 +42,8 @@ export default async function HelpPage({ searchParams }: PageProps<"/ajuda">) {
         title="Como podemos te ajudar?"
         subtitle="Encontre respostas, tutoriais e fale com o nosso time de suporte."
         breadcrumb={[{ label: "Início", href: "/" }, { label: "Ajuda e suporte" }]}
-        image="/images/hero-ajuda.jpg"
-        mobileImage="/images/mhero-ajuda.jpg"
+        image="/images/hero-ajuda.webp"
+        mobileImage="/images/mhero-ajuda.webp"
       >
         <SearchField label="Buscar na central de ajuda" placeholder="Buscar por dúvidas, tutoriais ou palavras-chave..." defaultValue={q} size="lg" className="max-w-[41rem]" />
       </PageHero>

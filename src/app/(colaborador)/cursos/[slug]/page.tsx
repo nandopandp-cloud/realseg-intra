@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import Link from "next/link";
+import Link from "@/components/ui/app-link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, Award, CircleCheck, Circle, Clock, FileText, Play } from "lucide-react";
 import { ButtonLink } from "@/components/ui/button";

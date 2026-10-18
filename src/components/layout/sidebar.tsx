@@ -2,7 +2,7 @@
 
 import { BrandLogo } from "@/components/ui/brand-logo";
 import Image from "next/image";
-import Link from "next/link";
+import Link from "@/components/ui/app-link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { PanelLeftClose, PanelLeftOpen } from "lucide-react";
@@ -78,7 +78,7 @@ export function Sidebar({ initialCollapsed }: { initialCollapsed: boolean }) {
 
       {!collapsed && (
         <div className="px-6 pb-4">
-          <Image src="/images/sidebar-promo.jpg" alt="Segurança que enxerga além." width={230} height={254} className="h-auto w-full rounded-2xl" />
+          <Image src="/images/sidebar-promo.webp" alt="Segurança que enxerga além." width={230} height={254} className="h-auto w-full rounded-2xl" />
         </div>
       )}
       <div className={cn("pb-5", collapsed ? "flex justify-center" : "px-6")}>

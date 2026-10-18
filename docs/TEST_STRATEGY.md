@@ -12,7 +12,7 @@ Dados: `scripts/seed/reference.ts` (configuração) + `scripts/seed/demo.ts` (de
 ## Critérios de release
 Nenhuma entrega é considerada validada sem: lint ✔, typecheck ✔, unitários ✔, integração ✔, build ✔, E2E (desktop + mobile + acessibilidade) ✔. O CI (`.github/workflows/ci.yml`) executa tudo e bloqueia o merge em caso de falha. Cobertura percentual não é medida (não reportamos métricas inventadas).
 
-## Matriz E2E (execução de 2026-10-17: 90/90 aprovados)
+## Matriz E2E (última execução: 2026-10-18, v0.4.0 — 90/90 aprovados; integração 70/70; unitários 41/41)
 | ID | Arquivo | Cenários | Usuário/papel | Resultado esperado verificado |
 | --- | --- | --- | --- | --- |
 | A | `auth.spec.ts` | redirecionamento com `next`; validação de campos; credencial inválida; bloqueio após 5 falhas; usuário inativo; logout com revogação no servidor; sessão expirada por inatividade; recuperação com link de uso único; CSRF | Carlos, João, Ana, contas de borda | URL de destino, mensagens, 401 da API após logout, registro em `mail_outbox`, link reutilizado recusado |

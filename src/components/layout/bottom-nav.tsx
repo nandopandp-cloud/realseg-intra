@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import Link from "@/components/ui/app-link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { Bell, ChartColumn, CircleHelp, GraduationCap, Menu, UserRound, UsersRound, type LucideIcon } from "lucide-react";

@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from "@/components/ui/app-link";
 import { Building2, ChevronRight, MapPin, ShieldCheck, Truck } from "lucide-react";
 import { Badge } from "@/components/ui/primitives";
 

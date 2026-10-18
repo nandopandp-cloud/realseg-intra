@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from "@/components/ui/app-link";
 import { LayoutGrid } from "lucide-react";
 import { iconFor } from "@/components/ui/icons";
 import { cn } from "@/lib/cn";

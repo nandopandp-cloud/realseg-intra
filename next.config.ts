@@ -6,7 +6,9 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
   serverExternalPackages: ["pg", "embedded-postgres", "nodemailer"],
   images: {
-    formats: ["image/avif", "image/webp"],
+    // Imagens já otimizadas (WebP) e servidas pela CDN como arquivos estáticos — sem transformações
+    // da Vercel Image Optimization (limite de 5 mil/mês no Hobby). docs/COST_OPTIMIZATION.md §2.
+    unoptimized: true,
   },
   turbopack: {
     rules: {
@@ -27,7 +29,14 @@ const nextConfig: NextConfig = {
     if (process.env.NODE_ENV === "production") {
       securityHeaders.push({ key: "Strict-Transport-Security", value: "max-age=63072000; includeSubDomains" });
     }
-    return [{ source: "/:path*", headers: securityHeaders }];
+    // Arquivos públicos versionados por nome: cache longo no navegador e na CDN (menos Edge Requests).
+    // Ao alterar uma imagem/logo, publique com NOVO nome de arquivo. docs/COST_OPTIMIZATION.md §3.
+    const longCache = [{ key: "Cache-Control", value: "public, max-age=2592000, stale-while-revalidate=86400" }];
+    return [
+      { source: "/:path*", headers: securityHeaders },
+      { source: "/images/:file*", headers: longCache },
+      { source: "/logo/:file*", headers: longCache },
+    ];
   },
 };
 

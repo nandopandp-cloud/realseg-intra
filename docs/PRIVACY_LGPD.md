@@ -33,7 +33,7 @@ Ver `SECURITY.md` (RBAC + escopo no servidor + 404 para recursos alheios). Feedb
 | Advertências/feedbacks | Duração do vínculo + 5 anos | |
 | Tickets e mensagens | 5 anos | |
 | Auditoria | 5 anos | |
-| Sessões/tokens/rate limits | 30 dias / 7 dias / 1 dia | já automatizado em `pnpm jobs:run` |
+| Sessões/tokens/rate limits | 30 dias / 7 dias / 1 dia | automatizado no cron diário (`/api/cron/daily`) |
 | Outbox de e-mail | Somente dev/teste | |
 
 Pendência: job de expurgo por categoria após a definição dos prazos.

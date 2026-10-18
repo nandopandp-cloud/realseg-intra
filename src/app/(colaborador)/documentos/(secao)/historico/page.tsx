@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import Link from "@/components/ui/app-link";
 import { CircleCheck, Clock, Download, Eye, FileDown, Send, RefreshCw } from "lucide-react";
 import { Card, EmptyState } from "@/components/ui/primitives";
 import { fmtDateTime } from "@/lib/format";

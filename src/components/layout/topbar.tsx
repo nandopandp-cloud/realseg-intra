@@ -1,9 +1,9 @@
 import { BrandLogo } from "@/components/ui/brand-logo";
-import Link from "next/link";
+import Link from "@/components/ui/app-link";
 import { Search } from "lucide-react";
-import { NotificationBell, UserMenu, type BellItem } from "./menus";
+import { NotificationBell, UserMenu } from "./menus";
 
-export function Topbar({ name, roleLabel, unread, notifications }: { name: string; roleLabel: string; unread: number; notifications: BellItem[] }) {
+export function Topbar({ name, roleLabel, unread }: { name: string; roleLabel: string; unread: number }) {
   return (
     <header className="sticky top-0 z-30 border-b border-line bg-surface/95 backdrop-blur">
       <div className="flex h-[4.5rem] items-center gap-3 px-4 sm:px-6 lg:h-[5.25rem] lg:px-10">
@@ -30,7 +30,7 @@ export function Topbar({ name, roleLabel, unread, notifications }: { name: strin
           <Link href="/busca" className="inline-flex size-11 items-center justify-center rounded-full text-ink hover:bg-canvas lg:hidden" aria-label="Pesquisar na intranet">
             <Search className="size-6" strokeWidth={1.75} aria-hidden />
           </Link>
-          <NotificationBell unread={unread} items={notifications} />
+          <NotificationBell unread={unread} />
           <span className="hidden h-8 w-px bg-line sm:block" aria-hidden />
           <UserMenu name={name} roleLabel={roleLabel} />
         </div>

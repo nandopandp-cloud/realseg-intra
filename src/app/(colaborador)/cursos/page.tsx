@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import Link from "next/link";
+import Link from "@/components/ui/app-link";
 import { ArrowRight, Award, ChartColumn, ChevronRight, GraduationCap, Play } from "lucide-react";
 import { z } from "zod";
 import { PageBody, PageHero } from "@/components/layout/page-hero";
@@ -51,8 +51,8 @@ export default async function CoursesPage({ searchParams }: PageProps<"/cursos">
         title="Cursos"
         subtitle="Acesse conteúdos e desenvolva suas habilidades."
         breadcrumb={[{ label: "Início", href: "/" }, { label: "Cursos" }]}
-        image="/images/hero-cursos.jpg"
-        mobileImage="/images/mhero-cursos.jpg"
+        image="/images/hero-cursos.webp"
+        mobileImage="/images/mhero-cursos.webp"
       >
         <SearchField label="Buscar cursos" placeholder="Buscar cursos, temas ou áreas..." defaultValue={sp.q} hidden={{ categoria: sp.categoria, filtro: sp.filtro }} size="lg" className="max-w-[41rem]" />
       </PageHero>

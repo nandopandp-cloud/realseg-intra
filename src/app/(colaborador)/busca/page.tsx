@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import Link from "@/components/ui/app-link";
 import { ChevronRight, Search, SearchX } from "lucide-react";
 import { z } from "zod";
 import { PageBody, PageHero } from "@/components/layout/page-hero";

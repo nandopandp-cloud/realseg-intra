@@ -44,7 +44,7 @@ scrypt (N=2^15, r=8, p=1, sal de 16 bytes), comparação em tempo constante, NFK
 `auth.login_succeeded/failed`, `auth.logout`, `auth.password_reset_requested/completed`, `auth.password_changed`, `auth.session_revoked`, `document.viewed/downloaded/acknowledged`, `submission.created/cancelled/file_downloaded`, `announcement.acknowledged/attachment_downloaded`, `ticket.created/status_changed/message_added/attachment_downloaded`, `course.completed`, `certificate.issued`, `opportunity.applied/withdrawn`, `feedback.viewed/acknowledged`, `profile.preferences_updated`. Metadados contêm apenas identificadores e categorias.
 
 ## Segredos
-Somente em variáveis de ambiente (`.env.local` fora do git; `.env.example` sem segredos). Em produção use o gerenciador de segredos da plataforma. Rotacionar `IP_HASH_SECRET` invalida apenas a correlação de IPs anteriores.
+`IP_HASH_SECRET`, `DEMO_PASSWORD`, `CRON_SECRET` e credenciais do banco ficam como variáveis **Sensitive** na Vercel. Somente em variáveis de ambiente (`.env.local` fora do git; `.env.example` sem segredos). Em produção use o gerenciador de segredos da plataforma. Rotacionar `IP_HASH_SECRET` invalida apenas a correlação de IPs anteriores.
 
 ## Resposta a incidentes (resumo — detalhes no RUNBOOK)
 1. Conter: revogar sessões do usuário afetado (`update sessions set revoked_at = now() where user_id = …`) ou desativar a conta.

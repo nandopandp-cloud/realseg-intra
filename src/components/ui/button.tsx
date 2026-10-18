@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from "@/components/ui/app-link";
 import { forwardRef, type ButtonHTMLAttributes, type ComponentProps, type ReactNode } from "react";
 import { LoaderCircle } from "lucide-react";
 import { cn } from "@/lib/cn";

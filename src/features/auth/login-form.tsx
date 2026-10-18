@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import Link from "@/components/ui/app-link";
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 import { Eye, EyeOff, LogIn } from "lucide-react";

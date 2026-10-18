@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import Link from "@/components/ui/app-link";
 import { ChevronRight, CloudUpload, ShieldCheck } from "lucide-react";
 import { Card, EmptyState } from "@/components/ui/primitives";
 import { SubmissionForm } from "@/features/documents/submission-form";

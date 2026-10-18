@@ -1,12 +1,13 @@
 # Status das funcionalidades
 
-Atualizado em 2026-10-18 (v0.2.0). Execução real registrada: **unitários 41/41**, **integração 67/67** (PostgreSQL 18 real), **E2E 90/90** (Chromium desktop 1440×900 + Pixel 7, com axe WCAG 2.2 A/AA), lint ✔, typecheck ✔, build de produção ✔. Nenhum teste foi pulado. Cobertura percentual não é medida.
+Atualizado em 2026-10-18 (v0.4.0). Execução real registrada: **unitários 41/41**, **integração 70/70** (PostgreSQL 18 real), **E2E 90/90** (Chromium desktop 1440×900 + Pixel 7, com axe WCAG 2.2 A/AA), lint ✔, typecheck ✔, build de produção ✔. Nenhum teste foi pulado. Cobertura percentual não é medida.
 
 Legenda: ✅ concluído (critérios de aceite + testes) · 🟡 parcial · ⏳ não iniciado/fase seguinte.
 
 | Módulo | Status | Testes que cobrem | Limitações / pendências reais |
 | --- | --- | --- | --- |
 | Fundação (env, banco, migrações, logger, erros, CI) | ✅ | integração (todas), CI | Métricas/APM (OpenTelemetry) pendentes |
+| Otimização de custos (Vercel/Neon) | ✅ | `cron.test.ts`, E2E completo, `scripts/dev/measure.mjs` | Ações manuais no painel do Neon (limitar autoscaling) — ver `COST_OPTIMIZATION.md` |
 | Deploy Vercel + Neon (homologação) | 🟡 | simulação local do `vercel-build` (migração + seed 2×, idempotente) | Migração no Neon só ocorre no próximo deploy; uploads efêmeros até o driver R2; Preview compartilha o banco; região alinhada em São Paulo (`vercel.json` → `gru1`, Neon `aws-sa-east-1`) |
 | Autenticação e sessão | ✅ | `auth.test.ts` (16), E2E A (9) | E-mail real depende do provedor SMTP corporativo (driver pronto). Sem MFA (avaliar para RH/ADMIN) |
 | RBAC e autorização | ✅ (papéis e matriz) | `api-matrix.test.ts`, testes IDOR por módulo | UI de gestão de papéis — fase RH |

@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from "@/components/ui/app-link";
 import { ChevronRight } from "lucide-react";
 import { iconFor, toTone, TONE } from "@/components/ui/icons";
 import { cn } from "@/lib/cn";

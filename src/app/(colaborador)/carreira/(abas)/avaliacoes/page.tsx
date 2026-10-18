@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import Link from "@/components/ui/app-link";
 import { ChevronRight, MessageSquareText, Star } from "lucide-react";
 import { Badge, EmptyState } from "@/components/ui/primitives";
 import { fmtDateLong } from "@/lib/format";

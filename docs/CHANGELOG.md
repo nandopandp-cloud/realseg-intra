@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.4.0] — 2026-10-18 — Otimização de custos (Vercel + Neon)
+Detalhes, motivos e medições em `docs/COST_OPTIMIZATION.md`.
+### Alterado
+- Prefetch automático desligado em todos os links (`app-link.tsx`): 0 prefetches no servidor (antes 3 por sessão típica).
+- Imagens em WebP (318 KB → 144 KB) servidas sem Image Optimization; migration de dados `0002_course_covers_webp`.
+- Cache de 30 dias para `/images` e `/logo`.
+- Lista do sininho carregada sob demanda; `last_seen_at` gravado no máximo a cada 5 min.
+- Pool do banco menor, conexões ociosas fecham em 5 s e `attachDatabasePool` (Fluid Compute).
+- Build de Preview não toca no banco; commits só de documentação/testes não geram deploy.
+### Adicionado
+- Cron diário da Vercel (`/api/cron/daily`, `CRON_SECRET`) com a manutenção (SLA, fechamento automático, limpeza).
+- `docs/COST_OPTIMIZATION.md` e utilitário `scripts/dev/measure.mjs`; README reescrito.
+
 ## [0.3.0] — 2026-10-18 — Logo oficial
 ### Alterado
 - Logo oficial (símbolo SVG vetorial + wordmark "REALSEG") em sidebar, cabeçalho mobile, login e certificado, substituindo os recortes das referências; removida a tagline "SECURITY INTELLIGENCE", que não faz parte da marca.

@@ -9,7 +9,7 @@ export default function DocumentsSectionLayout({ children }: { children: React.R
         title="Meus documentos"
         subtitle="Consulte, baixe e envie documentos de forma segura e organizada."
         breadcrumb={[{ label: "Início", href: "/" }, { label: "Documentos" }]}
-        image="/images/hero-documentos.jpg"
+        image="/images/hero-documentos.webp"
       />
       <PageBody>
         <DocumentsNav />

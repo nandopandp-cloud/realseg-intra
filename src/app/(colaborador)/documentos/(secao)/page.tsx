@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import Link from "@/components/ui/app-link";
 import { ArrowRight, ChevronRight, CloudUpload, Download, FileText, Info } from "lucide-react";
 import { z } from "zod";
 import { ButtonLink } from "@/components/ui/button";

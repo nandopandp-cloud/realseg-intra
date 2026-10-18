@@ -16,7 +16,7 @@ export default function AuthLayout({ children }: LayoutProps<"/">) {
             <span className="mt-6 block h-1 w-12 rounded-full bg-brand-400" aria-hidden />
           </div>
           <div className="pointer-events-none absolute inset-y-0 right-0 w-[62%]" aria-hidden>
-            <Image src="/images/mhero-ajuda.jpg" alt="" fill sizes="400px" className="object-cover object-center opacity-70" />
+            <Image src="/images/mhero-ajuda.webp" alt="" fill sizes="400px" className="object-cover object-center opacity-70" />
             <div className="absolute inset-0 bg-gradient-to-r from-navy-950 via-navy-950/40 to-transparent" />
           </div>
           <p className="relative z-10 text-sm text-on-dark-muted">Ambiente restrito a colaboradores REALSEG.</p>

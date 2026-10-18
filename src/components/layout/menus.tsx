@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import Link from "@/components/ui/app-link";
 import { useRouter } from "next/navigation";
 import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 import { Bell, ChevronDown, KeyRound, LogOut, UserRound } from "lucide-react";
@@ -45,10 +45,27 @@ function Panel({ id, open, children, className }: { id: string; open: boolean; c
 
 export type BellItem = { id: string; title: string; body: string | null; link: string | null; createdAt: string; readAt: string | null };
 
-export function NotificationBell({ unread, items }: { unread: number; items: BellItem[] }) {
+export function NotificationBell({ unread }: { unread: number }) {
   const { open, setOpen, ref, buttonRef } = usePopover();
   const id = useId();
   const router = useRouter();
+  // Lista carregada sob demanda (ao abrir), não em toda navegação — docs/COST_OPTIMIZATION.md §4.
+  const [items, setItems] = useState<BellItem[] | null>(null);
+  const [failed, setFailed] = useState(false);
+
+  async function toggle() {
+    const next = !open;
+    setOpen(next);
+    if (next) {
+      setFailed(false);
+      try {
+        const r = await api<{ items: BellItem[] }>("/notifications?pageSize=6");
+        setItems(r.items);
+      } catch {
+        setFailed(true);
+      }
+    }
+  }
 
   async function openItem(item: BellItem) {
     setOpen(false);
@@ -64,7 +81,7 @@ export function NotificationBell({ unread, items }: { unread: number; items: Bel
         type="button"
         aria-expanded={open}
         aria-controls={id}
-        onClick={() => setOpen(!open)}
+        onClick={toggle}
         className="relative inline-flex size-11 items-center justify-center rounded-full text-ink hover:bg-canvas"
         aria-label={unread > 0 ? `Notificações: ${unread} não lidas` : "Notificações"}
       >
@@ -76,11 +93,19 @@ export function NotificationBell({ unread, items }: { unread: number; items: Bel
           <p className="font-bold text-ink">Notificações</p>
           {unread > 0 && <span className="text-sm text-muted">{unread} não lidas</span>}
         </div>
-        {items.length === 0 ? (
+        {items === null && !failed ? (
+          <p className="px-4 py-6 text-center text-[0.9375rem] text-muted" role="status">
+            Carregando…
+          </p>
+        ) : failed ? (
+          <p className="px-4 py-6 text-center text-[0.9375rem] text-muted" role="alert">
+            Não foi possível carregar. Tente novamente.
+          </p>
+        ) : items!.length === 0 ? (
           <p className="px-4 py-6 text-center text-[0.9375rem] text-muted">Você não tem notificações.</p>
         ) : (
           <ul className="max-h-96 overflow-y-auto py-1">
-            {items.map((n) => (
+            {items!.map((n) => (
               <li key={n.id}>
                 <button type="button" onClick={() => openItem(n)} className="flex w-full gap-3 px-4 py-3 text-left hover:bg-canvas">
                   <span className={cn("mt-2 size-2 shrink-0 rounded-full", n.readAt ? "bg-transparent" : "bg-brand-500")} aria-hidden />

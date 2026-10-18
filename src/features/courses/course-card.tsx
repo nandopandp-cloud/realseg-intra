@@ -1,5 +1,5 @@
 import Image from "next/image";
-import Link from "next/link";
+import Link from "@/components/ui/app-link";
 import { ChevronRight, FileText } from "lucide-react";
 import { toTone, TONE } from "@/components/ui/icons";
 import { Badge, ProgressBar } from "@/components/ui/primitives";

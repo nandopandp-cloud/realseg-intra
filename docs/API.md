@@ -107,6 +107,11 @@ Objeto `sla` (exemplo):
 | POST | `/help/articles/:slug/feedback` | `{ helpful: boolean }` (um voto por pessoa, atualizável) |
 | GET | `/search?q` (≥ 2 caracteres) | Busca global respeitando o escopo de cada módulo |
 
+## Cron (interno)
+| Método | Rota | Descrição |
+| --- | --- | --- |
+| GET | `/api/cron/daily` | Manutenção diária (SLA, fechamento automático, limpeza). Chamado pelo Vercel Cron com `Authorization: Bearer <CRON_SECRET>`; sem segredo configurado responde 404, segredo inválido 401. Fora de `/api/v1`. |
+
 ## Exemplo
 ```bash
 curl -i -X POST http://localhost:3000/api/v1/auth/login \
