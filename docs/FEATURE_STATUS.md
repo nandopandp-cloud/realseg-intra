@@ -7,7 +7,7 @@ Legenda: ✅ concluído (critérios de aceite + testes) · 🟡 parcial · ⏳ n
 | Módulo | Status | Testes que cobrem | Limitações / pendências reais |
 | --- | --- | --- | --- |
 | Fundação (env, banco, migrações, logger, erros, CI) | ✅ | integração (todas), CI | Métricas/APM (OpenTelemetry) pendentes |
-| Deploy Vercel + Neon (homologação) | 🟡 | simulação local do `vercel-build` (migração + seed 2×, idempotente) | Migração no Neon só ocorre no próximo deploy; uploads efêmeros até o driver R2; Preview compartilha o banco; região das funções (`iad1`) a alinhar com a do Neon |
+| Deploy Vercel + Neon (homologação) | 🟡 | simulação local do `vercel-build` (migração + seed 2×, idempotente) | Migração no Neon só ocorre no próximo deploy; uploads efêmeros até o driver R2; Preview compartilha o banco; região alinhada em São Paulo (`vercel.json` → `gru1`, Neon `aws-sa-east-1`) |
 | Autenticação e sessão | ✅ | `auth.test.ts` (16), E2E A (9) | E-mail real depende do provedor SMTP corporativo (driver pronto). Sem MFA (avaliar para RH/ADMIN) |
 | RBAC e autorização | ✅ (papéis e matriz) | `api-matrix.test.ts`, testes IDOR por módulo | UI de gestão de papéis — fase RH |
 | Design system e shell | ✅ | E2E a11y (desktop + mobile), crawler de desenvolvimento | Logo vetorial oficial e fotos licenciadas em alta resolução pendentes (ADR-0010). Sem tema escuro |
