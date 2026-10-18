@@ -50,7 +50,8 @@ export function proxy(request: NextRequest) {
 export const config = {
   matcher: [
     {
-      source: "/((?!api|_next/static|_next/image|favicon.ico|icon.png|apple-icon.png|images|brand|robots.txt).*)",
+      // Ignora API, assets do Next e arquivos estáticos públicos (logo, imagens, ícones) — acessíveis sem login.
+      source: "/((?!api|_next/static|_next/image|.*\\.(?:svg|png|jpg|jpeg|webp|avif|ico|txt|webmanifest)$).*)",
       missing: [
         { type: "header", key: "next-router-prefetch" },
         { type: "header", key: "purpose", value: "prefetch" },

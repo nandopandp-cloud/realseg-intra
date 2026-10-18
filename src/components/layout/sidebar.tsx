@@ -1,5 +1,6 @@
 "use client";
 
+import { BrandLogo } from "@/components/ui/brand-logo";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -50,9 +51,9 @@ export function Sidebar({ initialCollapsed }: { initialCollapsed: boolean }) {
       <div className={cn("flex items-center pt-6 pb-8", collapsed ? "justify-center px-2" : "px-8")}>
         <Link href="/" aria-label="REALSEG — página inicial" className="rounded-lg">
           {collapsed ? (
-            <Image src="/brand/logo-icon.png" unoptimized alt="" width={44} height={40} className="h-10 w-auto rounded-md" />
+            <BrandLogo variant="dark" size="sm" symbolOnly />
           ) : (
-            <Image src="/brand/logo-dark.png" unoptimized alt="REALSEG Security Intelligence" width={212} height={74} priority className="h-auto w-[200px]" />
+            <BrandLogo variant="dark" size="md" />
           )}
         </Link>
       </div>

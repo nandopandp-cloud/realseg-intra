@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Image from "next/image";
+import { BrandLogo } from "@/components/ui/brand-logo";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
@@ -25,7 +25,9 @@ export default async function CertificatePage({ params }: PageProps<"/cursos/cer
         <PrintButton />
       </div>
       <section aria-label="Certificado" className="mx-auto mt-5 max-w-4xl rounded-[var(--radius-card)] border-4 border-double border-brand-200 bg-surface p-6 text-center sm:p-14 print:mt-0 print:border-brand-600">
-        <Image src="/brand/logo-light.png" unoptimized alt="REALSEG Security Intelligence" width={398} height={80} className="mx-auto h-auto w-56" />
+        <div className="flex justify-center">
+          <BrandLogo variant="light" size="lg" />
+        </div>
         <p className="eyebrow mt-8">Certificado de conclusão</p>
         <p className="mt-6 text-lg text-muted">Certificamos que</p>
         <h1 className="mt-2 text-3xl font-bold text-ink sm:text-4xl">{c.holderName}</h1>

@@ -10,7 +10,6 @@ export const metadata: Metadata = {
   title: { default: "Intranet REALSEG", template: "%s | Intranet REALSEG" },
   description: "Intranet corporativa REALSEG — Security Intelligence.",
   robots: { index: false, follow: false },
-  icons: { apple: "/brand/apple-touch-icon.png" },
 };
 
 export const viewport: Viewport = {

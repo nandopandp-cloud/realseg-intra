@@ -3,7 +3,7 @@
 Derivado das referências em `referencias/` (16 telas desktop e mobile). Tokens centralizados em `src/app/globals.css` (`@theme` do Tailwind 4 → CSS variables).
 
 ## Marca
-- Logo oficial recortada sem alterações das referências, com fundo convertido em transparência (`public/brand/logo-light.png`, `logo-dark.png`, `logo-icon.png`) — servidas sem otimização para preservar o alfa. **Pendência**: arquivo vetorial oficial.
+- Logo oficial = **símbolo + wordmark "REALSEG"** (sem tagline), via componente `BrandLogo` (`src/components/ui/brand-logo.tsx`). Símbolo: SVG oficial `public/logo/symbol.svg` recolorido nas cores oficiais — `symbol-on-dark.svg` (#1CC4A8, sobre fundos escuros) e `symbol-on-light.svg` (#009488, sobre fundos claros). Wordmark: PNGs oficiais `wordmark-white.png` / `wordmark-midnight.png` (2x). Ícones do app gerados do mesmo SVG (`src/app/icon.svg`, `src/app/apple-icon.png`). Pendência opcional: wordmark em SVG.
 - Fotografias decorativas (heroes, capas) em `public/images` — provisórias (ADR-0010). Sempre `alt=""`/`aria-hidden` quando decorativas.
 
 ## Cores (com contraste medido sobre branco salvo indicação)

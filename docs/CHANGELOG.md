@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.3.0] — 2026-10-18 — Logo oficial
+### Alterado
+- Logo oficial (símbolo SVG vetorial + wordmark "REALSEG") em sidebar, cabeçalho mobile, login e certificado, substituindo os recortes das referências; removida a tagline "SECURITY INTELLIGENCE", que não faz parte da marca.
+- Favicon (`icon.svg`) e ícone do iPhone (`apple-icon.png`) gerados a partir do SVG oficial.
+- `proxy.ts` deixa arquivos estáticos (logo, imagens, ícones) acessíveis sem login.
+
 ## [0.2.0] — 2026-10-18 — Home fiel à referência e deploy Vercel + Neon
 ### Alterado
 - Home redesenhada conforme `referencias/Dashboard Corporativo…` (desktop) e `Painel Corporativo…` (mobile): ícones sólidos nos atalhos, proporções do hero e do banner, documentos recentes incluindo manuais atualizados; pendências passaram a ser selos com texto nos atalhos (o bloco "Para você resolver" e a faixa de ajuda foram removidos, pois não existem na referência).

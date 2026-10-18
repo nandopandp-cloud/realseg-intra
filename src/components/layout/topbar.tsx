@@ -1,4 +1,4 @@
-import Image from "next/image";
+import { BrandLogo } from "@/components/ui/brand-logo";
 import Link from "next/link";
 import { Search } from "lucide-react";
 import { NotificationBell, UserMenu, type BellItem } from "./menus";
@@ -8,7 +8,7 @@ export function Topbar({ name, roleLabel, unread, notifications }: { name: strin
     <header className="sticky top-0 z-30 border-b border-line bg-surface/95 backdrop-blur">
       <div className="flex h-[4.5rem] items-center gap-3 px-4 sm:px-6 lg:h-[5.25rem] lg:px-10">
         <Link href="/" className="shrink-0 rounded-lg lg:hidden" aria-label="REALSEG — página inicial">
-          <Image src="/brand/logo-light.png" unoptimized alt="REALSEG Security Intelligence" width={398} height={80} priority className="h-auto w-[150px] min-[400px]:w-[170px] sm:w-[210px]" />
+          <BrandLogo variant="light" size="sm" />
         </Link>
         <form action="/busca" method="get" role="search" className="hidden max-w-[43rem] flex-1 lg:block">
           <label htmlFor="busca-global" className="sr-only">
