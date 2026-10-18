@@ -18,7 +18,7 @@
 - Variáveis configuradas (Production e Preview): `IP_HASH_SECRET` e `DEMO_PASSWORD` (Sensitive), `APP_ENV=staging`, `MAIL_DRIVER=outbox`, `SEED_DEMO=true`, `TRUST_PROXY=true`; somente em Production: `APP_URL` e `CRON_SECRET` (Sensitive).
 - **Preview usa o mesmo banco**: por isso o build de Preview não aplica migrações. Para testar migrações em branches, habilite na integração Neon o branch de banco por Preview e defina `PREVIEW_DB_TASKS=true` no ambiente Preview.
 - **Região**: Neon em São Paulo (`aws-sa-east-1`) e funções da Vercel em São Paulo (`gru1`), definido em `vercel.json` (plano Hobby permite uma região). Mantenha os dois na mesma região para evitar latência em cada consulta.
-- **Arquivos**: até o driver R2 existir, uploads ficam em `/tmp` da função (efêmero) e downloads de documentos de demonstração respondem "Arquivo indisponível".
+- **Arquivos**: Cloudflare R2 (bucket privado `realseg-intranet`), configurado por `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY` e `R2_BUCKET_NAME` no ambiente Production da Vercel. O token R2 precisa de "Object Read & Write" no bucket. Com dados de demonstração, o seed de deploy restaura no R2 os arquivos de demo ausentes (`scripts/seed/repair-files.ts`).
 - Ao migrar para produção real: `APP_ENV=production`, SMTP configurado, `SEED_DEMO` removido e base recriada sem dados de demonstração.
 
 ## Migrações

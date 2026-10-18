@@ -37,6 +37,7 @@ export default defineConfig({
             NODE_ENV: "test",
             TZ: "UTC",
             APP_ENV: "test",
+            STORAGE_DRIVER: "local",
             APP_URL: "http://localhost:3000",
             DATABASE_URL: `postgres://realseg:realseg@localhost:${TEST_DB_PORT}/realseg_test`,
             IP_HASH_SECRET: "integration-tests-secret-value",

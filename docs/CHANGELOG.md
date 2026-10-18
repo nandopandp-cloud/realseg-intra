@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.7.0] — 2026-10-18 — Arquivos no Cloudflare R2
+### Adicionado
+- Driver de armazenamento Cloudflare R2 (`STORAGE_DRIVER=r2`, automático com as credenciais `R2_*`). Uploads e downloads de documentos, anexos de comunicados e de solicitações passam a ficar no bucket privado, com o mesmo controle de acesso.
+- Reparo dos arquivos de demonstração que estavam no `/tmp` efêmero da Vercel, executado pelo seed de deploy.
+### Corrigido
+- O seed carregava o `.env.local` depois das importações; agora o carrega primeiro (`scripts/seed/load-env.ts`).
+
 ## [0.6.0] — 2026-10-18 — Página de leitura do comunicado
 ### Adicionado
 - Página do comunicado conforme `referencias/Colado 2026-10-18 às 12.08.10.png`: capa, selos, autor com data e hora, Favoritar e Compartilhar (menu nativo do celular ou cópia do link), "Quando começa a valer?", "O que muda", texto, confirmação de ciência, "Dúvidas?" com atalho para abrir solicitação, anexos com "Baixar todos", público-alvo, tags e relacionados.

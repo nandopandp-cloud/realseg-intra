@@ -5,9 +5,7 @@
  *   pnpm db:reset:demo    → apaga o schema, migra e popula referência + demonstração (somente dev)
  *   (build na Vercel)     → modo "deploy": referência sempre; demonstração só se SEED_DEMO=true e APP_ENV ≠ production
  */
-import { config } from "dotenv";
-config({ path: ".env.local", quiet: true });
-config({ quiet: true });
+import "./load-env";
 
 import { sql } from "drizzle-orm";
 import { closeDb, getDb } from "@/server/db/client";
@@ -36,6 +34,8 @@ async function main() {
     const { count } = (await db.execute<{ count: number }>(sql`select count(*)::int as count from employees`)).rows[0];
     if (count > 0) {
       console.log("Dados de demonstração já existem — use `pnpm db:reset:demo` para recriar.");
+      const { repairDemoFiles } = await import("./repair-files");
+      await repairDemoFiles(db);
       return;
     }
     const { seedDemo, DEMO_PASSWORD, DEMO_DOMAIN } = await import("./demo");

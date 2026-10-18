@@ -15,6 +15,7 @@ const env = {
   APP_URL: `http://localhost:${PORT}`,
   DATABASE_URL: url,
   IP_HASH_SECRET: "e2e-secret-value-only-for-tests",
+  STORAGE_DRIVER: "local",
   STORAGE_DIR: ".data/storage-e2e",
   MAIL_DRIVER: "outbox",
   SESSION_IDLE_MINUTES: "60",

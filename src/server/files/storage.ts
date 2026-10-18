@@ -3,6 +3,7 @@ import { createReadStream } from "node:fs";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { Readable } from "node:stream";
+import { AwsClient } from "aws4fetch";
 import { eq } from "drizzle-orm";
 import { getDb, type Executor } from "../db/client";
 import { fileAssets } from "../db/schema";
@@ -11,18 +12,20 @@ import { AppError } from "../errors";
 import { logger } from "../logger";
 import { validateUpload } from "./validation";
 
-/** Contrato de armazenamento privado (ADR-0007). Implementação S3 fica como pendência documentada. */
+/** Contrato de armazenamento privado (ADR-0007): disco local ou Cloudflare R2. */
 export interface StorageProvider {
   put(key: string, data: Uint8Array): Promise<void>;
   stream(key: string): Promise<ReadableStream<Uint8Array>>;
   remove(key: string): Promise<void>;
 }
 
+const KEY_RE = /^[0-9]{4}\/[0-9]{2}\/[0-9a-f-]{36}$/;
+
 class LocalDiskStorage implements StorageProvider {
   constructor(private readonly root: string) {}
 
   private resolve(key: string) {
-    if (!/^[0-9]{4}\/[0-9]{2}\/[0-9a-f-]{36}$/.test(key)) throw new Error("Chave de armazenamento inválida");
+    if (!KEY_RE.test(key)) throw new Error("Chave de armazenamento inválida");
     const full = path.resolve(this.root, key);
     if (!full.startsWith(path.resolve(this.root) + path.sep)) throw new Error("Caminho fora do armazenamento");
     return full;
@@ -45,9 +48,46 @@ class LocalDiskStorage implements StorageProvider {
   }
 }
 
+/** Cloudflare R2 pela API S3 (assinatura SigV4). Bucket privado: tudo passa pelas rotas com controle de acesso. */
+class R2Storage implements StorageProvider {
+  private readonly client: AwsClient;
+  private readonly base: string;
+
+  constructor(accountId: string, accessKeyId: string, secretAccessKey: string, bucket: string) {
+    this.client = new AwsClient({ accessKeyId, secretAccessKey, service: "s3", region: "auto" });
+    this.base = `https://${accountId}.r2.cloudflarestorage.com/${encodeURIComponent(bucket)}`;
+  }
+
+  private url(key: string) {
+    if (!KEY_RE.test(key)) throw new Error("Chave de armazenamento inválida");
+    return `${this.base}/${key}`;
+  }
+
+  async put(key: string, data: Uint8Array) {
+    const res = await this.client.fetch(this.url(key), { method: "PUT", body: new Blob([data as Uint8Array<ArrayBuffer>]), headers: { "Content-Type": "application/octet-stream", "If-None-Match": "*" } });
+    if (!res.ok) throw new Error(`R2 PUT falhou (${res.status})`);
+  }
+
+  async stream(key: string) {
+    const res = await this.client.fetch(this.url(key));
+    if (!res.ok || !res.body) throw new Error(`R2 GET falhou (${res.status})`);
+    return res.body;
+  }
+
+  async remove(key: string) {
+    const res = await this.client.fetch(this.url(key), { method: "DELETE" });
+    if (!res.ok && res.status !== 404) throw new Error(`R2 DELETE falhou (${res.status})`);
+  }
+}
+
 let provider: StorageProvider | undefined;
 export function storage(): StorageProvider {
-  provider ??= new LocalDiskStorage(path.resolve(env().STORAGE_DIR));
+  if (provider) return provider;
+  const e = env();
+  provider =
+    e.STORAGE_DRIVER === "r2"
+      ? new R2Storage(e.R2_ACCOUNT_ID!, e.R2_ACCESS_KEY_ID!, e.R2_SECRET_ACCESS_KEY!, e.R2_BUCKET_NAME!)
+      : new LocalDiskStorage(path.resolve(e.STORAGE_DIR));
   return provider;
 }
 

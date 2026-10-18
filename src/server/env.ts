@@ -16,8 +16,13 @@ const schema = z
     SESSION_IDLE_MINUTES: z.coerce.number().int().min(5).max(24 * 60).default(60),
     IP_HASH_SECRET: z.string().min(16, "IP_HASH_SECRET deve ter ao menos 16 caracteres"),
     TRUST_PROXY: bool,
-    // Na Vercel só /tmp é gravável (e efêmero) — uso provisório até o driver R2 (ADR-0007).
+    // "r2" quando as credenciais do Cloudflare R2 existem; "local" (disco) caso contrário (ADR-0007).
+    STORAGE_DRIVER: z.enum(["local", "r2"]).default(process.env.R2_BUCKET_NAME && process.env.R2_ACCESS_KEY_ID ? "r2" : "local"),
     STORAGE_DIR: z.string().default(process.env.VERCEL ? "/tmp/realseg-storage" : ".data/storage"),
+    R2_ACCOUNT_ID: z.string().optional(),
+    R2_ACCESS_KEY_ID: z.string().optional(),
+    R2_SECRET_ACCESS_KEY: z.string().optional(),
+    R2_BUCKET_NAME: z.string().optional(),
     UPLOAD_MAX_MB: z.coerce.number().int().min(1).max(50).default(10),
     MAIL_DRIVER: z.enum(["outbox", "smtp"]).default("outbox"),
     MAIL_FROM: z.string().default("Intranet REALSEG <nao-responda@realseg.com.br>"),
@@ -38,6 +43,11 @@ const schema = z
       }
       if (!env.APP_URL.startsWith("https://")) {
         ctx.addIssue({ code: "custom", path: ["APP_URL"], message: "Produção exige APP_URL com https." });
+      }
+    }
+    if (env.STORAGE_DRIVER === "r2") {
+      for (const k of ["R2_ACCOUNT_ID", "R2_ACCESS_KEY_ID", "R2_SECRET_ACCESS_KEY", "R2_BUCKET_NAME"] as const) {
+        if (!env[k]) ctx.addIssue({ code: "custom", path: [k], message: `${k} é obrigatório com STORAGE_DRIVER=r2.` });
       }
     }
     if (env.MAIL_DRIVER === "smtp" && !env.SMTP_HOST) {
