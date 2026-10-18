@@ -1,0 +1,17 @@
+# Changelog
+
+## [0.1.0] — 2026-10-17 — Ambiente do Colaborador
+### Adicionado
+- Fundação: Next.js 16, TypeScript estrito, Tailwind 4 com tokens da marca, PostgreSQL 18 + Drizzle com migrações versionadas, PostgreSQL embarcado para dev/teste, CI.
+- Segurança: sessões opacas no banco, scrypt, bloqueio e rate limit, CSRF por Origin, CSP com nonce, cabeçalhos de segurança, RBAC granular (COLABORADOR/GESTOR/RH/ADMIN), auditoria, logs com redação.
+- Autenticação: login por e-mail ou matrícula, logout, recuperação com token de uso único, alteração de senha, sessão expirada, sessões ativas.
+- Shell desktop (sidebar recolhível, topbar com busca e notificações) e mobile (cabeçalho + barra inferior + "Mais").
+- Home com pendências, atalhos personalizáveis, comunicado importante, solicitações e documentos recentes.
+- Comunicados com público-alvo, leitura por versão, ciência explícita, favoritos, anexos, destaque e eventos.
+- Documentos: recebidos com filtros e download auditado, ciência, normas e manuais, envio ao RH com validação de conteúdo e acompanhamento, histórico.
+- Solicitações com SLA em minutos úteis (calendário, feriados, pausa/retomada), rascunhos, anexos, conversa, cancelamento, confirmação, reabertura, monitor de SLA; serviços de atendimento para a fase RH.
+- Cursos: catálogo elegível, trilhas, progresso idempotente, retomada, certificados.
+- Carreira: visão geral, desenvolvimento, cargos e faixas publicadas, oportunidades com candidatura; feedbacks com confirmação de leitura.
+- Ajuda: busca, categorias, base de conhecimento, voto de utilidade, horário de atendimento derivado do calendário.
+- Notificações com preferências, perfil, busca global.
+- Testes: 41 unitários, 67 de integração (PostgreSQL real), 90 E2E (desktop, mobile, axe).
