@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.5.0] — 2026-10-18 — Home mobile fiel à referência
+### Alterado
+- Home no celular conforme `referencias/Painel Corporativo REALSEG.png`: boas-vindas mais compacta com a câmera inteira, cards de acesso rápido sem selos visíveis (o texto continua para leitores de tela), card "Comunicado importante" com data na mesma linha e botão em pílula, "Minhas solicitações" e "Documentos recentes" sem moldura externa e com o status na mesma linha. "Personalizar" foi para o fim da página.
+- Barra inferior com 4 itens (Início · Documentos · Solicitações · Mais), "Início" ativo com ícone preenchido; Buscar e Comunicados passaram para o "Mais" (ADR-0009 revisado).
+- Busca saiu do cabeçalho no celular (continua em tablets e no "Mais").
+
 ## [0.4.0] — 2026-10-18 — Otimização de custos (Vercel + Neon)
 Detalhes, motivos e medições em `docs/COST_OPTIMIZATION.md`.
 ### Alterado

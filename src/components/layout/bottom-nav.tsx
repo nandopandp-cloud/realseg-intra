@@ -3,12 +3,15 @@
 import Link from "@/components/ui/app-link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import { Bell, ChartColumn, CircleHelp, GraduationCap, Menu, UserRound, UsersRound, type LucideIcon } from "lucide-react";
+import { Bell, ChartColumn, CircleHelp, GraduationCap, Megaphone, Menu, Search, UserRound, UsersRound, type LucideIcon } from "lucide-react";
+import { HouseSolid } from "@/components/ui/solid-icons";
 import { Dialog } from "@/components/ui/dialog";
 import { cn } from "@/lib/cn";
 import { MOBILE_NAV } from "./nav-items";
 
 const MORE: Array<{ href: string; label: string; icon: LucideIcon; description: string }> = [
+  { href: "/busca", label: "Buscar", icon: Search, description: "Pesquisar em toda a intranet" },
+  { href: "/comunicados", label: "Comunicados", icon: Megaphone, description: "Avisos e novidades da empresa" },
   { href: "/cursos", label: "Cursos", icon: GraduationCap, description: "Aulas, progresso e certificados" },
   { href: "/carreira", label: "Minha carreira", icon: ChartColumn, description: "Desenvolvimento, cargos e oportunidades" },
   { href: "/ajuda", label: "Ajuda e suporte", icon: CircleHelp, description: "Dúvidas frequentes e tutoriais" },
@@ -23,7 +26,7 @@ export function BottomNav() {
   const inMore = MORE.some((m) => pathname === m.href || pathname.startsWith(`${m.href}/`));
 
   const itemCls = (active: boolean) =>
-    cn("relative flex min-h-16 min-w-0 flex-1 flex-col items-center justify-center gap-1 text-[0.75rem] leading-tight font-medium tracking-[-0.01em]", active ? "text-brand-700" : "text-muted");
+    cn("relative flex min-h-[4.25rem] min-w-0 flex-1 flex-col items-center justify-center gap-1 text-[0.8125rem] leading-tight font-medium tracking-[-0.01em]", active ? "text-brand-600 font-semibold" : "text-muted");
 
   return (
     <>
@@ -35,7 +38,7 @@ export function BottomNav() {
             return (
               <li key={item.href} className="flex flex-1">
                 <Link href={item.href} aria-current={active ? "page" : undefined} className={itemCls(active)}>
-                  <Icon className="size-6" strokeWidth={active ? 2.25 : 1.75} aria-hidden />
+                  {active && item.href === "/" ? <HouseSolid className="size-7" /> : <Icon className="size-7" strokeWidth={1.6} aria-hidden />}
                   {item.label}
                   {active && <span className="absolute bottom-1 h-[3px] w-8 rounded-full bg-brand-600" aria-hidden />}
                 </Link>
@@ -44,7 +47,7 @@ export function BottomNav() {
           })}
           <li className="flex flex-1">
             <button type="button" onClick={() => setOpen(true)} aria-expanded={open} aria-haspopup="dialog" className={itemCls(inMore)}>
-              <Menu className="size-6" strokeWidth={inMore ? 2.25 : 1.75} aria-hidden />
+              <Menu className="size-7" strokeWidth={inMore ? 2.25 : 1.6} aria-hidden />
               Mais
               {inMore && <span className="absolute bottom-1 h-[3px] w-8 rounded-full bg-brand-600" aria-hidden />}
             </button>

@@ -27,7 +27,7 @@ export function Topbar({ name, roleLabel, unread }: { name: string; roleLabel: s
           </div>
         </form>
         <div className="ml-auto flex items-center gap-0 sm:gap-3">
-          <Link href="/busca" className="inline-flex size-11 items-center justify-center rounded-full text-ink hover:bg-canvas lg:hidden" aria-label="Pesquisar na intranet">
+          <Link href="/busca" className="hidden size-11 items-center justify-center rounded-full text-ink hover:bg-canvas sm:inline-flex lg:hidden" aria-label="Pesquisar na intranet">
             <Search className="size-6" strokeWidth={1.75} aria-hidden />
           </Link>
           <NotificationBell unread={unread} />

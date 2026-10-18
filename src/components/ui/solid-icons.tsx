@@ -40,3 +40,12 @@ export function BarsSolid({ className }: P) {
     </svg>
   );
 }
+
+/** Casa preenchida — item "Início" ativo na barra inferior (referência mobile). */
+export function HouseSolid({ className }: P) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} aria-hidden fill="currentColor">
+      <path d="M10.6 2.6a2.2 2.2 0 0 1 2.8 0l7.3 6.1c.5.4.8 1 .8 1.7v9.4c0 1.2-1 2.2-2.2 2.2h-4.1v-6.2c0-.6-.4-1-1-1H9.8c-.6 0-1 .4-1 1V22H4.7c-1.2 0-2.2-1-2.2-2.2v-9.4c0-.7.3-1.3.8-1.7l7.3-6.1z" />
+    </svg>
+  );
+}

@@ -53,7 +53,7 @@ Padrão Tailwind: `sm` 640, `md` 768, `lg` 1024 (sidebar/topbar desktop a partir
 Todas as listas têm estado vazio orientando o próximo passo; carregamento com `loading.tsx` (skeleton + `role="status"`); erros com `error.tsx` (tentar novamente + código para suporte); 404 com `h1`.
 
 ## Responsividade
-- **Celular**: cabeçalho com logo/busca/notificações/conta; barra inferior fixa (Início · Documentos · Comunicação · Solicitações · Mais — ADR-0009); tabelas viram listas de cards; formulários em coluna única; ações primárias em largura total.
+- **Celular**: cabeçalho com logo/notificações/conta (busca no "Mais"); barra inferior fixa (Início · Documentos · Solicitações · Mais — ADR-0009); tabelas viram listas de cards; formulários em coluna única; ações primárias em largura total.
 - **Desktop**: sidebar escura recolhível, topbar com busca global, conteúdo com coluna lateral (`xl`).
 - Verificado por E2E em 375–412 px e 1440 px sem rolagem horizontal.
 
