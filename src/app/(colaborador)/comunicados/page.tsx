@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "@/components/ui/app-link";
-import { ArrowRight, MessageSquareMore, Megaphone } from "lucide-react";
+import { ArrowRight, MessageSquareMore, Megaphone, X } from "lucide-react";
 import { PageBody, PageHero } from "@/components/layout/page-hero";
 import { ButtonLink } from "@/components/ui/button";
 import { FilterSelect, SearchField } from "@/components/ui/filters";
@@ -19,6 +19,7 @@ const params = z.object({
   aba: z.enum(["todos", "importantes", "nao-lidos", "favoritos"]).catch("todos"),
   q: z.string().max(100).optional().catch(undefined),
   categoria: z.string().max(50).optional().catch(undefined),
+  tag: z.string().max(40).optional().catch(undefined),
   ordem: z.enum(["recentes", "antigos"]).catch("recentes"),
   page: z.coerce.number().int().min(1).max(1000).catch(1),
 });
@@ -27,14 +28,14 @@ export default async function AnnouncementsPage({ searchParams }: PageProps<"/co
   const ctx = await requireCtx();
   const sp = params.parse(await searchParams);
   const [list, featured, events, categories] = await Promise.all([
-    listAnnouncements(ctx, { tab: sp.aba as AnnouncementTab, q: sp.q, category: sp.categoria, sort: sp.ordem, page: sp.page }),
+    listAnnouncements(ctx, { tab: sp.aba as AnnouncementTab, q: sp.q, category: sp.categoria, tag: sp.tag, sort: sp.ordem, page: sp.page }),
     featuredAnnouncement(ctx),
     upcomingEvents(ctx),
     listCategories(),
   ]);
   const href = (patch: Record<string, string | number | undefined>) => {
     const p = new URLSearchParams();
-    const merged = { aba: sp.aba, q: sp.q, categoria: sp.categoria, ordem: sp.ordem, page: undefined, ...patch };
+    const merged = { aba: sp.aba, q: sp.q, categoria: sp.categoria, tag: sp.tag, ordem: sp.ordem, page: undefined, ...patch };
     for (const [k, v] of Object.entries(merged)) if (v !== undefined && v !== "" && !(k === "aba" && v === "todos") && !(k === "ordem" && v === "recentes") && !(k === "page" && String(v) === "1")) p.set(k, String(v));
     return `/comunicados${p.size ? `?${p}` : ""}`;
   };
@@ -63,7 +64,7 @@ export default async function AnnouncementsPage({ searchParams }: PageProps<"/co
             items={tabs.map((t) => ({ href: href({ aba: t.key }), label: t.label, count: t.count, badge: t.badge, active: sp.aba === t.key }))}
           />
           <div className="flex gap-2 lg:pb-2">
-            <SearchField label="Buscar comunicados" placeholder="Buscar comunicado..." defaultValue={sp.q} hidden={{ aba: sp.aba === "todos" ? undefined : sp.aba, categoria: sp.categoria, ordem: sp.ordem === "recentes" ? undefined : sp.ordem }} className="flex-1 lg:w-56" />
+            <SearchField label="Buscar comunicados" placeholder="Buscar comunicado..." defaultValue={sp.q} hidden={{ aba: sp.aba === "todos" ? undefined : sp.aba, categoria: sp.categoria, tag: sp.tag, ordem: sp.ordem === "recentes" ? undefined : sp.ordem }} className="flex-1 lg:w-56" />
             <FilterSelect name="categoria" label="Categoria" options={[{ value: "", label: "Todas" }, ...categories.map((c) => ({ value: c.slug, label: c.name }))]} className="w-32 lg:w-36" />
             <FilterSelect name="ordem" label="Ordenar" options={[{ value: "", label: "Mais recentes" }, { value: "antigos", label: "Mais antigos" }]} className="hidden w-40 sm:block" />
           </div>
@@ -71,6 +72,15 @@ export default async function AnnouncementsPage({ searchParams }: PageProps<"/co
 
         <div className="mt-5 grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_21.5rem]">
           <section aria-label="Lista de comunicados">
+            {sp.tag && (
+              <p className="mb-3 flex flex-wrap items-center gap-2 text-sm text-muted">
+                Tag:
+                <Link href={href({ tag: undefined })} className="inline-flex min-h-9 items-center gap-1.5 rounded-full bg-brand-50 px-3 font-medium text-brand-700 hover:bg-brand-100">
+                  {sp.tag} <X className="size-4" aria-hidden />
+                  <span className="sr-only">(remover filtro)</span>
+                </Link>
+              </p>
+            )}
             {list.items.length === 0 ? (
               <EmptyState
                 icon={Megaphone}
@@ -84,7 +94,7 @@ export default async function AnnouncementsPage({ searchParams }: PageProps<"/co
                         ? "Abra um comunicado e toque em “Favoritar” para guardá-lo aqui."
                         : "Novos comunicados aparecerão aqui."
                 }
-                action={sp.q || sp.categoria ? <ButtonLink href="/comunicados" variant="outline">Limpar filtros</ButtonLink> : undefined}
+                action={sp.q || sp.categoria || sp.tag ? <ButtonLink href="/comunicados" variant="outline">Limpar filtros</ButtonLink> : undefined}
               />
             ) : (
               <ul className="flex flex-col gap-3">

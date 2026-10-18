@@ -13,7 +13,7 @@ Legenda: ✅ concluído (critérios de aceite + testes) · 🟡 parcial · ⏳ n
 | RBAC e autorização | ✅ (papéis e matriz) | `api-matrix.test.ts`, testes IDOR por módulo | UI de gestão de papéis — fase RH |
 | Design system e shell | ✅ | E2E a11y (desktop + mobile), crawler de desenvolvimento | Logo vetorial oficial e fotos licenciadas em alta resolução pendentes (ADR-0010). Sem tema escuro |
 | Home | ✅ (fiel às referências desktop/mobile) | `services-read`, E2E B | Foto do colaborador no avatar: não há upload de foto (iniciais) |
-| Comunicados (colaborador) | ✅ | `announcements-documents`, E2E C | Publicação/segmentação/relatório de leitura pelo RH — fase RH |
+| Comunicados (colaborador, inclusive a página de leitura com vigência, "o que muda", tags e relacionados) | ✅ | `announcements-documents`, E2E C | Publicação/segmentação/relatório de leitura pelo RH — fase RH |
 | Documentos (colaborador) | ✅ | `announcements-documents`, E2E D/E | Distribuição e análise de envios pelo RH — fase RH. Antivírus: hook pronto, scanner não definido (status `skipped`). Armazenamento S3 pendente. Expurgo por retenção aguarda prazos do jurídico |
 | Solicitações e SLA | ✅ (colaborador) · 🟡 (atendimento: serviços prontos e testados, sem UI) | `tickets.test.ts`, `business-time.test.ts`, `ticket-state-machine.test.ts`, E2E F | Fila/atribuição/configuração de SLA na UI — fase RH. Valores de SLA são proposta inicial a validar com o RH. Feriados estaduais/municipais a cadastrar. Chat em tempo real não implementado (atendimento por mensagens no ticket) |
 | Cursos | ✅ | `learning-career`, E2E G | Conteúdo das aulas da demonstração é fictício; vídeos aceitos apenas de YouTube-nocookie/Vimeo; gestão de cursos e relatórios — fase RH |

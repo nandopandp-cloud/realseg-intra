@@ -24,7 +24,7 @@ beforeAll(async () => {
 describe("leituras do colaborador (dados de demonstração)", () => {
   it("comunicados: contagens por aba e segmentação por unidade", async () => {
     const r = await ann.listAnnouncements(carlos, { pageSize: 50 });
-    expect(r.counts).toEqual({ todos: 12, importantes: 3, naoLidos: 3, favoritos: 1 });
+    expect(r.counts).toEqual({ todos: 14, importantes: 3, naoLidos: 3, favoritos: 1 });
     expect(r.items.map((i) => i.title)).not.toContain("Mudança de escala na Unidade Rio de Janeiro");
     expect(r.items.some((i) => i.title.startsWith("Rascunho") || i.title.startsWith("Agendado"))).toBe(false);
     const unread = await ann.listAnnouncements(carlos, { tab: "nao-lidos" });

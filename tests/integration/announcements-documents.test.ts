@@ -56,6 +56,31 @@ describe("comunicados", () => {
     expect(a.isRead).toBe(false);
   });
 
+  it("página de leitura: público-alvo legível, relacionados por tags e só do que o ator vê", async () => {
+    const carlos = await ctxFor(people.carlos.user);
+    const page = await ann.getAnnouncementPage(carlos, await annId("Atualização no uso do uniforme"));
+    expect(page.audience).toEqual(["Todos os colaboradores"]);
+    expect(page.highlights).toHaveLength(3);
+    // 2 tags em comum cada; empate decidido pela mesma categoria (Operações).
+    expect(page.related.map((r) => r.title)).toEqual(["Modelos de crachá e utilização correta", "Boas práticas de segurança no dia a dia"]);
+    expect(page.related.every((r) => r.title !== "Mudança de escala na Unidade Rio de Janeiro")).toBe(true);
+    // Unidade como público: rótulo com o nome da unidade (visto por quem é da unidade).
+    const ana = await ctxFor(people.ana.user);
+    const rj = await ann.getAnnouncementPage(ana, await annId("Mudança de escala na Unidade Rio de Janeiro"));
+    expect(rj.audience).toEqual(["Unidade Rio de Janeiro"]);
+    // Do ponto de vista da Ana, o comunicado do RJ pode ser relacionado; do Carlos, nunca.
+    for (const id of [await annId("Modelos de crachá e utilização correta"), await annId("Atualização no uso do uniforme")]) {
+      const p = await ann.getAnnouncementPage(carlos, id);
+      expect(p.related.map((r) => r.title)).not.toContain("Mudança de escala na Unidade Rio de Janeiro");
+    }
+  });
+
+  it("filtro por tag", async () => {
+    const carlos = await ctxFor(people.carlos.user);
+    const list = await ann.listAnnouncements(carlos, { tag: "Crachá" });
+    expect(list.items.map((i) => i.title).sort()).toEqual(["Atualização no uso do uniforme", "Modelos de crachá e utilização correta"]);
+  });
+
   it("segmentação: comunicado de outra unidade, rascunho e agendado não são acessíveis", async () => {
     const carlos = await ctxFor(people.carlos.user);
     const ana = await ctxFor(people.ana.user);

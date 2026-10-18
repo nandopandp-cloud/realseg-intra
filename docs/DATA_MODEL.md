@@ -148,3 +148,12 @@ Extensão `unaccent` + função `f_unaccent` (IMMUTABLE) para busca sem acento e
 ## Exclusão e retenção
 - Documentos e usuários usam exclusão lógica; arquivos referenciados têm FK `restrict`.
 - Prazos legais de retenção por categoria de documento ficam em `document_categories.retention_months` — **a definir com o jurídico/RH** (pendência em `PRIVACY_LGPD.md`).
+
+### Conteúdo estruturado do comunicado (migration 0003)
+Campos opcionais em `announcements`, usados pela página de leitura (`referencias/Colado 2026-10-18 às 12.08.10.png`):
+- `cover_image`: capa (caminho em `/images`; no futuro, chave do R2). Sem capa, a interface usa a cor/ícone da categoria.
+- `effective_note`: texto do quadro "Quando começa a valer?".
+- `highlights` (jsonb `[{icon, title, text}]`): seção "O que muda". Ícones aceitos: `shirt`, `badge`, `boot`, `shield`, `clock`, `calendar`, `alert`, `check`.
+- `tags` (`text[]`, índice GIN): filtro `?tag=` na lista e base dos "Relacionados" (mais tags em comum → mesma categoria → mais recentes, sempre dentro do público do leitor).
+- `support_ticket_category`: categoria de solicitação sugerida no quadro "Dúvidas?".
+O texto (`body`) continua com a marcação simples (`## título`, listas, negrito).

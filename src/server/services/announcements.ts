@@ -1,4 +1,4 @@
-import { and, asc, count, desc, eq, gte, isNull, lte, or, sql, type SQL } from "drizzle-orm";
+import { and, asc, count, desc, eq, gte, inArray, isNull, lte, ne, or, sql, type SQL } from "drizzle-orm";
 import { audit } from "../audit";
 import { requireEmployee, requirePermission, type Ctx } from "../auth/actor";
 import { getDb } from "../db/client";
@@ -10,8 +10,12 @@ import {
   announcementFavorites,
   announcementReads,
   announcements,
+  departments,
   events,
   fileAssets,
+  jobFamilies,
+  jobPositions,
+  units,
 } from "../db/schema";
 import { invalidTransition, notFound } from "../errors";
 import { audienceMatch, textSearch, ref } from "./audience";
@@ -64,14 +68,16 @@ const listFields = (userId: string) => ({
 
 export async function listAnnouncements(
   ctx: Ctx,
-  opts: { tab?: AnnouncementTab; q?: string; category?: string; sort?: "recentes" | "antigos"; page?: number; pageSize?: number } = {},
+  opts: { tab?: AnnouncementTab; q?: string; category?: string; tag?: string; sort?: "recentes" | "antigos"; page?: number; pageSize?: number } = {},
 ) {
   requirePermission(ctx.actor, "announcement:read");
   const userId = ctx.actor.userId;
   const tab = opts.tab ?? "todos";
   const page = opts.page ?? 1;
   const pageSize = opts.pageSize ?? 10;
-  const base = and(visibleTo(ctx), textSearch([announcements.title, announcements.summary], opts.q), opts.category ? eq(announcementCategories.slug, opts.category) : undefined);
+  const base = and(visibleTo(ctx), textSearch([announcements.title, announcements.summary], opts.q), opts.category ? eq(announcementCategories.slug, opts.category) : undefined,
+    opts.tag ? sql`${opts.tag} = ANY(${announcements.tags})` : undefined,
+  );
   const where = and(base, tabFilter(tab, userId));
   const db = getDb();
 
@@ -112,7 +118,16 @@ export async function getAnnouncement(ctx: Ctx, id: string) {
   requirePermission(ctx.actor, "announcement:read");
   const db = getDb();
   const [row] = await db
-    .select({ ...listFields(ctx.actor.userId), body: announcements.body, version: announcements.version })
+    .select({
+      ...listFields(ctx.actor.userId),
+      body: announcements.body,
+      version: announcements.version,
+      coverImage: announcements.coverImage,
+      effectiveNote: announcements.effectiveNote,
+      highlights: announcements.highlights,
+      tags: announcements.tags,
+      supportTicketCategory: announcements.supportTicketCategory,
+    })
     .from(announcements)
     .innerJoin(announcementCategories, eq(announcementCategories.id, announcements.categoryId))
     .where(and(eq(announcements.id, id), visibleTo(ctx)))
@@ -131,6 +146,51 @@ export async function getAnnouncement(ctx: Ctx, id: string) {
       .where(and(eq(announcementAcknowledgements.announcementId, id), eq(announcementAcknowledgements.userId, ctx.actor.userId), eq(announcementAcknowledgements.version, row.version))),
   ]);
   return { ...row, attachments, acknowledgedAt: ackRow[0]?.at ?? null };
+}
+
+/** Página de leitura: comunicado + público-alvo legível + relacionados (consultas em paralelo). */
+export async function getAnnouncementPage(ctx: Ctx, id: string) {
+  const a = await getAnnouncement(ctx, id);
+  const [audience, related] = await Promise.all([audienceLabels(id), relatedAnnouncements(ctx, a)]);
+  return { ...a, audience, related };
+}
+
+/** Público-alvo em texto (ex.: "Todos os colaboradores", "Unidade Rio de Janeiro"). */
+async function audienceLabels(id: string): Promise<string[]> {
+  const db = getDb();
+  const rules = await db.select({ type: announcementAudiences.type, refId: announcementAudiences.refId }).from(announcementAudiences).where(eq(announcementAudiences.announcementId, id));
+  if (!rules.length || rules.some((r) => r.type === "all")) return ["Todos os colaboradores"];
+  const ids = (type: string) => rules.filter((r) => r.type === type && r.refId).map((r) => r.refId!);
+  const pick = async (list: string[], q: (l: string[]) => Promise<Array<{ name: string }>>) => (list.length ? (await q(list)).map((r) => r.name) : []);
+  const [u, d, p, f] = await Promise.all([
+    pick(ids("unit"), (l) => db.select({ name: units.name }).from(units).where(inArray(units.id, l))),
+    pick(ids("department"), (l) => db.select({ name: departments.name }).from(departments).where(inArray(departments.id, l))),
+    pick(ids("job_position"), (l) => db.select({ name: jobPositions.title }).from(jobPositions).where(inArray(jobPositions.id, l))),
+    pick(ids("job_family"), (l) => db.select({ name: jobFamilies.name }).from(jobFamilies).where(inArray(jobFamilies.id, l))),
+  ]);
+  return [...u, ...d.map((n) => `Área: ${n}`), ...p.map((n) => `Cargo: ${n}`), ...f.map((n) => `Família: ${n}`)];
+}
+
+/** Relacionados: mais tags em comum, depois mesma categoria, depois mais recentes — sempre dentro do que o ator pode ver. */
+async function relatedAnnouncements(ctx: Ctx, a: { id: string; tags: string[]; category: { slug: string } }, limit = 2) {
+  const tagArray = a.tags.length ? sql`ARRAY[${sql.join(a.tags.map((t) => sql`${t}`), sql`, `)}]::text[]` : sql`'{}'::text[]`;
+  return getDb()
+    .select({
+      id: announcements.id,
+      title: announcements.title,
+      publishedAt: announcements.publishedAt,
+      coverImage: announcements.coverImage,
+      category: { slug: announcementCategories.slug, name: announcementCategories.name, color: announcementCategories.color, icon: announcementCategories.icon },
+    })
+    .from(announcements)
+    .innerJoin(announcementCategories, eq(announcementCategories.id, announcements.categoryId))
+    .where(and(visibleTo(ctx), ne(announcements.id, a.id)))
+    .orderBy(
+      desc(sql`cardinality(ARRAY(SELECT unnest(${announcements.tags}) INTERSECT SELECT unnest(${tagArray})))`),
+      desc(sql`${announcementCategories.slug} = ${a.category.slug}`),
+      desc(announcements.publishedAt),
+    )
+    .limit(limit);
 }
 
 /** Registra visualização (idempotente por versão). Visualizar ≠ confirmar ciência. */

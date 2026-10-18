@@ -37,8 +37,8 @@ Códigos: `UNAUTHENTICATED` 401, `SESSION_EXPIRED` 401, `INVALID_CREDENTIALS` 40
 ## Comunicados
 | Método | Rota | Descrição |
 | --- | --- | --- |
-| GET | `/announcements?aba=todos\|importantes\|nao-lidos\|favoritos&q&categoria&ordem=recentes\|antigos&page` | Lista visível + `counts {todos, importantes, naoLidos, favoritos}` |
-| GET | `/announcements/:id` | Detalhe (anexos, `acknowledgedAt`) |
+| GET | `/announcements?aba=todos\|importantes\|nao-lidos\|favoritos&q&categoria&tag&ordem=recentes\|antigos&page` | Lista visível + `counts {todos, importantes, naoLidos, favoritos}` |
+| GET | `/announcements/:id` | Detalhe (anexos, `acknowledgedAt`, `coverImage`, `effectiveNote`, `highlights[]`, `tags[]`, `supportTicketCategory`) |
 | POST | `/announcements/:id/read` | Registra visualização (204) |
 | POST | `/announcements/:id/acknowledge` | Ciência formal (idempotente) → `{ acknowledgedAt }`; 409 se não exigida |
 | PUT / DELETE | `/announcements/:id/favorite` | Favoritar / desfavoritar |

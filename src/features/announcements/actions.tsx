@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { BookmarkCheck, Bookmark, CircleCheck, FileCheck } from "lucide-react";
+import { BookmarkCheck, Bookmark, CircleCheck, Download, FileCheck, Share2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Alert } from "@/components/ui/primitives";
 import { useToast } from "@/components/ui/toast";
@@ -20,7 +20,7 @@ export function MarkAnnouncementRead({ id }: { id: string }) {
   return null;
 }
 
-export function FavoriteButton({ id, initial }: { id: string; initial: boolean }) {
+export function FavoriteButton({ id, initial, className }: { id: string; initial: boolean; className?: string }) {
   const [fav, setFav] = useState(initial);
   const [busy, setBusy] = useState(false);
   const toast = useToast();
@@ -37,7 +37,7 @@ export function FavoriteButton({ id, initial }: { id: string; initial: boolean }
     }
   }
   return (
-    <Button variant="outline" onClick={toggle} loading={busy} aria-pressed={fav} icon={fav ? <BookmarkCheck className="size-5 text-brand-600" aria-hidden /> : <Bookmark className="size-5" aria-hidden />}>
+    <Button variant="outline" onClick={toggle} loading={busy} aria-pressed={fav} className={className} icon={fav ? <BookmarkCheck className="size-5 text-brand-600" aria-hidden /> : <Bookmark className="size-5" aria-hidden />}>
       {fav ? "Favoritado" : "Favoritar"}
     </Button>
   );
@@ -90,5 +90,55 @@ export function AcknowledgeBox({ endpoint, acknowledgedAt, subject }: { endpoint
         </div>
       </div>
     </div>
+  );
+}
+
+/** Compartilhar: menu nativo do celular quando existe; senão copia o link (só abre para quem tem acesso). */
+export function ShareButton({ title, className }: { title: string; className?: string }) {
+  const toast = useToast();
+  async function share() {
+    const url = window.location.href;
+    if (navigator.share) {
+      try {
+        await navigator.share({ title, url });
+      } catch {
+        /* cancelado pelo usuário */
+      }
+      return;
+    }
+    try {
+      await navigator.clipboard.writeText(url);
+      toast("success", "Link copiado. Ele só abre para quem tem acesso a este comunicado.");
+    } catch {
+      toast("error", "Não foi possível copiar o link.");
+    }
+  }
+  return (
+    <Button variant="outline" onClick={share} className={className} icon={<Share2 className="size-5" aria-hidden />}>
+      Compartilhar
+    </Button>
+  );
+}
+
+/** Baixa todos os anexos em sequência (cada download continua autorizado e auditado no servidor). */
+export function DownloadAllButton({ urls }: { urls: string[] }) {
+  const [busy, setBusy] = useState(false);
+  async function run() {
+    setBusy(true);
+    for (const url of urls) {
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      await new Promise((r) => setTimeout(r, 400));
+    }
+    setBusy(false);
+  }
+  return (
+    <button type="button" onClick={run} disabled={busy} className="inline-flex min-h-11 items-center gap-1.5 rounded-lg px-1 text-sm font-medium text-brand-600 hover:underline disabled:opacity-60">
+      <Download className="size-4" aria-hidden /> Baixar todos
+    </button>
   );
 }

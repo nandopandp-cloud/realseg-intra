@@ -1,4 +1,4 @@
-import { boolean, index, integer, pgEnum, pgTable, primaryKey, text, uuid } from "drizzle-orm/pg-core";
+import { boolean, index, integer, jsonb, pgEnum, pgTable, primaryKey, text, uuid } from "drizzle-orm/pg-core";
 import { audienceType, createdAt, id, tsz, updatedAt } from "./_shared";
 import { users } from "./identity";
 import { units } from "./org";
@@ -15,6 +15,9 @@ export const announcementCategories = pgTable("announcement_categories", {
   createdAt: createdAt(),
 });
 
+/** Item da seção "O que muda" (ícone mapeado no frontend: shirt, badge, boot, shield, clock, calendar, alert, check). */
+export type AnnouncementHighlight = { icon: string; title: string; text: string };
+
 export const announcementStatus = pgEnum("announcement_status", ["draft", "scheduled", "published", "archived"]);
 export type AnnouncementStatus = (typeof announcementStatus.enumValues)[number];
 
@@ -29,6 +32,16 @@ export const announcements = pgTable(
     summary: text("summary").notNull(),
     /** Texto com marcação simples (parágrafos, listas, negrito) renderizado com escape — nunca HTML bruto. */
     body: text("body").notNull(),
+    /** Imagem de capa (caminho público em /images ou, no futuro, chave do R2). Sem capa, o frontend usa a cor da categoria. */
+    coverImage: text("cover_image"),
+    /** Texto do quadro "Quando começa a valer?". */
+    effectiveNote: text("effective_note"),
+    /** Seção "O que muda" (até 6 itens). */
+    highlights: jsonb("highlights").$type<AnnouncementHighlight[]>().notNull().default([]),
+    /** Tags livres, também usadas para sugerir comunicados relacionados. */
+    tags: text("tags").array().notNull().default([]),
+    /** Categoria de solicitação sugerida no quadro "Dúvidas?" (slug de ticket_categories). */
+    supportTicketCategory: text("support_ticket_category"),
     isImportant: boolean("is_important").notNull().default(false),
     requiresAck: boolean("requires_ack").notNull().default(false),
     isFeatured: boolean("is_featured").notNull().default(false),
@@ -44,7 +57,7 @@ export const announcements = pgTable(
     createdAt: createdAt(),
     updatedAt: updatedAt(),
   },
-  (t) => [index("announcements_status_published_idx").on(t.status, t.publishedAt)],
+  (t) => [index("announcements_status_published_idx").on(t.status, t.publishedAt), index("announcements_tags_idx").using("gin", t.tags)],
 );
 
 export const announcementAudiences = pgTable(

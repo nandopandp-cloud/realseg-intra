@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.6.0] — 2026-10-18 — Página de leitura do comunicado
+### Adicionado
+- Página do comunicado conforme `referencias/Colado 2026-10-18 às 12.08.10.png`: capa, selos, autor com data e hora, Favoritar e Compartilhar (menu nativo do celular ou cópia do link), "Quando começa a valer?", "O que muda", texto, confirmação de ciência, "Dúvidas?" com atalho para abrir solicitação, anexos com "Baixar todos", público-alvo, tags e relacionados.
+- Campos `cover_image`, `effective_note`, `highlights`, `tags` e `support_ticket_category` em `announcements` (migration `0003_announcement_detail`, que também preenche o conteúdo de demonstração em bancos de demo); filtro `?tag=` na lista e na API.
+- Comunicados de demonstração "Boas práticas de segurança no dia a dia" e "Modelos de crachá e utilização correta".
+### Removido
+- Imagem promocional "Segurança que enxerga além." da sidebar, que atrapalhava a navegação.
+
 ## [0.5.0] — 2026-10-18 — Home mobile fiel à referência
 ### Alterado
 - Home no celular conforme `referencias/Painel Corporativo REALSEG.png`: boas-vindas mais compacta com a câmera inteira, cards de acesso rápido sem selos visíveis (o texto continua para leitores de tela), card "Comunicado importante" com data na mesma linha e botão em pílula, "Minhas solicitações" e "Documentos recentes" sem moldura externa e com o status na mesma linha. "Personalizar" foi para o fim da página.

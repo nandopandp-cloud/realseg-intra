@@ -43,8 +43,25 @@ test.describe("comunicados", () => {
     await page.goto("/comunicados?q=uniforme");
     await page.getByRole("link", { name: /Atualização no uso do uniforme/ }).click();
     const download = page.waitForEvent("download");
-    await page.getByRole("link", { name: /orientacoes-uniforme\.pdf/ }).click();
-    expect((await download).suggestedFilename()).toBe("orientacoes-uniforme.pdf");
+    await page.getByRole("link", { name: "Baixar Manual do uniforme REALSEG.pdf" }).click();
+    expect((await download).suggestedFilename()).toBe("Manual do uniforme REALSEG.pdf");
+  });
+
+  test("página de leitura: vigência, o que muda, público-alvo, tags e relacionados", async ({ page }) => {
+    await page.goto("/comunicados?q=uniforme");
+    await page.getByRole("link", { name: /Atualização no uso do uniforme/ }).click();
+    await expect(page.getByRole("heading", { name: "Quando começa a valer?" })).toBeVisible();
+    await expect(page.getByRole("heading", { level: 3, name: "Crachá visível durante toda a jornada" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Arquivos e anexos (3)" })).toBeVisible();
+    await expect(page.getByText("Todos os colaboradores")).toBeVisible();
+    const related = page.getByRole("region", { name: "Relacionados" });
+    await expect(related.getByRole("link", { name: /Modelos de crachá e utilização correta/ })).toBeVisible();
+    await expect(page.getByRole("link", { name: "Abrir solicitação" })).toHaveAttribute("href", "/solicitacoes/nova?categoria=servicos");
+    await page.getByRole("link", { name: "Crachá", exact: true }).click();
+    await expect(page).toHaveURL(/tag=Crach/);
+    const list = page.getByRole("region", { name: "Lista de comunicados" });
+    await expect(list.getByRole("link", { name: /Modelos de crachá e utilização correta/ })).toBeVisible();
+    await expect(list.getByRole("link", { name: /SIPAT 2026/ })).toHaveCount(0);
   });
 
   test("comunicado de outra unidade não é acessível pela URL", async ({ page }) => {

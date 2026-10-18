@@ -9,6 +9,9 @@ import * as s from "@/server/db/schema";
 import { hashPassword, shortCode } from "@/server/auth/crypto";
 import { storeUpload } from "@/server/files/storage";
 import { addBusinessMinutes, type BusinessCalendar } from "@/server/sla/business-time";
+import fs from "node:fs";
+import path from "node:path";
+import { ANNOUNCEMENT_DETAILS } from "./announcement-content";
 import { makeDemoPdf } from "./pdf";
 
 /** Senha padrão só para ambientes locais; em homologação pública defina DEMO_PASSWORD (forte e secreta). */
@@ -158,6 +161,8 @@ export async function seedDemo(db: Database, opts: { now?: Date } = {}) {
     { key: "lgpd", cat: "institucional", days: 40, important: true, ack: true, title: "Atualização da política de privacidade (LGPD)", summary: "Entenda como a REALSEG trata seus dados pessoais.", author: "Jurídico" },
     { key: "brigada", cat: "eventos", days: 45, title: "Inscrições abertas para a Brigada de Incêndio", summary: "Faça parte da brigada da sua unidade. Vagas limitadas.", author: "Segurança do Trabalho" },
     { key: "vacinacao", cat: "rh", days: 50, title: "Campanha de vacinação 2026", summary: "Vacinação gratuita contra a gripe nas unidades.", author: "Recursos Humanos" },
+    { key: "boas-praticas", cat: "seguranca", days: 36, title: "Boas práticas de segurança no dia a dia", summary: "Atitudes simples que evitam acidentes e protegem você e sua equipe.", author: "Segurança do Trabalho" },
+    { key: "cracha", cat: "operacoes", days: 43, title: "Modelos de crachá e utilização correta", summary: "Conheça os modelos de crachá e como usá-los corretamente.", author: "Operações" },
     { key: "canal", cat: "institucional", days: 60, title: "Novo canal de atendimento ao colaborador", summary: "Agora você pode abrir solicitações e acompanhar prazos pela intranet.", author: "Comunicação Interna" },
     // Segmentado para outra unidade — Carlos não deve ver.
     { key: "rj-only", cat: "operacoes", days: 6, title: "Mudança de escala na Unidade Rio de Janeiro", summary: "Nova escala de revezamento a partir do próximo mês.", author: "Operações", unit: uRj.id },
@@ -170,12 +175,17 @@ export async function seedDemo(db: Database, opts: { now?: Date } = {}) {
         categoryId: annCats[a.cat],
         title: a.title,
         summary: a.summary,
-        body: announcementBody(a.key, a.summary),
+        body: ANNOUNCEMENT_DETAILS[a.key]?.body ?? announcementBody(a.key, a.summary),
+        coverImage: ANNOUNCEMENT_DETAILS[a.key]?.coverImage,
+        effectiveNote: ANNOUNCEMENT_DETAILS[a.key]?.effectiveNote,
+        highlights: ANNOUNCEMENT_DETAILS[a.key]?.highlights,
+        tags: ANNOUNCEMENT_DETAILS[a.key]?.tags,
+        supportTicketCategory: ANNOUNCEMENT_DETAILS[a.key]?.supportTicketCategory,
         isImportant: a.important ?? false,
         requiresAck: a.ack ?? false,
         isFeatured: a.featured ?? false,
         status: "published",
-        publishedAt: ago(now, a.days, 10),
+        publishedAt: ago(now, a.days, 10, 24),
         authorUserId: mariana.user.id,
         authorLabel: a.author,
       })
@@ -200,11 +210,15 @@ export async function seedDemo(db: Database, opts: { now?: Date } = {}) {
       .returning();
     await db.insert(s.announcementAudiences).values({ announcementId: row.id, type: "all" });
   }
-  const attach = await pdf(ctx, "orientacoes-uniforme.pdf", "Orientações de uso do uniforme", ["Uso obrigatório do crachá visível.", "Camisa polo REALSEG em serviço externo.", "Calçado de segurança nas áreas operacionais."], mariana.user.id);
-  await db.insert(s.announcementAttachments).values({ announcementId: anns.uniforme, fileId: attach });
+  const uniformeFiles = [
+    await pdf(ctx, "Manual do uniforme REALSEG.pdf", "Manual do uniforme REALSEG", ["Uso obrigatório do crachá visível.", "Camisa polo REALSEG em serviço externo.", "Calçado de segurança nas áreas operacionais."], mariana.user.id),
+    await pdf(ctx, "Guia de uso do crachá.pdf", "Guia de uso do crachá", ["Use o crachá na altura do peito, sempre visível.", "Em caso de perda, abra uma solicitação para Serviços."], mariana.user.id),
+    (await storeUpload({ name: "Imagem ilustrativa do uniforme.png", bytes: fs.readFileSync(path.join(import.meta.dirname, "assets/uniforme-ilustrativo.png")) }, mariana.user.id, db)).id,
+  ];
+  await db.insert(s.announcementAttachments).values(uniformeFiles.map((fileId, position) => ({ announcementId: anns.uniforme, fileId, position })));
 
   // Carlos: 3 não lidos (uniforme, campanha, sipat), 1 favorito (sipat), LGPD com ciência.
-  const readKeys = ["ponto", "beneficios", "resultados", "destaque", "feriado", "lgpd", "brigada", "vacinacao", "canal"];
+  const readKeys = ["boas-praticas", "cracha", "ponto", "beneficios", "resultados", "destaque", "feriado", "lgpd", "brigada", "vacinacao", "canal"];
   await db.insert(s.announcementReads).values(readKeys.map((k, i) => ({ announcementId: anns[k], userId: carlos.user.id, version: 1, readAt: ago(now, 3 + i) })));
   await db.insert(s.announcementAcknowledgements).values({ announcementId: anns.lgpd, userId: carlos.user.id, version: 1, acknowledgedAt: ago(now, 38) });
   await db.insert(s.announcementFavorites).values({ announcementId: anns.sipat, userId: carlos.user.id });
