@@ -80,7 +80,7 @@ As funções da Vercel (`gru1`) e o Neon (`aws-sa-east-1`) estão em São Paulo.
 
 ## Ações manuais recomendadas (fora do código)
 
-1. **Neon → Settings → Compute:** limitar o autoscaling a **0,25–0,5 CU** (no Free ele pode subir até 2 CU e consumir CU-hora 8× mais rápido) e manter *scale to zero* em 5 min.
+1. **Neon → Compute (Edit primary compute):** nada a fazer. Conferido em 2026-10-18: o autoscaling está fixo em **0,25 CU** (de 0,25 até 0,25) e o *scale to zero* em 5 min, e nenhum dos dois é configurável no plano Free. Se o projeto migrar para um plano pago, travar o máximo em 0,25–0,5 CU.
 2. **Neon:** ativar o branch por preview na integração com a Vercel antes de criar migrações em outros branches.
 3. **Vercel → Usage:** conferir mensalmente Function Invocations, Fast Origin Transfer e Active CPU.
 4. **Neon → Monitoring:** acompanhar CU-hora e armazenamento (alerta mental: acima de 70 CU-h no mês, investigar o que está acordando o banco).
