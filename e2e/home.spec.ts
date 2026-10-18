@@ -7,7 +7,12 @@ test.describe("home do colaborador", () => {
   test("boas-vindas, pendências, comunicado importante, solicitações e documentos", async ({ page }) => {
     await page.goto("/");
     await expect(page.getByRole("heading", { level: 1 })).toHaveText(/Olá,\s*Carlos!/);
-    await expect(page.getByRole("heading", { name: "Para você resolver" })).toBeVisible();
+    // Pendências aparecem como selos com texto nos atalhos (como na referência, sem bloco extra)
+    const quick = page.getByRole("region", { name: "Acesso rápido" });
+    // A contagem exata depende de outras jornadas (ciência confirmada); o selo com texto precisa existir.
+    await expect(quick.getByRole("link", { name: /Meus documentos.*\d+ pendentes?/ })).toBeVisible();
+    await expect(quick.getByRole("link", { name: /Cursos.*\d+ obrigatórios?/ })).toBeVisible();
+    await expect(page.getByText("Manual de vestimentas")).toBeVisible();
     await expect(page.getByRole("heading", { name: "Atualização no uso do uniforme" })).toBeVisible();
     await expect(page.getByRole("link", { name: /#1048 - Atualização cadastral/ })).toBeVisible();
     await expect(page.getByRole("link", { name: "Baixar Holerite - Setembro/2026" })).toBeVisible();
@@ -45,7 +50,7 @@ test.describe("home sem dados", () => {
   test("estados vazios orientam o próximo passo", async ({ page }) => {
     await page.goto("/");
     await expect(page.getByText("Nenhuma solicitação em andamento")).toBeVisible();
-    await expect(page.getByText("Nenhum documento recebido ainda")).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Meus documentos recentes" })).toBeVisible();
     await page.getByRole("link", { name: "Nova solicitação" }).click();
     await expect(page).toHaveURL(/\/solicitacoes\/nova/);
   });

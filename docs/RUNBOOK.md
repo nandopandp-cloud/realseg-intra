@@ -10,6 +10,16 @@
 7. Agendar `pnpm jobs:run` a cada 5 minutos (cron/k8s CronJob).
 8. Verificar: `/login` responde 200 com header `Content-Security-Policy`; login com usuário de teste; logs `http.request` chegando.
 
+## Deploy na Vercel + Neon (homologação atual)
+- Projeto Vercel `realseg-intra` (conta `realsegintra-9920`), publicado a partir do branch `main` do GitHub. URL: https://realseg-intra-seven.vercel.app
+- A integração Neon cria `DATABASE_URL` (pooler) e `DATABASE_URL_UNPOOLED` (direta) como variáveis **Sensitive** — não são legíveis pela CLI, por isso migrações rodam **no build**.
+- O script `vercel-build` (usado automaticamente pela Vercel) executa: `scripts/migrate.ts` (conexão direta) → `seed deploy` (referência sempre; demonstração somente se `SEED_DEMO=true`, `APP_ENV` ≠ `production` e a base ainda não tiver colaboradores) → `next build`. É idempotente.
+- Variáveis configuradas (Production e Preview): `IP_HASH_SECRET` e `DEMO_PASSWORD` (Sensitive), `APP_ENV=staging`, `MAIL_DRIVER=outbox`, `SEED_DEMO=true`, `TRUST_PROXY=true`; `APP_URL` somente em Production.
+- **Atenção — Preview usa o mesmo banco**: um build de branch aplica suas migrações no banco compartilhado. Antes de criar migrações em branches, habilite na integração Neon a criação de um branch de banco por Preview.
+- **Latência**: as funções da Vercel estão em `iad1` (EUA). Mantenha banco e funções na mesma região (ex.: Neon `aws-sa-east-1` + Vercel `gru1`, ou ambos nos EUA).
+- **Arquivos**: até o driver R2 existir, uploads ficam em `/tmp` da função (efêmero) e downloads de documentos de demonstração respondem "Arquivo indisponível".
+- Ao migrar para produção real: `APP_ENV=production`, SMTP configurado, `SEED_DEMO` removido e base recriada sem dados de demonstração.
+
 ## Migrações
 - Gerar: altere `src/server/db/schema`, rode `pnpm db:generate --name <descricao>`, revise o SQL e commite.
 - Estratégia **expand/contract**: adicionar colunas/tabelas (compatível com a versão anterior) → publicar código → remover o antigo em release posterior.

@@ -17,7 +17,8 @@ export async function runMigrations(url: string) {
 }
 
 if (import.meta.url === `file://${process.argv[1]}`) {
-  const url = process.env.DATABASE_URL;
+  // Migrações usam a conexão direta (sem PgBouncer) quando disponível (ex.: integração Neon na Vercel).
+  const url = process.env.DATABASE_URL_UNPOOLED || process.env.DATABASE_URL;
   if (!url) throw new Error("DATABASE_URL não definido");
   runMigrations(url)
     .then(() => console.log("Migrações aplicadas."))

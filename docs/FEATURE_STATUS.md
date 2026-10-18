@@ -1,16 +1,17 @@
 # Status das funcionalidades
 
-Atualizado em 2026-10-18. Execução real registrada: **unitários 41/41**, **integração 67/67** (PostgreSQL 18 real), **E2E 90/90** (Chromium desktop 1440×900 + Pixel 7, com axe WCAG 2.2 A/AA), lint ✔, typecheck ✔, build de produção ✔. Nenhum teste foi pulado. Cobertura percentual não é medida.
+Atualizado em 2026-10-18 (v0.2.0). Execução real registrada: **unitários 41/41**, **integração 67/67** (PostgreSQL 18 real), **E2E 90/90** (Chromium desktop 1440×900 + Pixel 7, com axe WCAG 2.2 A/AA), lint ✔, typecheck ✔, build de produção ✔. Nenhum teste foi pulado. Cobertura percentual não é medida.
 
 Legenda: ✅ concluído (critérios de aceite + testes) · 🟡 parcial · ⏳ não iniciado/fase seguinte.
 
 | Módulo | Status | Testes que cobrem | Limitações / pendências reais |
 | --- | --- | --- | --- |
 | Fundação (env, banco, migrações, logger, erros, CI) | ✅ | integração (todas), CI | Métricas/APM (OpenTelemetry) pendentes |
+| Deploy Vercel + Neon (homologação) | 🟡 | simulação local do `vercel-build` (migração + seed 2×, idempotente) | Migração no Neon só ocorre no próximo deploy; uploads efêmeros até o driver R2; Preview compartilha o banco; região das funções (`iad1`) a alinhar com a do Neon |
 | Autenticação e sessão | ✅ | `auth.test.ts` (16), E2E A (9) | E-mail real depende do provedor SMTP corporativo (driver pronto). Sem MFA (avaliar para RH/ADMIN) |
 | RBAC e autorização | ✅ (papéis e matriz) | `api-matrix.test.ts`, testes IDOR por módulo | UI de gestão de papéis — fase RH |
 | Design system e shell | ✅ | E2E a11y (desktop + mobile), crawler de desenvolvimento | Logo vetorial oficial e fotos licenciadas em alta resolução pendentes (ADR-0010). Sem tema escuro |
-| Home | ✅ | `services-read`, E2E B | — |
+| Home | ✅ (fiel às referências desktop/mobile) | `services-read`, E2E B | Foto do colaborador no avatar: não há upload de foto (iniciais) |
 | Comunicados (colaborador) | ✅ | `announcements-documents`, E2E C | Publicação/segmentação/relatório de leitura pelo RH — fase RH |
 | Documentos (colaborador) | ✅ | `announcements-documents`, E2E D/E | Distribuição e análise de envios pelo RH — fase RH. Antivírus: hook pronto, scanner não definido (status `skipped`). Armazenamento S3 pendente. Expurgo por retenção aguarda prazos do jurídico |
 | Solicitações e SLA | ✅ (colaborador) · 🟡 (atendimento: serviços prontos e testados, sem UI) | `tickets.test.ts`, `business-time.test.ts`, `ticket-state-machine.test.ts`, E2E F | Fila/atribuição/configuração de SLA na UI — fase RH. Valores de SLA são proposta inicial a validar com o RH. Feriados estaduais/municipais a cadastrar. Chat em tempo real não implementado (atendimento por mensagens no ticket) |

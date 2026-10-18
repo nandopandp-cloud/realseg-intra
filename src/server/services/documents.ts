@@ -366,7 +366,28 @@ export async function documentHistory(ctx: Ctx, limit = 40): Promise<HistoryEntr
   return entries.sort((a, b) => b.at.getTime() - a.at.getTime()).slice(0, limit);
 }
 
-export async function recentDocuments(ctx: Ctx, limit = 3) {
-  const r = await listMyDocuments(ctx, { pageSize: limit });
-  return r.items;
+export type RecentDocument = { id: string; title: string; mimeType: string; at: Date; kind: "recebido" | "atualizado" };
+
+/** "Meus documentos recentes" da Home: recebidos pelo colaborador + normas/manuais atualizados recentemente. */
+export async function recentDocuments(ctx: Ctx, limit = 3): Promise<RecentDocument[]> {
+  const personal = (await listMyDocuments(ctx, { pageSize: limit })).items.map((d) => ({
+    id: d.id,
+    title: d.title,
+    mimeType: d.file.mimeType,
+    at: d.createdAt,
+    kind: "recebido" as const,
+  }));
+  const policies = ctx.actor.permissions.has("policy:read")
+    ? (
+        await getDb()
+          .select({ id: documents.id, title: documents.title, mimeType: fileAssets.mimeType, at: documentVersions.createdAt })
+          .from(documents)
+          .innerJoin(documentVersions, eq(documentVersions.id, documents.currentVersionId))
+          .innerJoin(fileAssets, eq(fileAssets.id, documentVersions.fileId))
+          .where(and(institutional(), sql`${documentVersions.createdAt} > now() - interval '60 days'`))
+          .orderBy(desc(documentVersions.createdAt))
+          .limit(limit)
+      ).map((d) => ({ ...d, kind: "atualizado" as const }))
+    : [];
+  return [...personal, ...policies].sort((a, b) => b.at.getTime() - a.at.getTime()).slice(0, limit);
 }

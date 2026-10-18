@@ -26,7 +26,8 @@
     "db:seed:demo": "tsx --conditions=react-server scripts/seed/index.ts demo",
     "db:reset:demo": "tsx --conditions=react-server scripts/seed/index.ts reset-demo",
     "jobs:run": "tsx --conditions=react-server scripts/jobs.ts",
-    "check": "pnpm lint && pnpm typecheck && pnpm test:unit && pnpm test:integration && pnpm build"
+    "check": "pnpm lint && pnpm typecheck && pnpm test:unit && pnpm test:integration && pnpm build",
+    "vercel-build": "tsx scripts/migrate.ts && tsx --conditions=react-server scripts/seed/index.ts deploy && next build"
   },
   "dependencies": {
     "@date-fns/tz": "^1.5.0",

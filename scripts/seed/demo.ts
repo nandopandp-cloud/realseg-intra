@@ -11,7 +11,8 @@ import { storeUpload } from "@/server/files/storage";
 import { addBusinessMinutes, type BusinessCalendar } from "@/server/sla/business-time";
 import { makeDemoPdf } from "./pdf";
 
-export const DEMO_PASSWORD = "Realseg@2026";
+/** Senha padrão só para ambientes locais; em homologação pública defina DEMO_PASSWORD (forte e secreta). */
+export const DEMO_PASSWORD = process.env.DEMO_PASSWORD || "Realseg@2026";
 export const DEMO_DOMAIN = "demo.realseg.invalid";
 
 type Ctx = { db: Database; now: Date };
@@ -260,18 +261,18 @@ export async function seedDemo(db: Database, opts: { now?: Date } = {}) {
   // Documento de outra pessoa (testes de IDOR)
   await personalDoc(ana, "holerite", "Holerite - Setembro/2026", 17, { period: "2026-09" });
 
-  async function policyDoc(cat: string, title: string, description: string, requiresAck = false) {
+  async function policyDoc(cat: string, title: string, description: string, requiresAck = false, updatedDaysAgo = 90) {
     const fileId = await pdf(ctx, `${title}.pdf`, title, [description], mariana.user.id);
     const [doc] = await db
       .insert(s.documents)
       .values({ categoryId: docCats[cat], scope: "institutional", title, description, requiresAck, effectiveFrom: "2026-01-01", createdByUserId: mariana.user.id, createdAt: ago(now, 90) })
       .returning();
-    const [v] = await db.insert(s.documentVersions).values({ documentId: doc.id, versionNumber: 1, fileId, createdByUserId: mariana.user.id }).returning();
+    const [v] = await db.insert(s.documentVersions).values({ documentId: doc.id, versionNumber: 1, fileId, createdByUserId: mariana.user.id, createdAt: ago(now, updatedDaysAgo) }).returning();
     await db.update(s.documents).set({ currentVersionId: v.id }).where(eq(s.documents.id, doc.id));
     return doc;
   }
   await policyDoc("normas-procedimentos", "Normas e procedimentos", "Políticas e regulamentos internos");
-  await policyDoc("manual-vestimentas", "Manual de vestimentas", "Uso de uniformes e EPIs", true);
+  await policyDoc("manual-vestimentas", "Manual de vestimentas", "Uso de uniformes e EPIs", true, 33);
   await policyDoc("manual-ponto", "Manual de ponto eletrônico", "Orientações de registro de ponto");
   await policyDoc("regulamentos-internos", "Regulamentos internos", "Diretrizes e condutas da empresa");
 

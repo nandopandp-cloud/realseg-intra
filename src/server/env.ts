@@ -16,7 +16,8 @@ const schema = z
     SESSION_IDLE_MINUTES: z.coerce.number().int().min(5).max(24 * 60).default(60),
     IP_HASH_SECRET: z.string().min(16, "IP_HASH_SECRET deve ter ao menos 16 caracteres"),
     TRUST_PROXY: bool,
-    STORAGE_DIR: z.string().default(".data/storage"),
+    // Na Vercel só /tmp é gravável (e efêmero) — uso provisório até o driver R2 (ADR-0007).
+    STORAGE_DIR: z.string().default(process.env.VERCEL ? "/tmp/realseg-storage" : ".data/storage"),
     UPLOAD_MAX_MB: z.coerce.number().int().min(1).max(50).default(10),
     MAIL_DRIVER: z.enum(["outbox", "smtp"]).default("outbox"),
     MAIL_FROM: z.string().default("Intranet REALSEG <nao-responda@realseg.com.br>"),

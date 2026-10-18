@@ -115,8 +115,15 @@ describe("leituras do colaborador (dados de demonstração)", () => {
     expect(home.highlight?.title).toBe("Atualização no uso do uniforme");
     expect(home.tickets.length).toBe(3);
     expect(home.pending.map((p) => p.key)).toEqual(["docs", "ann", "tickets", "courses", "feedbacks"]);
+    expect(home.badges).toMatchObject({ comunicados: "1 pendente", documentos: "3 pendentes", cursos: "1 obrigatório", solicitacoes: "2 aguardam você" });
+    expect(home.docs.map((d) => [d.title, d.kind])).toEqual([
+      ["Holerite - Setembro/2026", "recebido"],
+      ["Manual de vestimentas", "atualizado"],
+      ["Holerite - Agosto/2026", "recebido"],
+    ]);
     const empty = await homeData(joao);
     expect(empty.tickets).toEqual([]);
-    expect(empty.docs).toEqual([]);
+    // Sem documentos pessoais: só aparecem normas/manuais atualizados recentemente (visíveis a todos).
+    expect(empty.docs.every((d) => d.kind === "atualizado")).toBe(true);
   });
 });

@@ -111,7 +111,13 @@ export async function getFileAsset(id: string) {
 
 /** Resposta de download segura. `inline` só para tipos visualizáveis; nunca cacheável. */
 export async function fileResponse(asset: { storageKey: string; originalName: string; mimeType: string; sizeBytes: number }, disposition: "inline" | "attachment") {
-  const body = await storage().stream(asset.storageKey);
+  let body: ReadableStream<Uint8Array>;
+  try {
+    body = await storage().stream(asset.storageKey);
+  } catch (err) {
+    logger.error("storage.file_missing", { err, storageKey: asset.storageKey });
+    throw new AppError("NOT_FOUND", "Arquivo indisponível no momento. Tente novamente mais tarde ou fale com o RH.");
+  }
   const encoded = encodeURIComponent(asset.originalName);
   const ascii = asset.originalName.replace(/[^\x20-\x7e]/g, "_").replace(/"/g, "");
   return new Response(body, {

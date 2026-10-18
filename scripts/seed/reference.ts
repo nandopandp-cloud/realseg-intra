@@ -51,8 +51,11 @@ export async function seedReference(db: Database) {
       .values({ key, name: ROLE_LABELS[key] })
       .onConflictDoUpdate({ target: s.roles.key, set: { name: ROLE_LABELS[key] } })
       .returning();
-    await db.delete(s.rolePermissions).where(eq(s.rolePermissions.roleId, role.id));
-    await db.insert(s.rolePermissions).values(DEFAULT_ROLE_PERMISSIONS[key].map((permissionKey) => ({ roleId: role.id, permissionKey })));
+    // Acrescenta permissões padrão ausentes sem remover ajustes feitos pela administração.
+    await db
+      .insert(s.rolePermissions)
+      .values(DEFAULT_ROLE_PERMISSIONS[key].map((permissionKey) => ({ roleId: role.id, permissionKey })))
+      .onConflictDoNothing();
   }
 
   await db

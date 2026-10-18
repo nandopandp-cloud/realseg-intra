@@ -30,5 +30,15 @@ export async function homeData(ctx: Ctx) {
     learning.obrigatoriosPendentes > 0 && { key: "courses", label: `${learning.obrigatoriosPendentes} ${learning.obrigatoriosPendentes === 1 ? "curso obrigatório pendente" : "cursos obrigatórios pendentes"}`, href: "/cursos?filtro=obrigatorios" },
     feedbacks > 0 && { key: "feedbacks", label: `${feedbacks} ${feedbacks === 1 ? "feedback novo" : "feedbacks novos"} para ler`, href: "/carreira/avaliacoes" },
   ].filter(Boolean) as Array<{ key: string; label: string; href: string }>;
-  return { shortcuts: prefs.homeShortcuts, highlight, tickets, docs, pending };
+  // Selos discretos nos cards de atalho (texto + cor), no lugar de um bloco extra que a referência não possui.
+  const docsPending = pendingDocs.personal + pendingDocs.policies;
+  const badges: Record<string, string | undefined> = {
+    comunicados: pendingAnn > 0 ? `${pendingAnn} ${pendingAnn === 1 ? "pendente" : "pendentes"}` : undefined,
+    documentos: docsPending > 0 ? `${docsPending} ${docsPending === 1 ? "pendente" : "pendentes"}` : undefined,
+    cursos: learning.obrigatoriosPendentes > 0 ? `${learning.obrigatoriosPendentes} ${learning.obrigatoriosPendentes === 1 ? "obrigatório" : "obrigatórios"}` : undefined,
+    solicitacoes: awaiting > 0 ? `${awaiting} ${awaiting === 1 ? "aguarda você" : "aguardam você"}` : undefined,
+    avaliacoes: feedbacks > 0 ? `${feedbacks} ${feedbacks === 1 ? "novo" : "novos"}` : undefined,
+    carreira: feedbacks > 0 ? `${feedbacks} ${feedbacks === 1 ? "feedback novo" : "feedbacks novos"}` : undefined,
+  };
+  return { shortcuts: prefs.homeShortcuts, highlight, tickets, docs, pending, badges };
 }

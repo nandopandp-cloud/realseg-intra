@@ -7,6 +7,17 @@ import { env } from "../env";
 import { AppError, isAppError } from "../errors";
 import { logger } from "../logger";
 import { requestMeta } from "./meta";
+import { randomUUID } from "node:crypto";
+
+function safeMeta(headers: Headers): RequestMeta {
+  try {
+    return requestMeta(headers);
+  } catch (err) {
+    // Ex.: variável de ambiente obrigatória ausente — registra a causa e responde com erro padronizado.
+    logger.error("config.invalid", { err });
+    return { requestId: randomUUID(), ipHash: null, userAgent: null };
+  }
+}
 
 const MUTATING = new Set(["POST", "PUT", "PATCH", "DELETE"]);
 
@@ -106,7 +117,7 @@ export function authed<P = Record<string, string>, B = undefined, Q = undefined>
   handler: (ctx: HandlerCtx<B, Q, P> & { actor: Actor }) => Promise<unknown>,
 ) {
   return async (req: NextRequest, context: RouteContext<P>) => {
-    const meta = requestMeta(req.headers);
+    const meta = safeMeta(req.headers);
     return run(req, meta, async () => {
       const token = req.cookies.get(SESSION_COOKIE)?.value;
       if (!token) throw new AppError("UNAUTHENTICATED", "Faça login para continuar.");
@@ -127,7 +138,7 @@ export function publicRoute<P = Record<string, string>, B = undefined, Q = undef
   handler: (ctx: HandlerCtx<B, Q, P>) => Promise<unknown>,
 ) {
   return async (req: NextRequest, context: RouteContext<P>) => {
-    const meta = requestMeta(req.headers);
+    const meta = safeMeta(req.headers);
     return run(req, meta, async () => {
       const { body, query } = await parseInput(req, opts);
       const params = (await context?.params) ?? ({} as P);

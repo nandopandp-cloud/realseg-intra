@@ -1,8 +1,22 @@
 import { File, FileImage, FileText } from "lucide-react";
 import { cn } from "@/lib/cn";
 
-/** Ícone por tipo REAL do arquivo (PDF vermelho, imagem azul), como nas referências. */
-export function FileIcon({ mimeType, className }: { mimeType: string; className?: string }) {
+/**
+ * Ícone por tipo REAL do arquivo (PDF vermelho, imagem azul), como nas referências.
+ * `variant="manual"` identifica normas/manuais institucionais (documento azul), independentemente do formato.
+ */
+export function FileIcon({ mimeType, className, variant = "file" }: { mimeType: string; className?: string; variant?: "file" | "manual" }) {
+  if (variant === "manual") {
+    return (
+      <span className={cn("relative inline-flex h-11 w-9 shrink-0 items-center justify-center", className)} aria-hidden>
+        <svg viewBox="0 0 36 44" className="absolute inset-0 h-full w-full">
+          <path d="M4 0h20l12 12v28a4 4 0 0 1-4 4H4a4 4 0 0 1-4-4V4a4 4 0 0 1 4-4z" fill="#2F6FE4" />
+          <path d="M24 0l12 12h-8a4 4 0 0 1-4-4V0z" fill="#9CBDF5" />
+          <path d="M9 22h18M9 28h18M9 34h12" stroke="#fff" strokeWidth="2.6" strokeLinecap="round" />
+        </svg>
+      </span>
+    );
+  }
   if (mimeType === "application/pdf") {
     return (
       <span className={cn("relative inline-flex h-11 w-9 shrink-0 items-center justify-center", className)} aria-hidden>
