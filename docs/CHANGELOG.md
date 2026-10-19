@@ -11,7 +11,10 @@
 - Conversa da solicitação em bolhas (suas mensagens à direita, atendimento à esquerda com avatar).
 - Ajuda e suporte conforme `referencias/Central de Ajuda REALSEG.png` e `Portal de Ajuda e Suporte REALSEG.png`: atalhos com as cores da referência (4 colunas também no celular), categorias em 3/2 colunas, 4 artigos no celular e chamada "Ainda precisa de ajuda?".
 - Base de conhecimento com filtros por categoria e tipo; as páginas de categoria passam a abrir a base já filtrada. Artigo em duas colunas com "Falar com o suporte" e solicitação com assunto preenchido.
+- Cursos conforme `referencias/Painel de Cursos REALSEG.png` e `Interface de Cursos Corporativos REALSEG.png`: recomendados sem repetir o curso em andamento (obrigatórios primeiro), trilhas com barra de progresso e "Ver todas"; no celular, "Continuar assistindo" horizontal (o card inteiro leva à aula atual), cards compactos e seta "Ver mais categorias" na rolagem lateral.
+- Página do curso: progresso e botão de continuar logo após o título no celular, capa clicável para continuar e quadro "Sobre o curso".
 ### Adicionado
+- Página "Trilhas de aprendizagem" (`/cursos/trilhas`) com todas as trilhas e o progresso de cada uma.
 - Chat com o suporte (`/ajuda/chat`, `POST /support-chat`): cada conversa vira uma solicitação com `channel = "chat"` (protocolo, prazo, histórico), uma conversa aberta por vez, Enter envia, anexos, atualização automática e "Encerrar conversa". Migration `0004_ticket_channel`.
 
 ## [0.7.0] — 2026-10-18 — Arquivos no Cloudflare R2

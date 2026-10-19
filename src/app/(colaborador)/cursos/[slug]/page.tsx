@@ -20,6 +20,49 @@ export default async function CoursePage({ params }: PageProps<"/cursos/[slug]">
   if (!/^[a-z0-9-]{1,120}$/.test(slug)) notFound();
   const c = await orNotFound(getCourse(ctx, slug));
   const done = c.lessons.filter((l) => l.completed).length;
+  const continueHref = c.enrollment && c.enrollment.status !== "concluido" ? `/cursos/${c.slug}/continuar` : null;
+  const facts: Array<[string, string]> = [
+    ["Área", c.category.name],
+    ["Aulas", String(c.lessonCount)],
+    ["Carga horária", fmtMinutes(c.durationMinutes)],
+    ["Certificado", c.issuesCertificate ? "Sim, ao concluir" : "Não emite"],
+    ["Tipo", c.isMandatory ? "Obrigatório" : "Opcional"],
+  ];
+  const panel = c.enrollment ? (
+        <>
+          <p className="font-bold text-ink">Seu progresso</p>
+          <div className="mt-3 flex items-center gap-3">
+            <ProgressBar value={c.enrollment.progressPercent} label={`Progresso: ${c.enrollment.progressPercent}%`} />
+            <span className="text-sm font-semibold text-ink">{c.enrollment.progressPercent}%</span>
+          </div>
+          <p className="mt-2 text-sm text-muted">
+            {done} de {c.lessonCount} aulas concluídas
+            {c.enrollment.dueAt && c.enrollment.status !== "concluido" && ` • Prazo: ${fmtDate(c.enrollment.dueAt)}`}
+          </p>
+          {c.enrollment.status === "concluido" ? (
+            <>
+              <p className="mt-4 text-[0.9375rem] text-green-700">Concluído em {c.enrollment.completedAt ? fmtDate(c.enrollment.completedAt) : "—"}.</p>
+              {c.certificate && (
+                <ButtonLink href={`/cursos/certificados/${c.certificate.id}`} className="mt-4 w-full" icon={<Award className="size-5" aria-hidden />}>
+                  Ver certificado
+                </ButtonLink>
+              )}
+            </>
+          ) : (
+            <ButtonLink href={`/cursos/${c.slug}/continuar`} size="lg" className="mt-4 w-full" icon={<Play className="size-5 fill-current" aria-hidden />}>
+              {done > 0 ? "Continuar de onde parei" : "Começar primeira aula"}
+            </ButtonLink>
+          )}
+        </>
+      ) : (
+        <>
+          <p className="font-bold text-ink">{c.isMandatory ? "Curso obrigatório" : "Comece quando quiser"}</p>
+          <p className="mt-1 text-[0.9375rem] text-muted">Seu progresso é salvo automaticamente a cada aula concluída.</p>
+          <div className="mt-4 [&>button]:w-full">
+            <EnrollButton slug={c.slug} label="Iniciar curso" />
+          </div>
+        </>
+      );
 
   return (
     <div className="px-4 pt-5 sm:px-6 lg:px-10 lg:pt-8">
@@ -49,9 +92,16 @@ export default async function CoursePage({ params }: PageProps<"/cursos/[slug]">
               </li>
             )}
           </ul>
-          <div className="relative mt-5 aspect-[21/9] overflow-hidden rounded-[var(--radius-card)] bg-field">
-            {c.coverImage && <Image src={c.coverImage} alt="" fill priority sizes="(min-width:1280px) 60vw, 100vw" className="object-cover" />}
-          </div>
+          <Card className="mt-5 p-4 xl:hidden">{panel}</Card>
+          {continueHref ? (
+            <Link href={continueHref} className="relative mt-5 block aspect-[21/9] overflow-hidden rounded-[var(--radius-card)] bg-field hover:opacity-95" aria-label={`Continuar o curso ${c.title}`}>
+              {c.coverImage && <Image src={c.coverImage} alt="" fill priority sizes="(min-width:1280px) 60vw, 100vw" className="object-cover" />}
+            </Link>
+          ) : (
+            <div className="relative mt-5 aspect-[21/9] overflow-hidden rounded-[var(--radius-card)] bg-field">
+              {c.coverImage && <Image src={c.coverImage} alt="" fill priority sizes="(min-width:1280px) 60vw, 100vw" className="object-cover" />}
+            </div>
+          )}
           <RichText text={c.description} className="prose-rs mt-6" />
 
           <section aria-labelledby="conteudo-curso" className="mt-8">
@@ -89,43 +139,18 @@ export default async function CoursePage({ params }: PageProps<"/cursos/[slug]">
           </section>
         </div>
 
-        <aside>
-          <Card className="sticky top-28 p-5">
-            {c.enrollment ? (
-              <>
-                <p className="font-bold text-ink">Seu progresso</p>
-                <div className="mt-3 flex items-center gap-3">
-                  <ProgressBar value={c.enrollment.progressPercent} label={`Progresso: ${c.enrollment.progressPercent}%`} />
-                  <span className="text-sm font-semibold text-ink">{c.enrollment.progressPercent}%</span>
+        <aside className="hidden flex-col gap-4 xl:flex" aria-label="Progresso e informações do curso">
+          <Card className="p-5">{panel}</Card>
+          <Card className="p-5">
+            <h2 className="font-bold text-ink">Sobre o curso</h2>
+            <dl className="mt-2 space-y-2 text-[0.9375rem]">
+              {facts.map(([k, v]) => (
+                <div key={k} className="flex justify-between gap-3">
+                  <dt className="text-muted">{k}</dt>
+                  <dd className="text-right font-semibold text-ink">{v}</dd>
                 </div>
-                <p className="mt-2 text-sm text-muted">
-                  {done} de {c.lessonCount} aulas concluídas
-                  {c.enrollment.dueAt && c.enrollment.status !== "concluido" && ` • Prazo: ${fmtDate(c.enrollment.dueAt)}`}
-                </p>
-                {c.enrollment.status === "concluido" ? (
-                  <>
-                    <p className="mt-4 text-[0.9375rem] text-green-700">Concluído em {c.enrollment.completedAt ? fmtDate(c.enrollment.completedAt) : "—"}.</p>
-                    {c.certificate && (
-                      <ButtonLink href={`/cursos/certificados/${c.certificate.id}`} className="mt-4 w-full" icon={<Award className="size-5" aria-hidden />}>
-                        Ver certificado
-                      </ButtonLink>
-                    )}
-                  </>
-                ) : (
-                  <ButtonLink href={`/cursos/${c.slug}/continuar`} size="lg" className="mt-4 w-full" icon={<Play className="size-5 fill-current" aria-hidden />}>
-                    {done > 0 ? "Continuar de onde parei" : "Começar primeira aula"}
-                  </ButtonLink>
-                )}
-              </>
-            ) : (
-              <>
-                <p className="font-bold text-ink">{c.isMandatory ? "Curso obrigatório" : "Comece quando quiser"}</p>
-                <p className="mt-1 text-[0.9375rem] text-muted">Seu progresso é salvo automaticamente a cada aula concluída.</p>
-                <div className="mt-4 [&>button]:w-full">
-                  <EnrollButton slug={c.slug} label="Iniciar curso" />
-                </div>
-              </>
-            )}
+              ))}
+            </dl>
           </Card>
         </aside>
       </div>

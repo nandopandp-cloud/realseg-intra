@@ -19,7 +19,7 @@ export default async function LearningPathPage({ params }: PageProps<"/cursos/tr
   const pct = p.courses.length ? Math.round((done / p.courses.length) * 100) : 0;
   return (
     <div className="px-4 pt-5 sm:px-6 lg:px-10 lg:pt-8">
-      <Breadcrumbs items={[{ label: "Cursos", href: "/cursos" }, { label: p.title }]} />
+      <Breadcrumbs items={[{ label: "Início", href: "/" }, { label: "Cursos", href: "/cursos" }, { label: "Trilhas", href: "/cursos/trilhas" }, { label: p.title }]} />
       <Link href="/cursos" className="inline-flex min-h-11 items-center gap-2 text-[0.9375rem] font-semibold text-brand-600 lg:hidden">
         <ArrowLeft className="size-4" aria-hidden /> Cursos
       </Link>

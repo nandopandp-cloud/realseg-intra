@@ -22,7 +22,7 @@ test.describe("cursos", () => {
     await expect(page.getByText(/Aula concluída/)).toBeVisible();
     // Retomada: voltar ao curso e continuar leva à aula 2
     await page.goto("/cursos/cultura-de-seguranca");
-    await expect(page.getByText("1 de 5 aulas concluídas")).toBeVisible();
+    await expect(page.getByText("1 de 5 aulas concluídas").filter({ visible: true })).toBeVisible();
     await page.getByRole("link", { name: "Continuar de onde parei" }).click();
     await expect(page.getByText("Aula 2 de 5")).toBeVisible();
     for (let i = 2; i <= 5; i++) {
@@ -53,5 +53,13 @@ test.describe("cursos", () => {
     await page.goto("/cursos/gestao-administrativa");
     await expect(page.getByRole("heading", { name: "Página não encontrada" })).toBeVisible();
     await ctx.close();
+  });
+
+  test("trilhas: Ver todas lista as trilhas com progresso e abre o detalhe", async ({ page }) => {
+    await page.goto("/cursos");
+    await page.getByRole("region", { name: "Trilhas de aprendizagem" }).getByRole("link", { name: /Ver todas/ }).click();
+    await expect(page).toHaveURL(/\/cursos\/trilhas$/);
+    await page.getByRole("link", { name: /Segurança no trabalho/ }).click();
+    await expect(page.getByRole("heading", { level: 1, name: "Segurança no trabalho" })).toBeVisible();
   });
 });

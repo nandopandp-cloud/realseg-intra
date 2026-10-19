@@ -21,8 +21,8 @@ export type CourseCardData = {
 export function CourseCard({ c }: { c: CourseCardData }) {
   const tone = toTone(c.category.color);
   return (
-    <Link href={`/cursos/${c.slug}`} className="group flex items-center gap-4 rounded-[var(--radius-card)] border border-line bg-surface p-2.5 pr-3 transition-shadow hover:shadow-[var(--shadow-raised)]">
-      <span className="relative h-[5.5rem] w-[8.25rem] shrink-0 overflow-hidden rounded-xl bg-field sm:h-24 sm:w-36">
+    <Link href={`/cursos/${c.slug}`} className="group flex h-full items-center gap-3 rounded-[var(--radius-card)] border border-line bg-surface p-2 pr-3 transition-shadow hover:shadow-[var(--shadow-raised)] sm:gap-4 sm:p-2.5">
+      <span className="relative h-[4.5rem] w-[6.5rem] shrink-0 overflow-hidden rounded-xl bg-field sm:h-24 sm:w-36">
         {c.coverImage && <Image src={c.coverImage} alt="" fill sizes="150px" className="object-cover" />}
       </span>
       <span className="min-w-0 flex-1">
@@ -34,7 +34,7 @@ export function CourseCard({ c }: { c: CourseCardData }) {
           )}
           {c.enrollmentStatus === "concluido" && <Badge tone="green">Concluído</Badge>}
         </span>
-        <span className="mt-1.5 block leading-snug font-bold text-ink">{c.title}</span>
+        <span className="mt-1 block text-[0.9375rem] leading-snug font-bold text-ink sm:mt-1.5 sm:text-base">{c.title}</span>
         <span className="mt-1 flex items-center gap-1.5 text-sm text-muted">
           <FileText className="size-4" aria-hidden /> {c.lessonCount} aulas • {fmtMinutes(c.durationMinutes)}
         </span>

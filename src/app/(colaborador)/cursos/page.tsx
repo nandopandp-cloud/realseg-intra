@@ -4,7 +4,7 @@ import Link from "@/components/ui/app-link";
 import { ArrowRight, Award, ChartColumn, ChevronRight, GraduationCap, Play } from "lucide-react";
 import { z } from "zod";
 import { PageBody, PageHero } from "@/components/layout/page-hero";
-import { ButtonLink } from "@/components/ui/button";
+import { ButtonLink, buttonClasses } from "@/components/ui/button";
 import { SearchField } from "@/components/ui/filters";
 import { iconFor, toTone, TONE } from "@/components/ui/icons";
 import { LinkTabs } from "@/components/ui/navigation";
@@ -35,7 +35,11 @@ export default async function CoursesPage({ searchParams }: PageProps<"/cursos">
     myLearningSummary(ctx),
     listLearningPaths(ctx),
   ]);
-  const recommended = courses.filter((c) => c.enrollmentStatus !== "concluido").slice(0, 4);
+  // Recomendados: o que falta fazer, sem repetir o curso de "Continuar assistindo"; obrigatórios primeiro.
+  const recommended = courses
+    .filter((c) => c.enrollmentStatus !== "concluido" && c.slug !== cont?.slug)
+    .sort((a, b) => Number(b.isMandatory) - Number(a.isMandatory))
+    .slice(0, 4);
   const filterHref = (f?: string) => {
     const p = new URLSearchParams();
     if (sp.categoria) p.set("categoria", sp.categoria);
@@ -80,7 +84,7 @@ export default async function CoursesPage({ searchParams }: PageProps<"/cursos">
                 {courses.length === 0 ? (
                   <EmptyState className="mt-5" icon={GraduationCap} title="Nenhum curso encontrado" description="Tente outra categoria ou palavra-chave." action={<ButtonLink href="/cursos" variant="outline">Ver todos os cursos</ButtonLink>} />
                 ) : (
-                  <ul className="mt-4 grid grid-cols-1 gap-3 2xl:grid-cols-2">
+                  <ul className="mt-4 grid grid-cols-1 gap-2.5 min-[1440px]:grid-cols-2 sm:gap-3">
                     {courses.map((c) => (
                       <li key={c.id}>
                         <CourseCard c={c} />
@@ -94,29 +98,33 @@ export default async function CoursesPage({ searchParams }: PageProps<"/cursos">
                 <section aria-labelledby="continuar">
                   <SectionHeader title="Continuar assistindo" id="continuar" href="/cursos?filtro=em-andamento" className="mb-3" />
                   {cont ? (
-                    <Card className="flex flex-col gap-4 p-3 sm:flex-row sm:items-center sm:p-3">
-                      <Link href={`/cursos/${cont.slug}`} className="relative aspect-[16/9] w-full shrink-0 overflow-hidden rounded-xl sm:w-64" aria-label={`Continuar ${cont.title}`}>
-                        {cont.coverImage && <Image src={cont.coverImage} alt="" fill sizes="260px" className="object-cover" />}
-                        <span className="absolute inset-0 flex items-center justify-center" aria-hidden>
-                          <span className="inline-flex size-14 items-center justify-center rounded-full bg-white/95 text-ink shadow">
-                            <Play className="ml-1 size-6 fill-current" />
+                    <Card className="relative flex items-center gap-3 p-2.5 sm:gap-5 sm:p-3">
+                      <span className="relative aspect-[4/3] w-[7.5rem] shrink-0 overflow-hidden rounded-xl sm:aspect-[16/10] sm:w-56" aria-hidden>
+                        {cont.coverImage && <Image src={cont.coverImage} alt="" fill sizes="(min-width: 640px) 224px, 120px" className="object-cover" />}
+                        <span className="absolute inset-0 flex items-center justify-center">
+                          <span className="inline-flex size-10 items-center justify-center rounded-full bg-white/95 text-ink shadow sm:size-14">
+                            <Play className="ml-0.5 size-4 fill-current sm:ml-1 sm:size-6" />
                           </span>
                         </span>
-                      </Link>
-                      <div className="min-w-0 flex-1 px-1 pb-1 sm:px-0">
-                        <p className="font-mono text-xs tracking-[0.14em] text-muted uppercase">{cont.category.name}</p>
-                        <p className="mt-1 text-lg leading-snug font-bold text-ink">{cont.title}</p>
-                        <div className="mt-3 flex items-center gap-3">
+                      </span>
+                      <div className="min-w-0 flex-1">
+                        <p className="font-mono text-[0.6875rem] tracking-[0.14em] text-muted uppercase sm:text-xs">{cont.category.name}</p>
+                        {/* O título é o link principal; a área clicável cobre o card inteiro. */}
+                        <Link href={`/cursos/${cont.slug}/continuar`} className="mt-1 block leading-snug font-bold text-ink after:absolute after:inset-0 after:rounded-[var(--radius-card)] sm:text-lg" aria-label={`Continuar ${cont.title}`}>
+                          {cont.title}
+                        </Link>
+                        <div className="mt-2 flex items-center gap-3 sm:mt-3">
                           <ProgressBar value={cont.progressPercent ?? 0} label={`Progresso: ${cont.progressPercent ?? 0}%`} className="max-w-64" />
                           <span className="text-sm text-muted">{cont.progressPercent ?? 0}%</span>
                         </div>
-                        <p className="mt-2 text-sm text-muted">
+                        <p className="mt-1.5 text-sm text-muted sm:mt-2">
                           Aula {cont.currentLessonNumber} de {cont.lessonCount} • {fmtMinutes(cont.remainingMinutes)} restantes
                         </p>
                       </div>
-                      <ButtonLink href={`/cursos/${cont.slug}/continuar`} className="sm:mr-3" icon={<Play className="size-4 fill-current" aria-hidden />}>
-                        Continuar
-                      </ButtonLink>
+                      <span className={cn(buttonClasses("primary", "md"), "pointer-events-none relative mr-3 hidden sm:inline-flex")} aria-hidden>
+                        <Play className="size-4 fill-current" /> Continuar
+                      </span>
+                      <ChevronRight className="size-5 shrink-0 text-ink/70 sm:hidden" aria-hidden />
                     </Card>
                   ) : (
                     <EmptyState icon={Play} title="Nenhum curso em andamento" description="Escolha um curso abaixo e comece quando quiser. Seu progresso fica salvo." />
@@ -127,7 +135,7 @@ export default async function CoursesPage({ searchParams }: PageProps<"/cursos">
                   {recommended.length === 0 ? (
                     <EmptyState icon={GraduationCap} title="Você concluiu todos os cursos disponíveis" description="Novos cursos aparecerão aqui." />
                   ) : (
-                    <ul className="grid grid-cols-1 gap-3 2xl:grid-cols-2">
+                    <ul className="grid grid-cols-1 gap-2.5 min-[1440px]:grid-cols-2 sm:gap-3">
                       {recommended.map((c) => (
                         <li key={c.id}>
                           <CourseCard c={c} />
@@ -172,7 +180,7 @@ export default async function CoursesPage({ searchParams }: PageProps<"/cursos">
               </Link>
             </Card>
             <Card className="p-5" aria-labelledby="trilhas">
-              <SectionHeader title="Trilhas de aprendizagem" id="trilhas" as="h2" className="[&_h2]:text-lg" />
+              <SectionHeader title="Trilhas de aprendizagem" id="trilhas" as="h2" href="/cursos/trilhas" linkLabel="Ver todas" className="[&_h2]:text-lg" />
               <ul className="mt-1 divide-y divide-line">
                 {paths.map((p) => {
                   const Icon = iconFor(p.icon);
@@ -183,10 +191,14 @@ export default async function CoursesPage({ searchParams }: PageProps<"/cursos">
                         <span className={cn("inline-flex size-12 shrink-0 items-center justify-center rounded-xl", TONE[tone].tile, TONE[tone].icon)} aria-hidden>
                           <Icon className="size-6" />
                         </span>
-                        <span className="flex-1">
+                        <span className="min-w-0 flex-1">
                           <span className="block font-semibold text-ink">{p.title}</span>
                           <span className="block text-sm text-muted">
-                            {p.courseCount} cursos • {fmtMinutes(p.minutes)} • {p.percent}% concluído
+                            {p.courseCount} cursos • {fmtMinutes(p.minutes)}
+                          </span>
+                          <span className="mt-1.5 flex items-center gap-2">
+                            <ProgressBar value={p.percent} label={`${p.title}: ${p.percent}% concluído`} className="h-1 max-w-32" />
+                            <span className="text-xs text-muted">{p.percent}%</span>
                           </span>
                         </span>
                         <ChevronRight className="size-5 text-ink/70" aria-hidden />

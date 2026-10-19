@@ -52,4 +52,14 @@ test.describe("jornadas no celular", () => {
     await expect(page.getByRole("button", { name: "Enviar mensagem" })).toBeVisible();
     await expectNoHorizontalOverflow(page);
   });
+
+  test("cursos: seta de mais categorias e card Continuar leva à aula atual", async ({ page }) => {
+    await page.goto("/cursos");
+    await expect(page.getByRole("button", { name: "Ver mais categorias" })).toBeVisible();
+    await page.getByRole("button", { name: "Ver mais categorias" }).click();
+    await expectNoHorizontalOverflow(page);
+    await page.getByRole("link", { name: /^Continuar / }).click();
+    await expect(page).toHaveURL(/\/aulas\//);
+    await expect(page.getByRole("button", { name: "Concluir aula" })).toBeVisible();
+  });
 });
