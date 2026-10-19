@@ -90,19 +90,19 @@ export function PageHero({
               <p className="eyebrow lg:hidden">{eyebrow}</p>
             </div>
             <div className="relative flex items-start justify-between gap-4">
-              <div className={cn(art ? "max-w-[60%] lg:max-w-[64%]" : mobileImage ? "max-w-[62%] lg:max-w-[56%]" : "max-w-none lg:max-w-[56%]", back && "pl-9 lg:pl-0")}>
+              <div className={cn(art ? "max-w-[66%] sm:max-w-[60%] lg:max-w-[64%]" : mobileImage ? "max-w-[62%] lg:max-w-[56%]" : "max-w-none lg:max-w-[56%]", back && "pl-9 lg:pl-0")}>
                 <h1
                   id="page-title"
-                  className={cn("leading-[1.1] font-bold tracking-tight text-ink lg:text-[2.75rem]", art ? "mt-1.5 text-[1.75rem] sm:text-[2.25rem] lg:mt-2" : "mt-2 text-[2rem] sm:text-[2.5rem] lg:mt-3")}
+                  className={cn("leading-[1.1] font-bold tracking-tight text-ink lg:text-[2.75rem]", art ? "mt-1 text-[1.625rem] sm:text-[2.25rem] lg:mt-1.5 lg:text-[2.5rem]" : "mt-2 text-[2rem] sm:text-[2.5rem] lg:mt-3")}
                 >
                   {title}
                 </h1>
-                {subtitle && <p className={cn("leading-snug text-muted lg:text-[1.1875rem]", art ? "mt-1.5 text-[0.9375rem] sm:text-[1.0625rem] lg:mt-2" : "mt-2 text-[1.0625rem] lg:mt-3")}>{subtitle}</p>}
+                {subtitle && <p className={cn("leading-snug text-muted lg:text-[1.1875rem]", art ? "mt-1.5 text-[0.875rem] sm:text-[1.0625rem] lg:mt-1 lg:text-[1.125rem]" : "mt-2 text-[1.0625rem] lg:mt-3")}>{subtitle}</p>}
               </div>
               {actions && <div className="relative z-10 hidden shrink-0 lg:block">{actions}</div>}
             </div>
           </div>
-          {children && <div className={cn("relative", art ? "mt-4 lg:mt-5" : "mt-5 lg:mt-6")}>{children}</div>}
+          {children && <div className={cn("relative", art ? "mt-4 lg:mt-4" : "mt-5 lg:mt-6")}>{children}</div>}
         </div>
       </div>
     </section>

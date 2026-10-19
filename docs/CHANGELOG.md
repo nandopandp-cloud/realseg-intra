@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.8.2] — 2026-10-19 — Ajuda e suporte fiel à referência
+### Alterado
+- Ajuda e suporte conforme `referencias/Central de Ajuda REALSEG.png` e `Portal de Ajuda e Suporte REALSEG.png`: imagem do cabeçalho recortada da referência (desktop e celular), atalhos com títulos em duas linhas e setas na cor de cada atalho, categorias e artigos compactos, "Chat com o suporte" com o mesmo ícone da referência, horário de atendimento com ícone em destaque e selo "Online", solicitações recentes compactas e "Não encontrou o que precisa?" com ícone.
+- Celular: categorias e artigos na seleção e ordem da referência, chamada "Ainda precisa de ajuda?" com botão na mesma linha; os quadros laterais aparecem só no desktop (e nos resultados de busca).
+- "Artigos mais acessados" de demonstração na ordem da referência (migration de dados `0005_help_demo_views`, só em bancos de demonstração).
+
 ## [0.8.1] — 2026-10-19 — Imagens de cabeçalho das referências
 ### Alterado
 - Comunicados, Cursos e Minha carreira usam no cabeçalho as imagens recortadas das próprias referências (`*-ref.webp`, desktop e celular), na mesma proporção e posição, com o esfumado original. Novo `art` no `PageHero`; cabeçalho mais compacto nessas páginas, como nas referências. Imagens antigas removidas.

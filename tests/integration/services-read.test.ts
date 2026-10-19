@@ -118,6 +118,15 @@ describe("leituras do colaborador (dados de demonstração)", () => {
 
   it("ajuda, busca global e home", async () => {
     expect((await help.helpCategoriesWithCounts(carlos)).length).toBe(6);
+    // "Artigos mais acessados" na ordem da referência.
+    expect((await help.popularArticles(carlos, 6)).map((a) => a.slug)).toEqual([
+      "como-acessar-a-intranet-pela-primeira-vez",
+      "politica-de-uso-do-uniforme",
+      "esqueci-minha-senha",
+      "solicitacao-de-ferias",
+      "como-registrar-o-ponto",
+      "manual-do-colaborador",
+    ]);
     expect((await help.searchArticles(carlos, { q: "senha" }))[0]?.slug).toBe("esqueci-minha-senha");
     // Sugestões por palavras-chave (assunto livre), ignorando palavras comuns.
     expect((await help.suggestArticles(carlos, "Esqueci a senha do sistema de escalas"))[0]?.slug).toBe("esqueci-minha-senha");

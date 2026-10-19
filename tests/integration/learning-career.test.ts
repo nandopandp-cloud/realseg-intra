@@ -132,13 +132,14 @@ describe("ajuda, perfil e notificações", () => {
     expect(cats.find((c) => c.slug === "sistemas-e-acesso")?.articles).toBe(3);
     expect((await help.searchArticles(carlos, {})).length).toBe(11);
     const art = await help.getArticle(carlos, "esqueci-minha-senha");
+    const [before] = await getDb().select().from(helpArticles).where(eq(helpArticles.id, art.id));
     await help.registerArticleView(carlos, art.id);
     await help.voteArticle(carlos, art.id, true);
     await help.voteArticle(carlos, art.id, false);
     const after = await help.getArticle(carlos, "esqueci-minha-senha");
     expect(after).toMatchObject({ myVote: false, helpfulTotal: 1, helpfulYes: 0 });
     const [row] = await getDb().select().from(helpArticles).where(eq(helpArticles.id, art.id));
-    expect(row.viewCount).toBe(1);
+    expect(row.viewCount).toBe(before.viewCount + 1);
     await expect(help.getArticle(carlos, "artigo-rascunho")).rejects.toMatchObject({ code: "NOT_FOUND" });
   });
 
