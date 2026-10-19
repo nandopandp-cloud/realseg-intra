@@ -1,5 +1,6 @@
 import type { ComponentType } from "react";
 import { Award, CircleHelp, Headphones, UsersRound } from "lucide-react";
+import { FEATURES } from "@/lib/features";
 import { BarsSolid, DocumentSolid, GraduationSolid, MegaphoneSolid } from "@/components/ui/solid-icons";
 
 export type ShortcutDef = {
@@ -27,3 +28,6 @@ export const SHORTCUTS: Record<string, ShortcutDef> = {
   "fale-com-rh": { key: "fale-com-rh", href: "/fale-com-rh", title: "Fale com o RH", subtitle: "Envie uma mensagem ao RH.", short: "Mensagem ao RH", icon: UsersRound, card: "from-[#f2f1fc]", tile: "sm:bg-[#e5e4f8]", iconColor: "text-[#2f3b8f]" },
   avaliacoes: { key: "avaliacoes", href: "/carreira/avaliacoes", title: "Feedbacks", subtitle: "Avaliações e reconhecimentos.", short: "Avaliações e reconhecimentos", icon: Award, card: "from-[#fdf6ec]", tile: "sm:bg-[#f9e8d1]", iconColor: "text-[#8a4a0a]" },
 };
+
+/** Atalhos oferecidos em "Personalizar" (sem as áreas ocultas). */
+export const AVAILABLE_SHORTCUTS = Object.values(SHORTCUTS).filter((s) => FEATURES.talkToHr || s.key !== "fale-com-rh");

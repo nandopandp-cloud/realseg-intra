@@ -75,13 +75,10 @@ test.describe("solicitações", () => {
     expect((await page.request.get("/api/v1/tickets/1050")).status()).toBe(404);
   });
 
-  test("Fale com o RH cria solicitação na categoria RH", async ({ page }) => {
+  test("Fale com o RH está oculto: sem link na navegação e rota 404", async ({ page }) => {
+    await page.goto("/");
+    await expect(page.getByRole("link", { name: "Fale com o RH" })).toHaveCount(0);
     await page.goto("/fale-com-rh");
-    await page.getByLabel("Assunto").fill("Dúvida sobre vale-transporte");
-    await page.getByLabel("Descrição").fill("Gostaria de saber como alterar a linha do vale-transporte.");
-    await page.getByRole("button", { name: "Enviar mensagem ao RH" }).click();
-    await page.getByRole("dialog").getByRole("button", { name: "Confirmar e enviar" }).click();
-    await expect(page.getByText("Solicitação enviada!")).toBeVisible();
-    await expect(page.getByText("RH", { exact: true }).first()).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Página não encontrada" })).toBeVisible();
   });
 });

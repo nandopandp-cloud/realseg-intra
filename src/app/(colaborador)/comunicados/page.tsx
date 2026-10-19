@@ -165,7 +165,7 @@ export default async function AnnouncementsPage({ searchParams }: PageProps<"/co
                 </span>
                 <div>
                   <p className="text-[0.9375rem] text-muted">Tem alguma sugestão, dúvida ou precisa falar com o RH?</p>
-                  <ButtonLink href="/fale-com-rh" variant="outline" size="sm" className="mt-3 border-brand-200 bg-surface text-brand-700" iconRight={<ArrowRight className="size-4" aria-hidden />}>
+                  <ButtonLink href="/solicitacoes/nova?categoria=rh" variant="outline" size="sm" className="mt-3 border-brand-200 bg-surface text-brand-700" iconRight={<ArrowRight className="size-4" aria-hidden />}>
                     Enviar mensagem
                   </ButtonLink>
                 </div>

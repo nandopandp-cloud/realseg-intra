@@ -5,10 +5,13 @@ import { getDb } from "../db/client";
 import { departments, employees, jobFamilies, jobPositions, units, userPreferences, users } from "../db/schema";
 import { listActiveSessions, revokeSession } from "../auth/session";
 import { notFound } from "../errors";
+import { FEATURES } from "@/lib/features";
 
 /** Atalhos disponíveis na Home ("Personalizar"). */
 export const SHORTCUT_KEYS = ["comunicados", "documentos", "cursos", "carreira", "solicitacoes", "ajuda", "fale-com-rh", "avaliacoes"] as const;
 export type ShortcutKey = (typeof SHORTCUT_KEYS)[number];
+/** Atalhos que podem ser escolhidos agora (áreas ocultas ficam de fora, inclusive de preferências antigas). */
+export const isShortcutAvailable = (k: string): k is ShortcutKey => (SHORTCUT_KEYS as readonly string[]).includes(k) && (FEATURES.talkToHr || k !== "fale-com-rh");
 export const DEFAULT_SHORTCUTS: ShortcutKey[] = ["comunicados", "documentos", "cursos", "carreira"];
 
 export async function getProfile(ctx: Ctx) {
@@ -43,7 +46,7 @@ export async function getProfile(ctx: Ctx) {
 
 export async function getPreferences(ctx: Ctx) {
   const [row] = await getDb().select().from(userPreferences).where(eq(userPreferences.userId, ctx.actor.userId));
-  const shortcuts = (row?.homeShortcuts ?? DEFAULT_SHORTCUTS).filter((k): k is ShortcutKey => (SHORTCUT_KEYS as readonly string[]).includes(k));
+  const shortcuts = (row?.homeShortcuts ?? DEFAULT_SHORTCUTS).filter(isShortcutAvailable);
   return { homeShortcuts: shortcuts.length ? shortcuts : DEFAULT_SHORTCUTS, sidebarCollapsed: row?.sidebarCollapsed ?? false };
 }
 

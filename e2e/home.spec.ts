@@ -24,15 +24,16 @@ test.describe("home do colaborador", () => {
     await page.getByRole("button", { name: "Personalizar" }).click();
     const dialog = page.getByRole("dialog", { name: "Personalizar acesso rápido" });
     await dialog.getByText("Cursos", { exact: true }).click();
-    await dialog.getByText("Fale com o RH", { exact: true }).click();
+    await expect(dialog.getByText("Fale com o RH", { exact: true })).toHaveCount(0); // área oculta (src/lib/features.ts)
+    await dialog.getByText("Ajuda e suporte", { exact: true }).click();
     await dialog.getByRole("button", { name: "Salvar atalhos" }).click();
     await expect(page.getByText("Atalhos atualizados.")).toBeVisible();
     await page.reload();
     const quick = page.getByRole("region", { name: "Acesso rápido" });
-    await expect(quick.getByRole("link", { name: /Fale com o RH/ })).toBeVisible();
+    await expect(quick.getByRole("link", { name: /Ajuda e suporte/ })).toBeVisible();
     await expect(quick.getByRole("link", { name: /^Cursos/ })).toHaveCount(0);
-    await quick.getByRole("link", { name: /Fale com o RH/ }).click();
-    await expect(page).toHaveURL(/\/fale-com-rh$/);
+    await quick.getByRole("link", { name: /Ajuda e suporte/ }).click();
+    await expect(page).toHaveURL(/\/ajuda$/);
   });
 
   test("busca global encontra conteúdo autorizado", async ({ page }) => {

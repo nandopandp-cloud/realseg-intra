@@ -49,7 +49,7 @@ export default async function ProfilePage() {
             </dl>
             <p className="mt-4 text-sm text-muted">
               Algum dado incorreto?{" "}
-              <Link href="/fale-com-rh" className="font-semibold text-brand-600 underline">
+              <Link href="/solicitacoes/nova?categoria=rh" className="font-semibold text-brand-600 underline">
                 Solicite a correção ao RH
               </Link>
               .

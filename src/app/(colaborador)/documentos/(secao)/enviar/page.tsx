@@ -36,11 +36,13 @@ export default async function SubmitDocumentPage() {
                   <Link href={`/documentos/envios/${s.id}`} className="flex min-h-14 items-center gap-3 py-3 hover:bg-canvas">
                     <span className="min-w-0 flex-1">
                       <span className="block truncate font-semibold text-ink">{s.title}</span>
-                      <span className="block text-sm text-muted">
-                        {s.category.name} • {fmtDate(s.createdAt)}
+                      <span className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-muted">
+                        <span className="whitespace-nowrap">
+                          {s.category.name} • {fmtDate(s.createdAt)}
+                        </span>
+                        <SubmissionStatusBadge status={s.status} />
                       </span>
                     </span>
-                    <SubmissionStatusBadge status={s.status} />
                     <ChevronRight className="size-5 shrink-0 text-ink/70" aria-hidden />
                   </Link>
                 </li>

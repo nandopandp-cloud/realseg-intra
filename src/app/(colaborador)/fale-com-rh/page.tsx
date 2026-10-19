@@ -3,6 +3,8 @@ import { Clock, ShieldCheck, UsersRound } from "lucide-react";
 import { PageBody, PageHero } from "@/components/layout/page-hero";
 import { Card } from "@/components/ui/primitives";
 import { TicketForm } from "@/features/tickets/ticket-form";
+import { notFound } from "next/navigation";
+import { FEATURES } from "@/lib/features";
 import { requireCtx } from "@/server/auth/current";
 import { listTicketCategories, supportHours } from "@/server/services/tickets";
 
@@ -10,6 +12,7 @@ export const metadata: Metadata = { title: "Fale com o RH" };
 
 /** Canal direto com o RH: cria uma solicitação na categoria RH (com protocolo e prazo). */
 export default async function TalkToHrPage() {
+  if (!FEATURES.talkToHr) notFound();
   await requireCtx();
   const [categories, hours] = await Promise.all([listTicketCategories(), supportHours()]);
   return (

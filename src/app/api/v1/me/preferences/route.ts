@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { authed } from "@/server/http/route";
-import { getPreferences, SHORTCUT_KEYS, updatePreferences } from "@/server/services/profile";
+import { getPreferences, isShortcutAvailable, SHORTCUT_KEYS, updatePreferences } from "@/server/services/profile";
 import { setNotificationPreference } from "@/server/services/notifications";
 import { notificationCategory } from "@/server/db/schema";
 
@@ -8,7 +8,7 @@ export const GET = authed({ permission: "profile:read:own" }, async ({ actor, me
 
 const body = z
   .object({
-    homeShortcuts: z.array(z.enum(SHORTCUT_KEYS)).min(1, "Escolha ao menos 1 atalho.").max(4, "Escolha no máximo 4 atalhos.").optional(),
+    homeShortcuts: z.array(z.enum(SHORTCUT_KEYS).refine(isShortcutAvailable, "Atalho indisponível.")).min(1, "Escolha ao menos 1 atalho.").max(4, "Escolha no máximo 4 atalhos.").optional(),
     sidebarCollapsed: z.boolean().optional(),
     notification: z.object({ category: z.enum(notificationCategory.enumValues), inApp: z.boolean() }).optional(),
   })

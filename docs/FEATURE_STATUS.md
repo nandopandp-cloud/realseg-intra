@@ -21,7 +21,7 @@ Legenda: ✅ concluído (critérios de aceite + testes) · 🟡 parcial · ⏳ n
 | Feedbacks | ✅ (leitura e confirmação) | `learning-career`, E2E I | Registro por gestor/RH — fase RH. Comentário/réplica do colaborador não implementado |
 | Ajuda e suporte | ✅ | `learning-career`, E2E J | Artigos institucionais (ponto, uniforme, férias) são de demonstração; gestão de artigos — fase RH |
 | Perfil, notificações, busca | ✅ | `learning-career`, E2E B/L | Notificações por e-mail (preferência `email`) não enviadas nesta fase |
-| Fale com o RH | ✅ | E2E F | — |
+| Fale com o RH | ⏸️ oculto | E2E F (rota 404) | Oculto em 2026-10-18 por decisão do produto (`src/lib/features.ts` → `talkToHr`). Pedidos ao RH seguem por Solicitações → categoria RH; links antigos apontam para `/solicitacoes/nova?categoria=rh` |
 | Ambiente RH/Administração | ⏳ | — | Próxima fase: painel, colaboradores, comunicados, documentos, filas, SLA, cursos, carreira, feedbacks, relatórios, lote, auditoria (matriz E2E K) |
 | LGPD — exportação/eliminação | 🟡 | — | Acesso e download individuais existem; exportação consolidada e anonimização administrativa — fase RH |
 

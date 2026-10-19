@@ -11,11 +11,11 @@ export const metadata: Metadata = { title: "Nova solicitação" };
 
 export default async function NewTicketPage({ searchParams }: PageProps<"/solicitacoes/nova">) {
   const ctx = await requireCtx();
-  const sp = z.object({ categoria: z.string().max(50).optional().catch(undefined), rascunho: z.uuid().optional().catch(undefined) }).parse(await searchParams);
+  const sp = z.object({ categoria: z.string().max(50).optional().catch(undefined), assunto: z.string().max(200).optional().catch(undefined), rascunho: z.uuid().optional().catch(undefined) }).parse(await searchParams);
   const [categories, draft] = await Promise.all([listTicketCategories(), sp.rascunho ? getDraft(ctx, sp.rascunho).catch(() => null) : null]);
   const initial = draft
     ? { draftId: draft.id, categorySlug: draft.category?.slug ?? undefined, subject: draft.subject, description: draft.description }
-    : { categorySlug: categories.some((c) => c.slug === sp.categoria) ? sp.categoria : undefined };
+    : { categorySlug: categories.some((c) => c.slug === sp.categoria) ? sp.categoria : undefined, subject: sp.assunto?.slice(0, 120) };
   return (
     <div className="mx-auto max-w-4xl px-4 pt-5 sm:px-6 lg:px-10 lg:pt-8">
       <Breadcrumbs items={[{ label: "Início", href: "/" }, { label: "Minhas solicitações", href: "/solicitacoes" }, { label: "Nova solicitação" }]} />

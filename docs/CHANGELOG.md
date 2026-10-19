@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.8.0] — 2026-10-18 — Revisão das jornadas do colaborador
+### Alterado
+- "Fale com o RH" oculto (flag `FEATURES.talkToHr`): sai da sidebar, do "Mais", dos atalhos da Home (inclusive de preferências salvas) e a rota responde 404. Os links passam a abrir uma solicitação na categoria RH.
+- Documentos no celular conforme `referencias/Documentos REALSEG_ Gestão Segura.png`: seta de voltar, 4 recentes com "Ver todos" (lista completa com busca, filtros e paginação), card "Enviar documento" e "Documentos importantes" em 2 colunas. Ícones de documento por categoria (PDF, azul, verde), como nas referências.
+- Histórico de documentos com filtros (Recebidos, Enviados ao RH, Ciência, Acessos) e agrupamento por mês.
+- Detalhe do documento em duas colunas: referência por extenso, formato, versões, "Outros documentos" da mesma categoria e atalho "Dúvidas sobre este documento?" que abre a solicitação já com o assunto preenchido (`/solicitacoes/nova?assunto=`).
+
 ## [0.7.0] — 2026-10-18 — Arquivos no Cloudflare R2
 ### Adicionado
 - Driver de armazenamento Cloudflare R2 (`STORAGE_DRIVER=r2`, automático com as credenciais `R2_*`). Uploads e downloads de documentos, anexos de comunicados e de solicitações passam a ficar no bucket privado, com o mesmo controle de acesso.

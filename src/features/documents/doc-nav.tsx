@@ -3,6 +3,7 @@
 import Link from "@/components/ui/app-link";
 import { usePathname } from "next/navigation";
 import { BookOpen, ChevronRight, Clock, CloudUpload, FileText } from "lucide-react";
+import { DocumentSolid } from "@/components/ui/solid-icons";
 import { cn } from "@/lib/cn";
 
 const ITEMS = [
@@ -31,7 +32,11 @@ export function DocumentsNav() {
                   active ? "border-brand-200 bg-brand-50" : "border-line bg-surface hover:bg-canvas",
                 )}
               >
-                <Icon className={cn("size-7 shrink-0 lg:size-8", active ? "text-brand-600" : "text-ink")} strokeWidth={1.75} aria-hidden />
+                {active && it.href === "/documentos" ? (
+                  <DocumentSolid className="size-7 shrink-0 text-brand-600 lg:size-8" />
+                ) : (
+                  <Icon className={cn("size-7 shrink-0 lg:size-8", active ? "text-brand-600" : "text-ink")} strokeWidth={1.75} aria-hidden />
+                )}
                 <span className="min-w-0 flex-1">
                   <span className={cn("block text-[0.8125rem] leading-tight text-ink sm:text-[0.9375rem] lg:text-[1.0625rem]", active ? "font-bold" : "font-semibold")}>{it.label}</span>
                   <span className="mt-0.5 hidden text-sm text-muted lg:block">{it.sub}</span>

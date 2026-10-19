@@ -1,3 +1,4 @@
+import { FEATURES } from "@/lib/features";
 import { ChartColumn, CircleHelp, FileText, GraduationCap, Headphones, House, Megaphone, UsersRound, type LucideIcon } from "lucide-react";
 
 export type NavItem = { href: string; label: string; icon: LucideIcon; match?: (path: string) => boolean };
@@ -15,7 +16,7 @@ export const PRIMARY_NAV: NavItem[] = [
 
 export const SECONDARY_NAV: NavItem[] = [
   { href: "/ajuda", label: "Ajuda e suporte", icon: CircleHelp, match: starts("/ajuda") },
-  { href: "/fale-com-rh", label: "Fale com o RH", icon: UsersRound, match: starts("/fale-com-rh") },
+  ...(FEATURES.talkToHr ? [{ href: "/fale-com-rh", label: "Fale com o RH", icon: UsersRound, match: starts("/fale-com-rh") }] : []),
 ];
 
 /** Barra inferior mobile (ADR-0009): 4 itens + "Mais", como em referencias/Painel Corporativo REALSEG. */

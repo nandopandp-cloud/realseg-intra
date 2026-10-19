@@ -84,7 +84,8 @@ export function FileUpload({
       >
         <CloudUpload className="size-9 text-brand-600" aria-hidden />
         <p className="text-[0.9375rem] text-muted">
-          <span className="hidden sm:inline">Arraste o arquivo aqui ou </span>escolha uma opção:
+          <span className="hidden sm:inline">Arraste o arquivo aqui ou escolha uma opção:</span>
+          <span className="sm:hidden">Escolha uma opção:</span>
         </p>
         <div className="flex flex-wrap justify-center gap-2">
           <button type="button" onClick={() => inputRef.current?.click()} className="inline-flex min-h-11 items-center gap-2 rounded-[var(--radius-control)] border border-line-strong bg-surface px-4 text-[0.9375rem] font-semibold text-ink hover:bg-canvas" aria-describedby={`${id}-hint`}>

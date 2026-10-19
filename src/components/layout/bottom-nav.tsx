@@ -7,6 +7,7 @@ import { Bell, ChartColumn, CircleHelp, GraduationCap, Megaphone, Menu, Search, 
 import { HouseSolid } from "@/components/ui/solid-icons";
 import { Dialog } from "@/components/ui/dialog";
 import { cn } from "@/lib/cn";
+import { FEATURES } from "@/lib/features";
 import { MOBILE_NAV } from "./nav-items";
 
 const MORE: Array<{ href: string; label: string; icon: LucideIcon; description: string }> = [
@@ -15,7 +16,7 @@ const MORE: Array<{ href: string; label: string; icon: LucideIcon; description: 
   { href: "/cursos", label: "Cursos", icon: GraduationCap, description: "Aulas, progresso e certificados" },
   { href: "/carreira", label: "Minha carreira", icon: ChartColumn, description: "Desenvolvimento, cargos e oportunidades" },
   { href: "/ajuda", label: "Ajuda e suporte", icon: CircleHelp, description: "Dúvidas frequentes e tutoriais" },
-  { href: "/fale-com-rh", label: "Fale com o RH", icon: UsersRound, description: "Envie uma mensagem ao RH" },
+  ...(FEATURES.talkToHr ? [{ href: "/fale-com-rh", label: "Fale com o RH", icon: UsersRound, description: "Envie uma mensagem ao RH" }] : []),
   { href: "/notificacoes", label: "Notificações", icon: Bell, description: "Avisos e atualizações" },
   { href: "/perfil", label: "Meu perfil", icon: UserRound, description: "Dados, preferências e senha" },
 ];

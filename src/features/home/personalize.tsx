@@ -9,7 +9,7 @@ import { Alert } from "@/components/ui/primitives";
 import { useToast } from "@/components/ui/toast";
 import { api, ApiError } from "@/lib/api-client";
 import { cn } from "@/lib/cn";
-import { SHORTCUTS } from "./shortcuts";
+import { AVAILABLE_SHORTCUTS } from "./shortcuts";
 
 export function PersonalizeShortcuts({ current }: { current: string[] }) {
   const [open, setOpen] = useState(false);
@@ -72,7 +72,7 @@ export function PersonalizeShortcuts({ current }: { current: string[] }) {
         <fieldset>
           <legend className="mb-3 text-sm text-muted">{selected.length} de 4 selecionados</legend>
           <ul className="grid gap-2 sm:grid-cols-2">
-            {Object.values(SHORTCUTS).map((s) => {
+            {AVAILABLE_SHORTCUTS.map((s) => {
               const on = selected.includes(s.key);
               const disabled = !on && selected.length >= 4;
               const Icon = s.icon;

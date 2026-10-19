@@ -1,4 +1,6 @@
 import Image from "next/image";
+import Link from "@/components/ui/app-link";
+import { ChevronLeft } from "lucide-react";
 import type { ReactNode } from "react";
 import { cn } from "@/lib/cn";
 import { Breadcrumbs } from "@/components/ui/primitives";
@@ -18,6 +20,7 @@ export function PageHero({
   children,
   actions,
   overlay,
+  back,
 }: {
   eyebrow: string;
   title: string;
@@ -29,6 +32,8 @@ export function PageHero({
   children?: ReactNode;
   actions?: ReactNode;
   overlay?: ReactNode;
+  /** Celular: seta "voltar" à esquerda do rótulo, com o título recuado (referências de Documentos e Solicitações). */
+  back?: { href: string; label: string };
 }) {
   return (
     <section className="relative overflow-hidden border-b border-line/60 bg-gradient-to-b from-canvas to-surface lg:border-b-0 lg:bg-none" aria-labelledby="page-title">
@@ -45,9 +50,16 @@ export function PageHero({
       )}
       <div className="relative px-4 pt-6 pb-6 sm:px-6 lg:px-10 lg:pt-8 lg:pb-7">
         {breadcrumb && <Breadcrumbs items={breadcrumb} />}
+        <div className={cn(back && "relative pl-9 lg:pl-0")}>
+        {back && (
+          <Link href={back.href} className="absolute top-1/2 -left-2.5 inline-flex size-11 -translate-y-1/2 items-center justify-center rounded-full text-ink hover:bg-canvas lg:hidden" aria-label={back.label}>
+            <ChevronLeft className="size-6" strokeWidth={2.2} aria-hidden />
+          </Link>
+        )}
         <p className="eyebrow lg:hidden">{eyebrow}</p>
+        </div>
         <div className="flex items-start justify-between gap-4">
-          <div className="max-w-[62%] lg:max-w-[56%]">
+          <div className={cn(mobileImage ? "max-w-[62%]" : "max-w-none", back && "pl-9 lg:pl-0", "lg:max-w-[56%]")}>
             <h1 id="page-title" className="mt-2 text-[2.125rem] leading-[1.1] font-bold tracking-tight text-ink sm:text-[2.5rem] lg:mt-3 lg:text-[2.75rem]">
               {title}
             </h1>
