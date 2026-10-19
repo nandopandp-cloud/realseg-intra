@@ -8,7 +8,13 @@ test.describe("carreira", () => {
   test("visão geral e abas", async ({ page }) => {
     await page.goto("/carreira");
     await expect(page.getByText("Trilha: Operacional")).toBeVisible();
-    await page.getByRole("link", { name: "Cargos e salários" }).click();
+    // 4 abas, como na referência; Cargos e salários fica dentro de "Meu desenvolvimento".
+    const tabs = page.getByRole("navigation", { name: "Seções de carreira" });
+    await expect(tabs.getByRole("link")).toHaveCount(4);
+    await expect(page.getByRole("link", { name: /Continuar minha trilha: Boas práticas/ })).toBeVisible();
+    await tabs.getByRole("link", { name: "Meu desenvolvimento" }).click();
+    await page.getByRole("navigation", { name: "Meu desenvolvimento" }).getByRole("link", { name: "Cargos e salários" }).click();
+    await expect(tabs.getByRole("link", { name: "Meu desenvolvimento" })).toHaveAttribute("aria-current", "page");
     await expect(page.getByRole("heading", { name: /Plano de cargos e salários — Operacional/ })).toBeVisible();
     await expect(page.getByText("Seu cargo atual")).toBeVisible();
   });
@@ -17,6 +23,8 @@ test.describe("carreira", () => {
     await page.goto("/carreira/cargos");
     const gerente = page.locator("li", { hasText: "Gerente de Operações" });
     await expect(gerente.getByText("Faixa não divulgada")).toBeVisible();
+    // Faixas publicadas aparecem (cargo atual: Auxiliar Operacional II).
+    await expect(page.locator("li", { hasText: "Seu cargo atual" }).getByText(/R\$\s?2\.600\s?–\s?R\$\s?3\.200/)).toBeVisible();
     const plan = await (await page.request.get("/api/v1/career/plan")).text();
     expect(plan).not.toContain("1200000");
   });
@@ -28,7 +36,10 @@ test.describe("carreira", () => {
     await page.getByRole("dialog").getByLabel(/Mensagem para o RH/).fill("Tenho CNH D.");
     await page.getByRole("dialog").getByRole("button", { name: "Enviar candidatura" }).click();
     await expect(page.getByText("Você se candidatou a esta vaga")).toBeVisible();
-    await page.reload();
+    await page.goto("/carreira/oportunidades");
+    const mine = page.getByRole("region", { name: "Minhas candidaturas" });
+    await expect(mine.getByRole("link", { name: /Motorista de Transporte.*Enviada/ })).toBeVisible();
+    await mine.getByRole("link", { name: /Motorista de Transporte/ }).click();
     await page.getByRole("button", { name: "Retirar candidatura" }).click();
     await page.getByRole("dialog").getByRole("button", { name: "Retirar" }).click();
     await expect(page.getByRole("button", { name: "Quero me candidatar" })).toBeVisible();

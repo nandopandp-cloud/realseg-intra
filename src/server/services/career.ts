@@ -18,7 +18,7 @@ import {
 } from "../db/schema";
 import { conflict, invalidTransition, notFound } from "../errors";
 import { audienceMatch, ref } from "./audience";
-import { listCourses, listLearningPaths, trainingHistory } from "./courses";
+import { getLearningPath, listCourses, listLearningPaths, trainingHistory } from "./courses";
 
 const NEW_DAYS = 7;
 
@@ -98,6 +98,25 @@ export async function withdrawApplication(ctx: Ctx, id: string) {
   await audit({ action: "opportunity.withdrawn", actorUserId: ctx.actor.userId, entityType: "opportunity", entityId: id, meta: ctx.meta });
 }
 
+/** Minhas candidaturas (inclusive de vagas já encerradas), mais recentes primeiro. */
+export async function myApplications(ctx: Ctx) {
+  requirePermission(ctx.actor, "opportunity:apply");
+  const e = requireEmployee(ctx.actor);
+  return getDb()
+    .select({
+      opportunityId: opportunityApplications.opportunityId,
+      title: internalOpportunities.title,
+      status: opportunityApplications.status,
+      appliedAt: opportunityApplications.createdAt,
+      closesAt: internalOpportunities.closesAt,
+      open: sql<boolean>`(${internalOpportunities.status} = 'published' AND (${internalOpportunities.closesAt} IS NULL OR ${internalOpportunities.closesAt} > now()))`,
+    })
+    .from(opportunityApplications)
+    .innerJoin(internalOpportunities, eq(internalOpportunities.id, opportunityApplications.opportunityId))
+    .where(eq(opportunityApplications.employeeId, e.id))
+    .orderBy(desc(opportunityApplications.createdAt));
+}
+
 /**
  * Plano de cargos da família do colaborador. Somente faixas publicadas e vigentes.
  * Não há salário individual no sistema; nada é inferido sobre promoção/elegibilidade.
@@ -119,7 +138,7 @@ export async function careerPlan(ctx: Ctx) {
       band: sql<{ minCents: number; maxCents: number; effectiveFrom: string } | null>`(
         SELECT json_build_object('minCents', b.min_cents, 'maxCents', b.max_cents, 'effectiveFrom', b.effective_from)
         FROM ${salaryBands} b
-        WHERE b.job_position_id = ${jobPositions.id}
+        WHERE b.job_position_id = ${ref(jobPositions.id)}
           AND b.visible_to_employees = true
           AND b.effective_from <= current_date
           AND (b.effective_until IS NULL OR b.effective_until >= current_date)
@@ -163,7 +182,12 @@ export async function myTrack(ctx: Ctx) {
   const e = requireEmployee(ctx.actor);
   const paths = await listLearningPaths(ctx);
   const [familyPath] = await getDb().select({ id: learningPaths.id }).from(learningPaths).where(eq(learningPaths.jobFamilyId, e.jobFamilyId)).limit(1);
-  return paths.find((p) => p.id === familyPath?.id) ?? null;
+  const track = paths.find((p) => p.id === familyPath?.id);
+  if (!track) return null;
+  // Próximo curso da trilha (primeiro não concluído), para o atalho "Continuar minha trilha".
+  const detail = await getLearningPath(ctx, track.slug);
+  const next = detail.courses.find((c) => c.enrollmentStatus !== "concluido");
+  return { ...track, next: next ? { slug: next.slug, title: next.title, started: next.enrollmentStatus === "em_andamento" } : null };
 }
 
 export async function recommendedContent(ctx: Ctx, limit = 3) {

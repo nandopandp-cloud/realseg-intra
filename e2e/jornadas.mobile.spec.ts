@@ -62,4 +62,16 @@ test.describe("jornadas no celular", () => {
     await expect(page).toHaveURL(/\/aulas\//);
     await expect(page.getByRole("button", { name: "Concluir aula" })).toBeVisible();
   });
+
+  test("carreira: 1 conteúdo recomendado, chamada final e plano de cargos pelo desenvolvimento", async ({ page }) => {
+    await page.goto("/carreira");
+    await expect(page.getByRole("region", { name: "Conteúdos recomendados" }).getByRole("listitem").filter({ visible: true })).toHaveCount(1);
+    await expectNoHorizontalOverflow(page);
+    await page.getByRole("link", { name: /Construa o seu futuro com a gente/ }).click();
+    await expect(page).toHaveURL(/\/carreira\/oportunidades$/);
+    await page.goto("/carreira/desenvolvimento");
+    await page.getByRole("navigation", { name: "Meu desenvolvimento" }).getByRole("link", { name: "Cargos e salários" }).click();
+    await expect(page.getByRole("heading", { name: /Plano de cargos e salários/ })).toBeVisible();
+    await expectNoHorizontalOverflow(page);
+  });
 });

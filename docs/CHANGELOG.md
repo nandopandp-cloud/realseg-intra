@@ -13,7 +13,11 @@
 - Base de conhecimento com filtros por categoria e tipo; as páginas de categoria passam a abrir a base já filtrada. Artigo em duas colunas com "Falar com o suporte" e solicitação com assunto preenchido.
 - Cursos conforme `referencias/Painel de Cursos REALSEG.png` e `Interface de Cursos Corporativos REALSEG.png`: recomendados sem repetir o curso em andamento (obrigatórios primeiro), trilhas com barra de progresso e "Ver todas"; no celular, "Continuar assistindo" horizontal (o card inteiro leva à aula atual), cards compactos e seta "Ver mais categorias" na rolagem lateral.
 - Página do curso: progresso e botão de continuar logo após o título no celular, capa clicável para continuar e quadro "Sobre o curso".
+- Minha carreira conforme `referencias/Dashboard de Carreira REALSEG.png` e `Painel de carreira REALSEG.png`: 4 abas (Visão geral, Meu desenvolvimento, Oportunidades, Avaliações), com Cargos e salários dentro de "Meu desenvolvimento"; "Continuar minha trilha" leva direto ao próximo curso; oportunidades com selos à direita; conteúdos recomendados em 3 colunas (1 no celular); etapa atual destacada em "Próximas etapas"; chamada "Construa o seu futuro" no celular.
+### Corrigido
+- Plano de cargos e salários mostrava "Faixa não divulgada" para todos os cargos: a subconsulta da faixa comparava a coluna errada. Faixas publicadas e vigentes voltam a aparecer (faixas não publicadas continuam ocultas).
 ### Adicionado
+- "Minhas candidaturas" em Oportunidades, com situação de cada candidatura e acesso à vaga.
 - Página "Trilhas de aprendizagem" (`/cursos/trilhas`) com todas as trilhas e o progresso de cada uma.
 - Chat com o suporte (`/ajuda/chat`, `POST /support-chat`): cada conversa vira uma solicitação com `channel = "chat"` (protocolo, prazo, histórico), uma conversa aberta por vez, Enter envia, anexos, atualização automática e "Encerrar conversa". Migration `0004_ticket_channel`.
 

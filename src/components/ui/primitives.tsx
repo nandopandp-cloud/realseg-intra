@@ -100,13 +100,14 @@ export function ProgressBar({ value, label, className, tone = "brand" }: { value
   );
 }
 
-export function ProgressRing({ value, size = 128, stroke = 12, caption = "Concluído" }: { value: number; size?: number; stroke?: number; caption?: string }) {
+/** Anel de progresso. Escala pelo viewBox: `className` pode reduzir o tamanho em telas menores (ex.: `max-sm:!size-26`). */
+export function ProgressRing({ value, size = 128, stroke = 12, caption = "Concluído", className }: { value: number; size?: number; stroke?: number; caption?: string; className?: string }) {
   const v = Math.max(0, Math.min(100, Math.round(value)));
   const r = (size - stroke) / 2;
   const c = 2 * Math.PI * r;
   return (
-    <div className="relative inline-flex shrink-0 items-center justify-center" style={{ width: size, height: size }} role="img" aria-label={`${v}% ${caption.toLowerCase()}`}>
-      <svg width={size} height={size} className="-rotate-90" aria-hidden>
+    <div className={cn("relative inline-flex shrink-0 items-center justify-center", className)} style={{ width: size, height: size }} role="img" aria-label={`${v}% ${caption.toLowerCase()}`}>
+      <svg viewBox={`0 0 ${size} ${size}`} className="size-full -rotate-90" aria-hidden>
         <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="var(--color-line)" strokeWidth={stroke} />
         <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="var(--color-brand-600)" strokeWidth={stroke} strokeLinecap="round" strokeDasharray={c} strokeDashoffset={c * (1 - v / 100)} />
       </svg>

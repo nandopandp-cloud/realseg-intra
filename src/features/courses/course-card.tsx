@@ -18,8 +18,28 @@ export type CourseCardData = {
   category: { slug: string; name: string; color: string };
 };
 
-export function CourseCard({ c }: { c: CourseCardData }) {
+/** `compact`: miniatura menor e texto reduzido, para grades de 3 colunas (ex.: "Conteúdos recomendados" da carreira). */
+export function CourseCard({ c, compact }: { c: CourseCardData; compact?: boolean }) {
   const tone = toTone(c.category.color);
+  if (compact) {
+    return (
+      <Link href={`/cursos/${c.slug}`} className="group flex h-full items-center gap-3 rounded-[var(--radius-card)] border border-line bg-surface p-2 pr-2.5 transition-shadow hover:shadow-[var(--shadow-raised)]">
+        <span className="relative h-[4.5rem] w-[6.5rem] shrink-0 overflow-hidden rounded-xl bg-field lg:size-[5.25rem]">
+          {c.coverImage && <Image src={c.coverImage} alt="" fill sizes="110px" className="object-cover" />}
+        </span>
+        <span className="min-w-0 flex-1">
+          <span className={cn("inline-block rounded-full px-2 py-0.5 font-mono text-[0.625rem] font-medium tracking-[0.12em] uppercase", c.isMandatory ? "bg-brand-100 text-brand-700" : cn(TONE[tone].soft, TONE[tone].text))}>
+            {c.isMandatory ? "Obrigatório" : c.category.name}
+          </span>
+          <span className="mt-1 line-clamp-2 block text-[0.9375rem] leading-snug font-bold text-ink lg:text-sm">{c.title}</span>
+          <span className="mt-1 flex items-center gap-1.5 text-xs text-muted">
+            <FileText className="size-3.5" aria-hidden /> {c.lessonCount} aulas • {fmtMinutes(c.durationMinutes)}
+          </span>
+        </span>
+        <ChevronRight className="size-4 shrink-0 text-ink/70" aria-hidden />
+      </Link>
+    );
+  }
   return (
     <Link href={`/cursos/${c.slug}`} className="group flex h-full items-center gap-3 rounded-[var(--radius-card)] border border-line bg-surface p-2 pr-3 transition-shadow hover:shadow-[var(--shadow-raised)] sm:gap-4 sm:p-2.5">
       <span className="relative h-[4.5rem] w-[6.5rem] shrink-0 overflow-hidden rounded-xl bg-field sm:h-24 sm:w-36">

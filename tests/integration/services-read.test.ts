@@ -100,11 +100,14 @@ describe("leituras do colaborador (dados de demonstração)", () => {
     expect(plan.positions.find((p) => p.isCurrent)?.levelLabel).toBe("II");
     const gerente = plan.positions.find((p) => p.title === "Gerente de Operações");
     expect(gerente?.band).toBeNull();
+    // Faixas publicadas aparecem (regressão: a subconsulta comparava com a coluna errada e nunca encontrava faixa).
+    expect(plan.positions.find((p) => p.isCurrent)?.band).toMatchObject({ minCents: 260000, maxCents: 320000 });
     const opps = await career.listOpportunities(carlos);
     expect(opps.map((o) => o.title)).toEqual(["Agente de Segurança Patrimonial", "Motorista de Transporte"]);
     expect((await career.listOpportunities(joao)).map((o) => o.title)).toContain("Assistente de RH");
     const ov = await career.careerOverview(carlos);
     expect(ov.track?.title).toBe("Operacional");
+    expect(ov.track?.next).toMatchObject({ slug: "boas-praticas-de-seguranca", started: true });
     expect(ov.goals.length).toBe(4);
   });
 

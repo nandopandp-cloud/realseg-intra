@@ -1,3 +1,4 @@
+import { DevelopmentSubnav } from "@/features/career/career-tabs";
 import type { Metadata } from "next";
 import Link from "@/components/ui/app-link";
 import { Award, CircleCheck, Circle, GraduationCap } from "lucide-react";
@@ -18,6 +19,8 @@ export default async function DevelopmentPage() {
   const [track, goals, history, achievements, paths] = await Promise.all([myTrack(ctx), myGoals(ctx), trainingHistory(ctx), myAchievements(ctx, 50), listLearningPaths(ctx)]);
   const totalMinutes = history.reduce((a, h) => a + h.durationMinutes, 0);
   return (
+    <>
+    <DevelopmentSubnav />
     <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
       <Card className="p-5" aria-labelledby="plano">
         <h2 id="plano" className="text-lg font-bold text-ink">
@@ -128,5 +131,6 @@ export default async function DevelopmentPage() {
         )}
       </Card>
     </div>
+    </>
   );
 }

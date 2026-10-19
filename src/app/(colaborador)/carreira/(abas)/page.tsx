@@ -27,9 +27,9 @@ export default async function CareerOverviewPage() {
             <SectionHeader title="Meu desenvolvimento" id="meu-desenvolvimento" href="/carreira/desenvolvimento" linkLabel="Ver detalhes" className="mb-3" />
             {track ? (
               <>
-                <div className="flex flex-col items-start gap-5 sm:flex-row sm:items-center">
-                  <ProgressRing value={track.percent} size={136} />
-                  <div className="flex-1">
+                <div className="flex items-center gap-4 sm:gap-6">
+                  <ProgressRing value={track.percent} size={136} className="max-sm:!size-[6.75rem]" />
+                  <div className="min-w-0 flex-1">
                     <p className="text-lg font-bold text-ink">Trilha: {track.title}</p>
                     <p className="mt-1 text-[0.9375rem] text-muted">Conclua os próximos cursos e atividades para continuar evoluindo na sua carreira.</p>
                     <p className="mt-3 text-sm text-muted">
@@ -38,10 +38,21 @@ export default async function CareerOverviewPage() {
                     <ProgressBar value={track.percent} label={`Trilha ${track.percent}% concluída`} className="mt-2" />
                   </div>
                 </div>
-                <Link href={`/cursos/trilhas/${track.slug}`} className="mt-5 flex min-h-14 items-center gap-3 rounded-xl bg-brand-50 px-4 text-brand-700 hover:bg-brand-100">
-                  <Play className="size-5 fill-current" aria-hidden />
-                  <span className="flex-1 font-medium">Continuar minha trilha</span>
-                  <ChevronRight className="size-5" aria-hidden />
+                <Link
+                  href={track.next ? (track.next.started ? `/cursos/${track.next.slug}/continuar` : `/cursos/${track.next.slug}`) : `/cursos/trilhas/${track.slug}`}
+                  className="mt-5 flex min-h-14 items-center gap-3 rounded-xl bg-brand-50 px-4 text-brand-700 hover:bg-brand-100"
+                >
+                  <Play className="size-5 shrink-0 fill-current" aria-hidden />
+                  <span className="min-w-0 flex-1 font-medium">
+                    {track.next ? (
+                      <>
+                        Continuar minha trilha<span className="hidden sm:inline">: {track.next.title}</span>
+                      </>
+                    ) : (
+                      "Trilha concluída — ver cursos da trilha"
+                    )}
+                  </span>
+                  <ChevronRight className="size-5 shrink-0" aria-hidden />
                 </Link>
               </>
             ) : (
@@ -54,7 +65,7 @@ export default async function CareerOverviewPage() {
             {o.opportunities.length === 0 ? (
               <EmptyState icon={UsersRound} title="Nenhuma oportunidade aberta para você agora" description="Fique de olho: novas vagas internas aparecem aqui assim que forem publicadas." />
             ) : (
-              <ul className="grid grid-cols-1 gap-3 2xl:grid-cols-2">
+              <ul className="grid grid-cols-1 gap-3 min-[1440px]:grid-cols-2">
                 {o.opportunities.map((op) => (
                   <li key={op.id}>
                     <OpportunityCard o={op} />
@@ -69,15 +80,27 @@ export default async function CareerOverviewPage() {
             {o.recommended.length === 0 ? (
               <p className="text-[0.9375rem] text-muted">Sem recomendações no momento.</p>
             ) : (
-              <ul className="grid grid-cols-1 gap-3 2xl:grid-cols-2">
-                {o.recommended.map((c) => (
-                  <li key={c.id}>
-                    <CourseCard c={c} />
+              <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 min-[1440px]:grid-cols-3">
+                {o.recommended.map((c, i) => (
+                  <li key={c.id} className={cn(i > 0 && "hidden sm:block")}>
+                    <CourseCard c={c} compact />
                   </li>
                 ))}
               </ul>
             )}
           </section>
+
+          {/* Celular: chamada final da referência mobile (o card inteiro é o link). */}
+          <Link href="/carreira/oportunidades" className="flex items-center gap-4 rounded-[var(--radius-card)] bg-brand-50 p-4 hover:bg-brand-100/70 xl:hidden">
+            <span className="inline-flex size-14 shrink-0 items-center justify-center rounded-2xl bg-brand-100/80 text-brand-600" aria-hidden>
+              <Star className="size-7" strokeWidth={1.8} />
+            </span>
+            <span className="min-w-0 flex-1">
+              <span className="block text-lg font-bold text-ink">Construa o seu futuro com a gente</span>
+              <span className="block text-[0.9375rem] leading-snug text-muted">A REALSEG investe no seu desenvolvimento e oferece oportunidades para você crescer.</span>
+            </span>
+            <ChevronRight className="size-5 shrink-0 text-ink" aria-hidden />
+          </Link>
         </div>
 
         <aside className="flex flex-col gap-5">
@@ -94,13 +117,17 @@ export default async function CareerOverviewPage() {
                   .slice(0, 4)
                   .map((g, i, arr) => {
                     const done = g.status === "concluida" || g.courseCompleted;
+                    // A primeira etapa não concluída é a "atual" (anel com ponto, como na referência).
+                    const current = !done && arr.findIndex((x) => !(x.status === "concluida" || x.courseCompleted)) === i;
                     return (
                       <li key={g.id} className="relative flex gap-3 pb-5 last:pb-0">
                         {i < arr.length - 1 && <span className="absolute top-8 left-[0.9375rem] h-[calc(100%-2rem)] w-px bg-line" aria-hidden />}
                         {done ? (
                           <CircleCheck className="size-8 shrink-0 fill-brand-600 text-white" aria-label="Concluída" />
-                        ) : g.status === "em_andamento" ? (
-                          <span className="inline-flex size-8 shrink-0 items-center justify-center rounded-full border-[3px] border-brand-500" aria-label="Em andamento" />
+                        ) : current || g.status === "em_andamento" ? (
+                          <span className="inline-flex size-8 shrink-0 items-center justify-center rounded-full border-[3px] border-brand-500" role="img" aria-label={g.status === "em_andamento" ? "Em andamento" : "Próxima etapa"}>
+                            <span className="size-2.5 rounded-full bg-brand-500" />
+                          </span>
                         ) : (
                           <Circle className="size-8 shrink-0 text-subtle" aria-label="Pendente" />
                         )}
@@ -150,7 +177,7 @@ export default async function CareerOverviewPage() {
         </aside>
       </div>
 
-      <div className="flex flex-col gap-4 rounded-[var(--radius-card)] border border-brand-100 bg-brand-50 p-5 sm:flex-row sm:items-center">
+      <div className="hidden items-center gap-4 rounded-[var(--radius-card)] border border-brand-100 bg-brand-50 p-5 xl:flex">
         <span className="inline-flex size-14 shrink-0 items-center justify-center rounded-2xl bg-brand-100 text-brand-600" aria-hidden>
           <UsersRound className="size-7" />
         </span>

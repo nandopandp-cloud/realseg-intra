@@ -1,3 +1,4 @@
+import { DevelopmentSubnav } from "@/features/career/career-tabs";
 import type { Metadata } from "next";
 import { Info, MapPin } from "lucide-react";
 import { Alert, Badge, Card } from "@/components/ui/primitives";
@@ -13,7 +14,8 @@ export default async function CareerPlanPage() {
   const plan = await careerPlan(ctx);
   return (
     <div className="flex flex-col gap-5">
-      <div>
+      <DevelopmentSubnav />
+      <div className="-mt-5">
         <h2 className="text-xl font-bold text-ink">Plano de cargos e salários — {plan.family.name}</h2>
         <p className="text-[0.9375rem] text-muted">{plan.family.description}</p>
       </div>
