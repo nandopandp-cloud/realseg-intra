@@ -60,7 +60,7 @@ export function PageHero({
         </div>
         <div className="flex items-start justify-between gap-4">
           <div className={cn(mobileImage ? "max-w-[62%]" : "max-w-none", back && "pl-9 lg:pl-0", "lg:max-w-[56%]")}>
-            <h1 id="page-title" className="mt-2 text-[2.125rem] leading-[1.1] font-bold tracking-tight text-ink sm:text-[2.5rem] lg:mt-3 lg:text-[2.75rem]">
+            <h1 id="page-title" className="mt-2 text-[2rem] leading-[1.1] font-bold tracking-tight text-ink sm:text-[2.5rem] lg:mt-3 lg:text-[2.75rem]">
               {title}
             </h1>
             {subtitle && <p className="mt-2 text-[1.0625rem] leading-snug text-muted lg:mt-3 lg:text-[1.1875rem]">{subtitle}</p>}

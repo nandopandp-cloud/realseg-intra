@@ -34,6 +34,21 @@ test.describe("ajuda e suporte", () => {
     await page.goto("/ajuda");
     await page.getByRole("link", { name: /Sistemas e acesso/ }).click();
     await expect(page.getByRole("heading", { level: 1, name: "Sistemas e acesso" })).toBeVisible();
+    await expect(page).toHaveURL(/\/ajuda\/artigos\?categoria=sistemas-e-acesso/);
     await expect(page.getByRole("link", { name: /Como acessar a intranet pela primeira vez/ })).toBeVisible();
+    // Filtro por tipo combina com a categoria e fica na URL.
+    await page.getByRole("navigation", { name: "Tipo de conteúdo" }).getByRole("link", { name: "Perguntas frequentes" }).click();
+    await expect(page).toHaveURL(/tipo=faq/);
+    await expect(page.getByRole("link", { name: /Esqueci minha senha/ })).toBeVisible();
+    await expect(page.getByRole("link", { name: /Como acessar a intranet pela primeira vez/ })).toHaveCount(0);
+    await page.getByRole("navigation", { name: "Categorias" }).getByRole("link", { name: "Todas" }).click();
+    await expect(page.getByRole("heading", { level: 1, name: "Base de conhecimento" })).toBeVisible();
+  });
+
+  test("artigo oferece chat com o suporte e solicitação com assunto preenchido", async ({ page }) => {
+    await page.goto("/ajuda/artigos/esqueci-minha-senha");
+    await expect(page.getByRole("link", { name: "Falar com o suporte" })).toHaveAttribute("href", "/ajuda/chat");
+    await page.getByRole("link", { name: "Abrir solicitação" }).click();
+    await expect(page.getByLabel("Assunto")).toHaveValue("Dúvida: Esqueci minha senha. E agora?");
   });
 });

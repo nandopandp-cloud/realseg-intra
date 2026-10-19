@@ -16,6 +16,7 @@ import {
   ticketParticipants,
   tickets,
   users,
+  type TicketChannel,
   type TicketPriority,
   type TicketStatus,
 } from "../db/schema";
@@ -116,6 +117,7 @@ const listFields = {
   number: tickets.number,
   subject: tickets.subject,
   status: tickets.status,
+  channel: tickets.channel,
   priority: tickets.priority,
   createdAt: tickets.createdAt,
   updatedAt: tickets.updatedAt,
@@ -139,7 +141,13 @@ async function withSla<T extends { calendarId: string | null; status: TicketStat
   return out;
 }
 
-export async function listMyTickets(ctx: Ctx, opts: { tab?: TicketTab; q?: string; category?: string; page?: number; pageSize?: number } = {}) {
+/** Janela de abertura aceita no filtro "Período" (dias). */
+export const TICKET_PERIODS = [30, 90, 365] as const;
+
+export async function listMyTickets(
+  ctx: Ctx,
+  opts: { tab?: TicketTab; q?: string; category?: string; periodDays?: (typeof TICKET_PERIODS)[number]; page?: number; pageSize?: number } = {},
+) {
   requirePermission(ctx.actor, "ticket:read:own");
   const tab = opts.tab ?? "todos";
   const page = opts.page ?? 1;
@@ -148,7 +156,12 @@ export async function listMyTickets(ctx: Ctx, opts: { tab?: TicketTab; q?: strin
   const search = opts.q
     ? or(textSearch([tickets.subject], opts.q), /^\d{1,9}$/.test(qNumber ?? "") ? eq(tickets.number, Number(qNumber)) : undefined)
     : undefined;
-  const base = and(requesterScope(ctx.actor), search, opts.category ? eq(ticketCategories.slug, opts.category) : undefined);
+  const base = and(
+    requesterScope(ctx.actor),
+    search,
+    opts.category ? eq(ticketCategories.slug, opts.category) : undefined,
+    opts.periodDays ? sql`${tickets.createdAt} >= now() - make_interval(days => ${opts.periodDays})` : undefined,
+  );
   const where = and(base, tab === "todos" ? undefined : inArray(tickets.status, TAB_STATUSES[tab]));
   const db = getDb();
   const [rows, [{ total }], [counts]] = await Promise.all([
@@ -158,7 +171,7 @@ export async function listMyTickets(ctx: Ctx, opts: { tab?: TicketTab; q?: strin
       .innerJoin(ticketCategories, eq(ticketCategories.id, tickets.categoryId))
       .leftJoin(slaPolicies, eq(slaPolicies.id, tickets.slaPolicyId))
       .where(where)
-      .orderBy(sql`CASE WHEN ${tickets.status} IN ('resolvido','fechado','cancelado') THEN 1 ELSE 0 END`, desc(tickets.createdAt))
+      .orderBy(sql`CASE WHEN ${tickets.status} IN ('resolvido','fechado','cancelado') THEN 1 ELSE 0 END`, desc(tickets.number))
       .limit(pageSize)
       .offset((page - 1) * pageSize),
     db.select({ total: count() }).from(tickets).innerJoin(ticketCategories, eq(ticketCategories.id, tickets.categoryId)).where(where),
@@ -246,6 +259,7 @@ export async function getMyTicket(ctx: Ctx, number: number) {
     subject: t.subject,
     description: t.description,
     status: t.status,
+    channel: t.channel,
     priority: t.priority,
     createdAt: t.createdAt,
     updatedAt: t.updatedAt,
@@ -267,7 +281,64 @@ export async function getMyTicket(ctx: Ctx, number: number) {
   };
 }
 
+// ── Chat de suporte ───────────────────────────────────────────────────────────
+
+const CLOSED_STATUSES: TicketStatus[] = ["resolvido", "fechado", "cancelado"];
+
+/** Conversa de chat em aberto do colaborador (no máximo uma por vez), ou nula. */
+export async function activeChatNumber(ctx: Ctx): Promise<number | null> {
+  requirePermission(ctx.actor, "ticket:read:own");
+  const [row] = await getDb()
+    .select({ number: tickets.number })
+    .from(tickets)
+    .where(and(requesterScope(ctx.actor), eq(tickets.channel, "chat"), sql`${tickets.status} NOT IN ('resolvido','fechado','cancelado')`))
+    .orderBy(desc(tickets.createdAt))
+    .limit(1);
+  return row?.number ?? null;
+}
+
+/** Conversas de chat anteriores (encerradas), para retomar o contexto. */
+export async function pastChats(ctx: Ctx, limit = 3) {
+  requirePermission(ctx.actor, "ticket:read:own");
+  return getDb()
+    .select({ number: tickets.number, subject: tickets.subject, status: tickets.status, createdAt: tickets.createdAt, category: ticketCategories.name })
+    .from(tickets)
+    .innerJoin(ticketCategories, eq(ticketCategories.id, tickets.categoryId))
+    .where(and(requesterScope(ctx.actor), eq(tickets.channel, "chat"), inArray(tickets.status, CLOSED_STATUSES)))
+    .orderBy(desc(tickets.createdAt))
+    .limit(limit);
+}
+
+/**
+ * Inicia uma conversa pelo chat: vira uma solicitação (mesma fila, SLA e histórico) com canal "chat".
+ * Se já houver conversa aberta, a mensagem entra nela — evita conversas duplicadas.
+ */
+export async function startChat(ctx: Ctx, input: { categorySlug: string; message: string }) {
+  const open = await activeChatNumber(ctx);
+  if (open) {
+    await addRequesterMessage(ctx, open, { body: input.message });
+    return { number: open, resumed: true };
+  }
+  const firstLine = input.message.split(/\n/)[0].trim();
+  const subject = firstLine.length > 70 ? `${firstLine.slice(0, 67).trimEnd()}…` : firstLine;
+  const created = await createTicket(ctx, { categorySlug: input.categorySlug, subject: subject.length >= 4 ? subject : "Conversa pelo chat", description: input.message, channel: "chat" });
+  return { number: created.number, resumed: false };
+}
+
 // ── Criação e interação do solicitante ───────────────────────────────────────
+
+/** Prazos padrão de cada área (prioridade padrão da categoria), para orientar quem abre a solicitação. */
+export async function categorySlaSummary() {
+  const rows = await getDb()
+    .select({ slug: ticketCategories.slug, name: ticketCategories.name, firstResponseMinutes: slaPolicies.firstResponseMinutes, resolutionMinutes: slaPolicies.resolutionMinutes })
+    .from(ticketCategories)
+    .innerJoin(slaPolicies, and(eq(slaPolicies.categoryId, ticketCategories.id), eq(slaPolicies.priority, ticketCategories.defaultPriority), isNull(slaPolicies.supersededAt)))
+    .where(eq(ticketCategories.active, true))
+    .orderBy(asc(ticketCategories.position));
+  // Jornada de atendimento: 10 horas úteis por dia (seg–sex, 8h às 18h).
+  const label = (min: number) => (min < 600 ? `${Math.max(1, Math.round(min / 60))}h úteis` : `${Math.ceil(min / 600)} ${Math.ceil(min / 600) === 1 ? "dia útil" : "dias úteis"}`);
+  return rows.map((r) => ({ ...r, firstResponse: label(r.firstResponseMinutes), resolution: label(r.resolutionMinutes) }));
+}
 
 export async function listTicketCategories() {
   return getDb()
@@ -288,7 +359,7 @@ async function attachFiles(tx: Executor, ctx: Ctx, ticketId: string, messageId: 
 
 export async function createTicket(
   ctx: Ctx,
-  input: { categorySlug: string; subject: string; description: string; files?: UploadFile[]; draftId?: string },
+  input: { categorySlug: string; subject: string; description: string; files?: UploadFile[]; draftId?: string; channel?: TicketChannel },
 ) {
   requirePermission(ctx.actor, "ticket:create");
   const e = requireEmployee(ctx.actor);
@@ -309,6 +380,7 @@ export async function createTicket(
         categoryId: cat.id,
         subject: input.subject,
         description: input.description,
+        channel: input.channel ?? "portal",
         priority,
         slaPolicyId: policy?.id ?? null,
         firstResponseDueAt: policy && cal ? addBusinessMinutes(now, policy.firstResponseMinutes, cal) : null,
@@ -320,7 +392,7 @@ export async function createTicket(
     await tx.insert(ticketEvents).values({ ticketId: t.id, type: "created", toValue: "aberto", actorUserId: ctx.actor.userId });
     if (input.files?.length) await attachFiles(tx, ctx, t.id, null, input.files);
     if (input.draftId) await tx.delete(ticketDrafts).where(and(eq(ticketDrafts.id, input.draftId), eq(ticketDrafts.employeeId, e.id)));
-    await audit({ action: "ticket.created", actorUserId: ctx.actor.userId, entityType: "ticket", entityId: t.id, metadata: { number: t.number, category: cat.slug, attachments: input.files?.length ?? 0 }, meta: ctx.meta }, tx);
+    await audit({ action: "ticket.created", actorUserId: ctx.actor.userId, entityType: "ticket", entityId: t.id, metadata: { number: t.number, category: cat.slug, channel: t.channel, attachments: input.files?.length ?? 0 }, meta: ctx.meta }, tx);
     if (!policy) logger.warn("ticket.no_sla_policy", { category: cat.slug, priority });
     return t;
   });

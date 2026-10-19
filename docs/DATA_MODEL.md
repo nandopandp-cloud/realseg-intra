@@ -124,7 +124,7 @@ Colunas `created_at`/`updated_at` existem em quase todas as tabelas e não são 
 | `sla_calendars` | Expediente | `timezone` IANA, `working_hours` JSON por dia da semana |
 | `sla_holidays` | Feriados | UQ (calendário, data) |
 | `sla_policies` | Prazos por área × prioridade | minutos úteis de 1ª resposta e resolução, `pause_statuses`, `warn_at_percent`; versão ativa única por (área, prioridade) via índice parcial `superseded_at IS NULL` — histórico preservado |
-| `tickets` (DP) | Solicitações | `number` (sequência), `status`, `priority`, `assignee_user_id`, `sla_policy_id`, vencimentos, `paused_at`, `paused_business_minutes`, marcas de violação/alerta, `version`; idx (solicitante, data), status, atendente |
+| `tickets` (DP) | Solicitações | `number` (sequência), `status`, `channel` (`portal` | `chat`, migration `0004_ticket_channel`), `priority`, `assignee_user_id`, `sla_policy_id`, vencimentos, `paused_at`, `paused_business_minutes`, marcas de violação/alerta, `version`; idx (solicitante, data), status, atendente |
 | `ticket_messages` (DP) | Conversa | `is_internal` nunca exposto ao solicitante |
 | `ticket_attachments`, `ticket_events`, `ticket_participants`, `ticket_drafts` | Anexos, histórico auditável (status, atribuição, prioridade, pausa/retomada, SLA), compartilhamento, rascunhos | |
 

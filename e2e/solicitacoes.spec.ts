@@ -69,6 +69,59 @@ test.describe("solicitações", () => {
     await expect(page.getByRole("link", { name: /Lâmpada queimada/ })).toHaveCount(0);
   });
 
+  test("filtros por categoria e período ficam na URL e sobrevivem ao recarregar", async ({ page }) => {
+    await page.goto("/solicitacoes");
+    await page.getByRole("button", { name: "Filtros" }).click();
+    const dialog = page.getByRole("dialog", { name: "Filtrar solicitações" });
+    await dialog.getByLabel("Categoria").selectOption("facilities");
+    await dialog.getByLabel("Período de abertura").selectOption("30");
+    await dialog.getByRole("button", { name: "Aplicar filtros" }).click();
+    await expect(page).toHaveURL(/categoria=facilities/);
+    await expect(page).toHaveURL(/periodo=30/);
+    await page.reload();
+    const table = page.getByRole("table", { name: "Solicitações" });
+    await expect(table.getByRole("link", { name: "Manutenção do ar-condicionado" })).toBeVisible();
+    await expect(table.getByRole("link", { name: "Atualização cadastral" })).toHaveCount(0);
+  });
+
+  test("ao digitar o assunto, sugere artigos da central de ajuda", async ({ page }) => {
+    await page.goto("/solicitacoes/nova");
+    await page.getByLabel("Assunto").fill("Esqueci minha senha do sistema");
+    const tips = page.getByRole("region", { name: "Artigos que podem ajudar" });
+    await expect(tips.getByRole("link", { name: /Esqueci minha senha\. E agora\?/ })).toBeVisible();
+  });
+
+  test("chat com o suporte: inicia conversa, envia mensagens e vira solicitação rastreável", async ({ page }) => {
+    await page.goto("/ajuda");
+    await page.getByRole("link", { name: "Chat com o suporte" }).click();
+    await expect(page).toHaveURL(/\/ajuda\/chat$/);
+    await expect(page.getByText(/Sobre o que você quer falar\?/)).toBeVisible();
+    // Sem assunto, não envia.
+    await page.getByLabel("Primeira mensagem").fill("Meu crachá não abre a catraca da portaria");
+    await page.getByRole("button", { name: "Enviar mensagem" }).click();
+    await expect(page.getByText("Escolha sobre o que você quer falar.")).toBeVisible();
+    await page.locator("label").filter({ hasText: /^Serviços/ }).click();
+    await expect(page.getByRole("radio", { name: /^Serviços/ })).toBeChecked();
+    await page.getByLabel("Primeira mensagem").press("Enter");
+    const chat = page.getByRole("list", { name: "Conversa" });
+    await expect(chat.getByText("Meu crachá não abre a catraca da portaria")).toBeVisible();
+    await expect(page.getByText(/Uma pessoa do time de Serviços vai responder/)).toBeVisible();
+    // Segunda mensagem pelo campo da conversa (Enter envia).
+    await page.getByLabel("Mensagem", { exact: true }).fill("Desde ontem à tarde.");
+    await page.getByLabel("Mensagem", { exact: true }).press("Enter");
+    await expect(chat.getByText("Desde ontem à tarde.")).toBeVisible();
+    // A conversa aparece em Minhas solicitações, com protocolo.
+    const protocol = await page.getByRole("link", { name: /^#\d{4}$/ }).first().innerText();
+    await page.goto("/solicitacoes");
+    await expect(page.getByRole("table", { name: "Solicitações" }).getByText(protocol)).toBeVisible();
+    // Encerrar sem resposta cancela o pedido e libera um novo chat.
+    await page.goto("/ajuda/chat");
+    await page.getByRole("button", { name: "Encerrar conversa" }).click();
+    await page.getByRole("dialog").getByRole("button", { name: "Encerrar conversa" }).click();
+    await expect(page.getByText(/Sobre o que você quer falar\?/)).toBeVisible();
+    await expect(page.getByRole("heading", { name: /Conversas anteriores/ })).toBeVisible();
+  });
+
   test("solicitação de outra pessoa retorna 404", async ({ page }) => {
     await page.goto("/solicitacoes/1050");
     await expect(page.getByRole("heading", { name: "Página não encontrada" })).toBeVisible();

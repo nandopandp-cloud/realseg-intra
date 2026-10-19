@@ -42,6 +42,24 @@ test.describe("documentos", () => {
     }
   });
 
+  test("detalhe do documento: outros da categoria e dúvida abre solicitação com assunto preenchido", async ({ page }) => {
+    await page.goto("/documentos?categoria=holerite");
+    await page.getByRole("link", { name: "Holerite - Setembro/2026" }).first().click();
+    await expect(page.getByText("Setembro de 2026")).toBeVisible();
+    await expect(page.getByRole("link", { name: /Holerite - Agosto\/2026/ })).toBeVisible();
+    await page.getByRole("link", { name: "Abrir solicitação" }).click();
+    await expect(page.getByLabel("Assunto")).toHaveValue("Dúvida sobre: Holerite - Setembro/2026");
+    await expect(page.getByRole("radio", { name: /^RH\b/ })).toBeChecked();
+  });
+
+  test("histórico filtra por tipo e agrupa por mês", async ({ page }) => {
+    await page.goto("/documentos/historico");
+    await page.getByRole("link", { name: /Enviados ao RH/ }).click();
+    await expect(page).toHaveURL(/tipo=enviados/);
+    await expect(page.getByText("Você enviou ao RH").first()).toBeVisible();
+    await expect(page.getByText("Documento recebido")).toHaveCount(0);
+  });
+
   test("confirma ciência de documento pendente", async ({ page }) => {
     await page.goto("/documentos?status=pendente");
     await page.getByRole("link", { name: "Carta de Advertência" }).first().click();

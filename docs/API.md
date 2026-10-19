@@ -61,7 +61,7 @@ Códigos: `UNAUTHENTICATED` 401, `SESSION_EXPIRED` 401, `INVALID_CREDENTIALS` 40
 ## Solicitações
 | Método | Rota | Descrição |
 | --- | --- | --- |
-| GET | `/tickets?aba=todos\|andamento\|aguardando\|respondidos\|concluidos&q&categoria&page` | Lista com `sla` e `counts` |
+| GET | `/tickets?aba=todos\|andamento\|aguardando\|respondidos\|concluidos&q&categoria&page` | Lista com `sla`, `channel` e `counts` (abertas primeiro, depois pelo número) |
 | POST | `/tickets` | multipart: `categorySlug`, `subject` (4–120), `description` (10–5000), `draftId?`, `files` (até 5) → 201 `{ id, number, status, resolutionDueAt }` |
 | GET | `/tickets/:number` | Detalhe: mensagens (sem notas internas), anexos, eventos, `sla`, `actions` |
 | POST | `/tickets/:number/messages` | multipart `body` + `files` → retoma atendimento quando aguardava o colaborador |
@@ -69,6 +69,8 @@ Códigos: `UNAUTHENTICATED` 401, `SESSION_EXPIRED` 401, `INVALID_CREDENTIALS` 40
 | POST | `/tickets/:number/confirm` | Confirma solução e encerra |
 | POST | `/tickets/:number/reopen` | `{ body }` — até 7 dias após resolução |
 | GET | `/tickets/:number/attachments/:id` | Anexo |
+| GET | `/support-chat` | Conversa de chat em aberto: `{ number }` ou `{ number: null }` |
+| POST | `/support-chat` | `{ categorySlug, message (4–2000) }` → inicia conversa (solicitação com `channel: "chat"`, mesmo SLA e fila) — 201 `{ number, resumed: false }`; se já houver conversa aberta, a mensagem entra nela — 200 `{ number, resumed: true }` |
 | GET | `/ticket-categories` | Áreas ativas |
 | GET / POST | `/ticket-drafts` | Rascunhos (`{ categorySlug?, subject, description }`) |
 | PUT / DELETE | `/ticket-drafts/:id` | Atualiza / exclui |
@@ -102,6 +104,7 @@ Objeto `sla` (exemplo):
 | Método | Rota | Descrição |
 | --- | --- | --- |
 | GET | `/help/articles?q&categoria` | Artigos publicados |
+| GET | `/help/articles?sugerir=texto` | Até 3 artigos relacionados a um texto livre (palavras-chave, sem palavras comuns) — usado no assunto da solicitação e no chat |
 | GET | `/help/articles/:slug` | Artigo + relacionados + meu voto + agregados |
 | POST | `/help/articles/:slug/view` | Contador anônimo |
 | POST | `/help/articles/:slug/feedback` | `{ helpful: boolean }` (um voto por pessoa, atualizável) |

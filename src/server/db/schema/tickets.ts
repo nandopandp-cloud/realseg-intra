@@ -30,6 +30,10 @@ export const ticketStatus = pgEnum("ticket_status", [
 ]);
 export type TicketStatus = (typeof ticketStatus.enumValues)[number];
 
+/** Canal de abertura: formulário do portal ou conversa pelo chat de suporte (mesma fila, mesmo SLA). */
+export const ticketChannel = pgEnum("ticket_channel", ["portal", "chat"]);
+export type TicketChannel = (typeof ticketChannel.enumValues)[number];
+
 export const ticketPriority = pgEnum("ticket_priority", ["baixa", "normal", "alta", "urgente"]);
 export type TicketPriority = (typeof ticketPriority.enumValues)[number];
 
@@ -112,6 +116,7 @@ export const tickets = pgTable(
     description: text("description").notNull(),
     priority: ticketPriority("priority").notNull(),
     status: ticketStatus("status").notNull().default("aberto"),
+    channel: ticketChannel("channel").notNull().default("portal"),
     assigneeUserId: uuid("assignee_user_id").references(() => users.id, { onDelete: "set null" }),
     slaPolicyId: uuid("sla_policy_id").references(() => slaPolicies.id, { onDelete: "restrict" }),
     firstResponseDueAt: tsz("first_response_due_at"),

@@ -8,10 +8,13 @@ export function LinkTabs({
   items,
   label,
   className,
+  size = "md",
 }: {
   items: Array<{ href: string; label: ReactNode; active: boolean; icon?: ReactNode; count?: number; badge?: number }>;
   label: string;
   className?: string;
+  /** "sm": abas compactas dentro de cards (referência de Solicitações). */
+  size?: "md" | "sm";
 }) {
   return (
     <nav aria-label={label} className={cn("-mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0", className)}>
@@ -23,7 +26,8 @@ export function LinkTabs({
               aria-current={it.active ? "page" : undefined}
               scroll={false}
               className={cn(
-                "relative inline-flex min-h-12 items-center gap-2 px-3 text-[0.9375rem] font-medium whitespace-nowrap transition-colors sm:px-4",
+                "relative inline-flex items-center gap-2 font-medium whitespace-nowrap transition-colors",
+                size === "sm" ? "min-h-11 px-3 text-sm" : "min-h-12 px-3 text-[0.9375rem] sm:px-4",
                 it.active ? "text-brand-700" : "text-muted hover:text-ink",
               )}
             >

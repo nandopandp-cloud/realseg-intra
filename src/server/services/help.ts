@@ -39,16 +39,37 @@ export async function popularArticles(ctx: Ctx, limit = 6) {
   return getDb().select(cardFields).from(helpArticles).innerJoin(helpCategories, eq(helpCategories.id, helpArticles.categoryId)).where(published).orderBy(desc(helpArticles.viewCount), asc(helpArticles.title)).limit(limit);
 }
 
-export async function searchArticles(ctx: Ctx, opts: { q?: string; category?: string }) {
+export async function searchArticles(ctx: Ctx, opts: { q?: string; category?: string; type?: "artigo" | "tutorial" | "faq" }) {
   requirePermission(ctx.actor, "help:read");
   return getDb()
     .select(cardFields)
     .from(helpArticles)
     .innerJoin(helpCategories, eq(helpCategories.id, helpArticles.categoryId))
-    .where(and(published, textSearch([helpArticles.title, helpArticles.summary, helpArticles.body], opts.q), opts.category ? eq(helpCategories.slug, opts.category) : undefined))
+    .where(and(published, textSearch([helpArticles.title, helpArticles.summary, helpArticles.body], opts.q), opts.category ? eq(helpCategories.slug, opts.category) : undefined, opts.type ? eq(helpArticles.type, opts.type) : undefined))
     // Correspondência no título primeiro, depois popularidade.
     .orderBy(...(opts.q ? [sql`CASE WHEN ${textSearch([helpArticles.title], opts.q)} THEN 0 ELSE 1 END`] : []), desc(helpArticles.viewCount), asc(helpArticles.title))
     .limit(50);
+}
+
+const STOPWORDS = new Set(["como", "para", "sobre", "minha", "meu", "meus", "minhas", "esta", "está", "estou", "preciso", "quero", "gostaria", "fazer", "uma", "um", "com", "que", "não", "nao", "dos", "das", "pelo", "pela", "solicitação", "solicitacao", "dúvida", "duvida"]);
+
+/**
+ * Sugestões de artigos a partir de um texto livre (ex.: assunto de uma solicitação):
+ * palavras significativas (≥ 4 letras, sem palavras comuns), ordenadas pelo número de palavras encontradas.
+ */
+export async function suggestArticles(ctx: Ctx, text: string, limit = 3) {
+  requirePermission(ctx.actor, "help:read");
+  const words = [...new Set(text.toLowerCase().split(/[^\p{L}\p{N}]+/u).filter((w) => w.length >= 4 && !STOPWORDS.has(w)))].slice(0, 6);
+  if (!words.length) return [];
+  const hits = words.map((w) => sql`(CASE WHEN ${textSearch([helpArticles.title, helpArticles.summary], w)} THEN 1 ELSE 0 END)`);
+  const score = sql<number>`(${sql.join(hits, sql` + `)})`;
+  return getDb()
+    .select(cardFields)
+    .from(helpArticles)
+    .innerJoin(helpCategories, eq(helpCategories.id, helpArticles.categoryId))
+    .where(and(published, sql`${score} > 0`))
+    .orderBy(desc(score), desc(helpArticles.viewCount))
+    .limit(limit);
 }
 
 export async function getHelpCategory(ctx: Ctx, slug: string) {

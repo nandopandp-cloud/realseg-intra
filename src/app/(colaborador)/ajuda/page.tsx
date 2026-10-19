@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "@/components/ui/app-link";
-import { ArrowRight, BookOpen, ChevronRight, Clock, FileText, Headphones, Lightbulb, MessageSquareMore, SearchX } from "lucide-react";
+import { ArrowRight, BookOpen, ChevronRight, Clock, FileText, Headphones, Lightbulb, MessageSquareMore, MessagesSquare, SearchX } from "lucide-react";
 import { z } from "zod";
 import { PageBody, PageHero } from "@/components/layout/page-hero";
 import { ButtonLink } from "@/components/ui/button";
@@ -17,13 +17,15 @@ import { listMyTickets, supportHours } from "@/server/services/tickets";
 
 export const metadata: Metadata = { title: "Ajuda e suporte" };
 
+/** Atalhos rápidos (cores das referências: verde, azul, lilás e laranja). */
 const SHORTCUTS = [
-  { href: "/solicitacoes/nova", title: "Abertura de solicitação", text: "Registre uma nova demanda para o time de suporte.", icon: FileText, card: "from-brand-50", tone: "text-brand-600" },
-  { href: "/ajuda/artigos", title: "Base de conhecimento", text: "Tutoriais, manuais e artigos passo a passo.", icon: BookOpen, card: "from-blue-50", tone: "text-blue-600" },
-  { href: "/solicitacoes/nova?categoria=ti", title: "Fale com o suporte", text: "Converse com o nosso time por mensagens.", icon: MessageSquareMore, card: "from-indigo-50", tone: "text-indigo-600" },
-  { href: "/solicitacoes", title: "Acompanhar minhas solicitações", text: "Veja o status das suas demandas e interaja com o time.", icon: Headphones, card: "from-amber-50", tone: "text-amber-600" },
+  { href: "/solicitacoes/nova", title: "Abertura de solicitação", text: "Registre uma nova demanda para o time de suporte.", short: "Registre uma nova demanda", icon: FileText, card: "bg-[#e9f6f3]", tone: "text-brand-600" },
+  { href: "/ajuda/artigos", title: "Base de conhecimento", text: "Tutoriais, manuais e artigos passo a passo.", short: "Tutoriais e artigos passo a passo", icon: BookOpen, card: "bg-[#ebf2fc]", tone: "text-blue-600" },
+  { href: "/ajuda/chat", title: "Fale com o suporte", text: "Converse com o nosso time pelo chat.", short: "Converse com o nosso time", icon: MessageSquareMore, card: "bg-[#f1effc]", tone: "text-indigo-600" },
+  { href: "/solicitacoes", title: "Acompanhar minhas solicitações", text: "Veja o status das suas demandas e interaja com o time.", short: "Veja o status das suas demandas", icon: Headphones, card: "bg-[#fdf3e7]", tone: "text-amber-600" },
 ];
 
+/** Ajuda e suporte — fiel a referencias/Central de Ajuda REALSEG.png (desktop) e Portal de Ajuda e Suporte REALSEG.png (celular). */
 export default async function HelpPage({ searchParams }: PageProps<"/ajuda">) {
   const ctx = await requireCtx();
   const q = z.string().max(100).optional().catch(undefined).parse((await searchParams).q)?.trim();
@@ -58,26 +60,38 @@ export default async function HelpPage({ searchParams }: PageProps<"/ajuda">) {
                     icon={SearchX}
                     title="Não encontramos artigos para essa busca"
                     description="Tente palavras diferentes ou fale com o suporte — vamos te ajudar."
-                    action={<ButtonLink href="/solicitacoes/nova">Abrir uma solicitação</ButtonLink>}
+                    action={
+                      <div className="flex flex-col gap-2 sm:flex-row">
+                        <ButtonLink href="/ajuda/chat" icon={<MessagesSquare className="size-5" aria-hidden />}>
+                          Falar com o suporte
+                        </ButtonLink>
+                        <ButtonLink href="/solicitacoes/nova" variant="outline">
+                          Abrir uma solicitação
+                        </ButtonLink>
+                      </div>
+                    }
                   />
                 ) : (
-                  <ArticleList items={results} />
+                  <ArticleList items={results} columns={1} />
                 )}
               </section>
             ) : (
               <>
                 <section aria-labelledby="atalhos">
-                  <SectionHeader title="Atalhos rápidos" id="atalhos" className="mb-3" />
-                  <ul className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+                  <SectionHeader title="Atalhos rápidos" id="atalhos" href="/ajuda/artigos" linkLabel="Ver todos" className="mb-3" />
+                  <ul className="grid grid-cols-4 gap-1.5 sm:gap-3">
                     {SHORTCUTS.map((s) => {
                       const Icon = s.icon;
                       return (
                         <li key={s.title} className="min-w-0">
-                          <Link href={s.href} className={cn("flex h-full flex-col rounded-[var(--radius-card)] border border-line/70 bg-gradient-to-br to-surface p-4 hover:shadow-[var(--shadow-raised)] sm:p-5", s.card)}>
-                            <Icon className={cn("size-8", s.tone)} strokeWidth={1.75} aria-hidden />
-                            <span className="mt-3 leading-snug font-bold text-ink">{s.title}</span>
-                            <span className="mt-1 flex-1 text-sm text-muted">{s.text}</span>
-                            <span className="mt-3 inline-flex size-9 items-center justify-center rounded-full border border-line bg-surface" aria-hidden>
+                          <Link href={s.href} className={cn("flex h-full flex-col rounded-[var(--radius-card)] p-2.5 hover:shadow-[var(--shadow-raised)] sm:p-4 lg:p-5", s.card)}>
+                            <Icon className={cn("size-7 sm:size-8", s.tone)} strokeWidth={1.75} aria-hidden />
+                            <span className="mt-2 text-[0.8125rem] leading-snug font-bold text-ink sm:mt-3 sm:text-base">{s.title}</span>
+                            <span className="mt-1 flex-1 text-[0.6875rem] leading-snug text-muted sm:text-sm">
+                              <span className="sm:hidden">{s.short}</span>
+                              <span className="hidden sm:inline">{s.text}</span>
+                            </span>
+                            <span className="mt-3 inline-flex size-8 items-center justify-center rounded-full border border-line bg-surface sm:size-9" aria-hidden>
                               <ArrowRight className={cn("size-4", s.tone)} />
                             </span>
                           </Link>
@@ -86,59 +100,82 @@ export default async function HelpPage({ searchParams }: PageProps<"/ajuda">) {
                     })}
                   </ul>
                 </section>
+
                 <section aria-labelledby="categorias-ajuda">
                   <SectionHeader title="Principais categorias" id="categorias-ajuda" href="/ajuda/artigos" linkLabel="Ver todas" className="mb-3" />
-                  <ul className="grid grid-cols-1 gap-2 sm:grid-cols-2 2xl:grid-cols-3">
-                    {categories.map((c) => {
+                  <ul className="grid grid-cols-2 gap-2 lg:grid-cols-3">
+                    {categories.map((c, i) => {
                       const Icon = iconFor(c.icon);
                       const tone = toTone(c.color);
                       return (
-                        <li key={c.id}>
-                          <Link href={`/ajuda/categorias/${c.slug}`} className="flex h-full items-center gap-3 rounded-xl border border-line p-3 hover:bg-canvas">
-                            <span className={cn("inline-flex size-12 shrink-0 items-center justify-center rounded-xl", TONE[tone].tile, TONE[tone].icon)} aria-hidden>
-                              <Icon className="size-6" />
+                        <li key={c.id} className={cn("min-w-0", i >= 4 && "hidden lg:block")}>
+                          <Link href={`/ajuda/categorias/${c.slug}`} className="flex h-full items-center gap-2.5 rounded-xl border border-line bg-surface p-2.5 hover:bg-canvas sm:gap-3 sm:p-3">
+                            <span className={cn("inline-flex size-10 shrink-0 items-center justify-center rounded-xl sm:size-11 lg:size-12", TONE[tone].tile, TONE[tone].icon)} aria-hidden>
+                              <Icon className="size-5 sm:size-6" />
                             </span>
                             <span className="min-w-0 flex-1">
-                              <span className="block font-semibold text-ink">{c.name}</span>
-                              <span className="block text-sm text-muted">{c.description}</span>
+                              <span className="block text-sm leading-snug font-semibold text-ink sm:text-[0.9375rem]">{c.name}</span>
+                              <span className="block text-xs leading-snug text-muted sm:text-[0.8125rem]">{c.description}</span>
                             </span>
-                            <ChevronRight className="size-5 shrink-0 text-ink/70" aria-hidden />
+                            <ChevronRight className="hidden size-5 shrink-0 text-ink/70 sm:block" aria-hidden />
                           </Link>
                         </li>
                       );
                     })}
                   </ul>
                 </section>
+
                 <section aria-labelledby="mais-acessados">
                   <SectionHeader title="Artigos mais acessados" id="mais-acessados" href="/ajuda/artigos" className="mb-3" />
-                  <ArticleList items={popular} />
+                  <ArticleList items={popular} className="[&>li:nth-child(n+5)]:hidden lg:[&>li:nth-child(n+5)]:block" />
                 </section>
+
+                {/* Celular: chamada final da referência. */}
+                <div className="flex flex-wrap items-center gap-4 rounded-[var(--radius-card)] bg-brand-50 p-4 lg:hidden">
+                  <span className="inline-flex size-12 shrink-0 items-center justify-center rounded-full bg-brand-100/80 text-brand-600" aria-hidden>
+                    <MessagesSquare className="size-6" />
+                  </span>
+                  <span className="min-w-0 flex-1">
+                    <span className="block font-bold text-ink">Ainda precisa de ajuda?</span>
+                    <span className="block text-sm text-muted">Nossa equipe está pronta para te atender.</span>
+                  </span>
+                  <ButtonLink href="/ajuda/chat" className="w-full rounded-xl sm:w-auto" iconRight={<ArrowRight className="size-4" aria-hidden />}>
+                    Fale com o suporte
+                  </ButtonLink>
+                </div>
               </>
             )}
           </div>
 
-          <aside className="flex flex-col gap-4">
-            <Card className="p-5">
+          <aside className="flex flex-col gap-4" aria-label="Atendimento">
+            <Card className="hidden p-5 lg:block">
               <h2 className="text-lg font-bold text-ink">Fale com o suporte</h2>
               <p className="text-[0.9375rem] text-muted">Nosso time está pronto para te atender.</p>
               <div className="mt-4 flex flex-col gap-2">
-                <ButtonLink href="/solicitacoes/nova" size="lg" className="justify-start" icon={<MessageSquareMore className="size-5" aria-hidden />} iconRight={<ArrowRight className="ml-auto size-5" aria-hidden />}>
+                <ButtonLink href="/solicitacoes/nova" size="lg" className="justify-start rounded-xl" icon={<MessageSquareMore className="size-5" aria-hidden />} iconRight={<ArrowRight className="ml-auto size-5" aria-hidden />}>
                   Abrir uma solicitação
                 </ButtonLink>
-                <ButtonLink href="/fale-com-rh" variant="subtle" size="lg" className="justify-start" icon={<MessageSquareMore className="size-5 text-brand-600" aria-hidden />} iconRight={<ArrowRight className="ml-auto size-5" aria-hidden />}>
-                  Mensagem para o RH
+                <ButtonLink href="/ajuda/chat" variant="subtle" size="lg" className="justify-start rounded-xl" icon={<MessagesSquare className="size-5 text-brand-600" aria-hidden />} iconRight={<ArrowRight className="ml-auto size-5" aria-hidden />}>
+                  Chat com o suporte
                 </ButtonLink>
               </div>
             </Card>
             {hours && (
-              <Card className="flex gap-3 p-5">
+              <Card className="flex items-start gap-3 p-5">
                 <Clock className="size-7 shrink-0 text-brand-600" aria-hidden />
-                <div className="flex-1">
+                <div className="min-w-0 flex-1">
                   <h2 className="font-bold text-ink">Horário de atendimento</h2>
-                  <p className="text-[0.9375rem] text-muted">{hours.label}</p>
-                  <p className="text-[0.9375rem] text-muted">{hours.hours}</p>
+                  <div className="flex items-end justify-between gap-2">
+                    <p className="text-[0.9375rem] text-muted">
+                      {hours.label}
+                      <br />
+                      {hours.hours}
+                    </p>
+                    <Badge tone={hours.online ? "green" : "slate"} className="mb-0.5 shrink-0 whitespace-nowrap">
+                      {hours.online ? "Online" : "Fora do horário"}
+                    </Badge>
+                  </div>
                 </div>
-                <Badge tone={hours.online ? "green" : "slate"}>{hours.online ? "Online" : "Fora do horário"}</Badge>
               </Card>
             )}
             <Card className="p-5">
@@ -150,24 +187,27 @@ export default async function HelpPage({ searchParams }: PageProps<"/ajuda">) {
                   {recent.items.map((t) => (
                     <li key={t.id}>
                       <Link href={`/solicitacoes/${t.number}`} className="flex min-h-14 items-center gap-2 py-2.5 hover:bg-canvas">
-                        <span className="w-12 text-sm text-muted">{fmtTicketNumber(t.number)}</span>
+                        <span className="w-11 shrink-0 text-xs text-muted">{fmtTicketNumber(t.number)}</span>
                         <span className="min-w-0 flex-1">
-                          <span className="block truncate text-[0.9375rem] font-semibold text-ink">{t.subject}</span>
-                          <span className="block text-xs text-muted">{fmtDateLong(t.createdAt)}</span>
+                          <span className="block truncate text-sm font-semibold text-ink">{t.subject}</span>
+                          <span className="block text-xs whitespace-nowrap text-muted">{fmtDateLong(t.createdAt)}</span>
                         </span>
-                        <TicketStatusBadge status={t.status} />
+                        <span className="shrink-0">
+                          <TicketStatusBadge status={t.status} short />
+                        </span>
+                        <ChevronRight className="size-4 shrink-0 text-ink/60" aria-hidden />
                       </Link>
                     </li>
                   ))}
                 </ul>
               )}
             </Card>
-            <Card className="flex gap-3 border-brand-100 bg-brand-50 p-5">
+            <Card className="hidden gap-3 border-brand-100 bg-brand-50 p-5 lg:flex">
               <Lightbulb className="size-7 shrink-0 text-brand-600" aria-hidden />
               <div>
                 <h2 className="font-bold text-ink">Não encontrou o que precisa?</h2>
                 <p className="text-sm text-muted">Envie sua dúvida para nossa equipe.</p>
-                <Link href="/solicitacoes/nova" className="mt-1 inline-flex min-h-11 items-center gap-1.5 text-[0.9375rem] font-semibold text-brand-600">
+                <Link href="/ajuda/chat" className="mt-1 inline-flex min-h-11 items-center gap-1.5 text-[0.9375rem] font-semibold text-brand-600 hover:underline">
                   Falar com o suporte <ArrowRight className="size-4" aria-hidden />
                 </Link>
               </div>

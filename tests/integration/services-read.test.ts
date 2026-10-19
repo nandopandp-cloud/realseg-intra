@@ -65,6 +65,16 @@ describe("leituras do colaborador (dados de demonstração)", () => {
     expect(await tk.awaitingMeCount(carlos)).toBe(2);
     const hours = await tk.supportHours(new Date("2026-10-14T15:00:00Z"));
     expect(hours).toMatchObject({ label: "Segunda a sexta", hours: "08h às 18h", online: true });
+    // Ordem: abertas primeiro, depois pelo número (mais recente primeiro).
+    expect(r.items.slice(0, 3).map((i) => i.number)).toEqual([1048, 1042, 1036]);
+    // Período de abertura: só as abertas nos últimos 30 dias.
+    const recent = await tk.listMyTickets(carlos, { periodDays: 30 });
+    expect(recent.items.map((i) => i.number)).toEqual(expect.arrayContaining([1048, 1042, 1036, 1029]));
+    expect(recent.items.map((i) => i.number)).not.toContain(972);
+    // Prazos padrão por área, em linguagem simples.
+    const slas = await tk.categorySlaSummary();
+    expect(slas.map((s) => s.slug)).toEqual(["rh", "ti", "servicos", "facilities"]);
+    expect(slas.find((s) => s.slug === "ti")).toMatchObject({ firstResponse: "2h úteis", resolution: "1 dia útil" });
   });
 
   it("cursos: elegibilidade, progresso e trilhas", async () => {
@@ -106,6 +116,9 @@ describe("leituras do colaborador (dados de demonstração)", () => {
   it("ajuda, busca global e home", async () => {
     expect((await help.helpCategoriesWithCounts(carlos)).length).toBe(6);
     expect((await help.searchArticles(carlos, { q: "senha" }))[0]?.slug).toBe("esqueci-minha-senha");
+    // Sugestões por palavras-chave (assunto livre), ignorando palavras comuns.
+    expect((await help.suggestArticles(carlos, "Esqueci a senha do sistema de escalas"))[0]?.slug).toBe("esqueci-minha-senha");
+    expect(await help.suggestArticles(carlos, "como para que")).toEqual([]);
     const art = await help.getArticle(carlos, "como-registrar-o-ponto");
     expect(art.relatedTicket?.slug).toBe("rh");
     const results = await globalSearch(carlos, "holerite");

@@ -9,6 +9,7 @@ import { Field, Input, Textarea } from "@/components/ui/form";
 import { FileUpload } from "@/components/ui/file-upload";
 import { iconFor, toTone, TONE } from "@/components/ui/icons";
 import { Alert } from "@/components/ui/primitives";
+import { ArticleSuggestions } from "@/features/help/article-suggestions";
 import { useToast } from "@/components/ui/toast";
 import { api, ApiError, fieldErrors } from "@/lib/api-client";
 import { cn } from "@/lib/cn";
@@ -126,6 +127,7 @@ export function TicketForm({
         <Field label="Assunto" hint="Resuma em poucas palavras. Ex.: Troca de crachá" error={errors.subject} required>
           {({ id, describedBy, invalid, required }) => <Input id={id} value={subject} onChange={(e) => setSubject(e.target.value)} maxLength={120} aria-describedby={describedBy} invalid={invalid} aria-required={required || undefined} />}
         </Field>
+        <ArticleSuggestions text={subject} className="-mt-2" />
         <Field label="Descrição" hint="Conte o que você precisa e, se possível, onde e desde quando." error={errors.description} required>
           {({ id, describedBy, invalid, required }) => <Textarea id={id} value={description} onChange={(e) => setDescription(e.target.value)} maxLength={5000} aria-describedby={describedBy} invalid={invalid} aria-required={required || undefined} />}
         </Field>

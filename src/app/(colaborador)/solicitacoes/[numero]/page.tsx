@@ -1,14 +1,15 @@
 import type { Metadata } from "next";
 import Link from "@/components/ui/app-link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, Clock, Paperclip } from "lucide-react";
+import { ArrowLeft, Clock } from "lucide-react";
 import { IconByKey, toTone, TONE } from "@/components/ui/icons";
 import { Alert, Badge, Breadcrumbs, Card } from "@/components/ui/primitives";
+import { Conversation, type ConversationMessage } from "@/features/tickets/conversation";
 import { SlaMeter } from "@/features/tickets/sla-meter";
 import { TicketStatusBadge } from "@/features/tickets/status-badge";
 import { ReplyForm, TicketActions } from "@/features/tickets/ticket-actions";
 import { cn } from "@/lib/cn";
-import { fmtDateTime, fmtFileSize, fmtTicketNumber } from "@/lib/format";
+import { fmtDateTime, fmtTicketNumber } from "@/lib/format";
 import { requireCtx } from "@/server/auth/current";
 import { orNotFound } from "@/server/http/page";
 import { getMyTicket, STATUS_LABEL } from "@/server/services/tickets";
@@ -31,19 +32,12 @@ export default async function TicketPage({ params, searchParams }: PageProps<"/s
   const t = await orNotFound(getMyTicket(ctx, Number(numero)));
   const created = (await searchParams).criada === "1";
   const tone = toTone(t.category.color);
-  const filesFor = (messageId: string | null) => t.attachments.filter((a) => a.messageId === messageId);
-  const attachmentList = (messageId: string | null) =>
-    filesFor(messageId).length ? (
-      <ul className="mt-2 flex flex-wrap gap-2">
-        {filesFor(messageId).map((a) => (
-          <li key={a.id}>
-            <a href={`/api/v1/tickets/${t.number}/attachments/${a.id}`} className="inline-flex min-h-10 items-center gap-2 rounded-lg border border-line bg-surface px-3 text-sm text-ink hover:bg-canvas">
-              <Paperclip className="size-4" aria-hidden /> {a.name} <span className="text-muted">({fmtFileSize(a.sizeBytes)})</span>
-            </a>
-          </li>
-        ))}
-      </ul>
-    ) : null;
+  const filesFor = (messageId: string | null) =>
+    t.attachments.filter((a) => a.messageId === messageId).map((a) => ({ id: a.id, name: a.name, sizeBytes: a.sizeBytes, href: `/api/v1/tickets/${t.number}/attachments/${a.id}` }));
+  const conversation: ConversationMessage[] = [
+    { id: "abertura", mine: true, authorName: null, body: t.description, createdAt: t.createdAt, attachments: filesFor(null) },
+    ...t.messages.map((m) => ({ id: m.id, mine: m.mine, authorName: m.authorName, body: m.body, createdAt: m.createdAt, attachments: filesFor(m.id) })),
+  ];
 
   return (
     <div className="px-4 pt-5 sm:px-6 lg:px-10 lg:pt-8">
@@ -74,27 +68,10 @@ export default async function TicketPage({ params, searchParams }: PageProps<"/s
       <div className="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_20rem]">
         <div className="flex flex-col gap-6">
           <section aria-labelledby="conversa">
-            <h2 id="conversa" className="sr-only">
+            <h2 id="conversa" className="mb-3 text-lg font-bold text-ink">
               Conversa
             </h2>
-            <ol className="flex flex-col gap-3">
-              <li className="rounded-[var(--radius-card)] border border-line bg-canvas p-4">
-                <p className="text-sm text-muted">
-                  <strong className="text-ink">Você</strong> • {fmtDateTime(t.createdAt)}
-                </p>
-                <p className="mt-2 whitespace-pre-wrap text-ink">{t.description}</p>
-                {attachmentList(null)}
-              </li>
-              {t.messages.map((m) => (
-                <li key={m.id} className={cn("rounded-[var(--radius-card)] border p-4", m.mine ? "border-line bg-canvas" : "border-brand-100 bg-brand-50")}>
-                  <p className="text-sm text-muted">
-                    <strong className="text-ink">{m.mine ? "Você" : m.authorName}</strong> {!m.mine && <span>(atendimento)</span>} • {fmtDateTime(m.createdAt)}
-                  </p>
-                  <p className="mt-2 whitespace-pre-wrap text-ink">{m.body}</p>
-                  {attachmentList(m.id)}
-                </li>
-              ))}
-            </ol>
+            <Conversation messages={conversation} />
           </section>
 
           {t.actions.canReply ? (

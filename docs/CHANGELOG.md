@@ -6,6 +6,13 @@
 - Documentos no celular conforme `referencias/Documentos REALSEG_ Gestão Segura.png`: seta de voltar, 4 recentes com "Ver todos" (lista completa com busca, filtros e paginação), card "Enviar documento" e "Documentos importantes" em 2 colunas. Ícones de documento por categoria (PDF, azul, verde), como nas referências.
 - Histórico de documentos com filtros (Recebidos, Enviados ao RH, Ciência, Acessos) e agrupamento por mês.
 - Detalhe do documento em duas colunas: referência por extenso, formato, versões, "Outros documentos" da mesma categoria e atalho "Dúvidas sobre este documento?" que abre a solicitação já com o assunto preenchido (`/solicitacoes/nova?assunto=`).
+- Solicitações conforme `referencias/Painel REALSEG de Solicitações.png` e `Tela de Solicitações em Aplicativo Corporativo.png`: tabela com "Data de abertura", abas compactas, "Filtros" (situação, categoria, período de abertura — na URL), ordem pelo número; no celular, seta de voltar, botão centralizado, categorias em 4 colunas, abas "Meus tickets / Rascunhos" e "Precisa de ajuda?".
+- Nova solicitação em duas colunas com "Como funciona", prazos de atendimento por área e sugestão de artigos da central de ajuda enquanto o assunto é digitado (`GET /help/articles?sugerir=`).
+- Conversa da solicitação em bolhas (suas mensagens à direita, atendimento à esquerda com avatar).
+- Ajuda e suporte conforme `referencias/Central de Ajuda REALSEG.png` e `Portal de Ajuda e Suporte REALSEG.png`: atalhos com as cores da referência (4 colunas também no celular), categorias em 3/2 colunas, 4 artigos no celular e chamada "Ainda precisa de ajuda?".
+- Base de conhecimento com filtros por categoria e tipo; as páginas de categoria passam a abrir a base já filtrada. Artigo em duas colunas com "Falar com o suporte" e solicitação com assunto preenchido.
+### Adicionado
+- Chat com o suporte (`/ajuda/chat`, `POST /support-chat`): cada conversa vira uma solicitação com `channel = "chat"` (protocolo, prazo, histórico), uma conversa aberta por vez, Enter envia, anexos, atualização automática e "Encerrar conversa". Migration `0004_ticket_channel`.
 
 ## [0.7.0] — 2026-10-18 — Arquivos no Cloudflare R2
 ### Adicionado

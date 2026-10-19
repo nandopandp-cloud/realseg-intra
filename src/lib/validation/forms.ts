@@ -12,6 +12,11 @@ export const ticketMessageSchema = z.object({
   body: z.string({ error: "Escreva sua mensagem." }).trim().min(1, "Escreva sua mensagem.").max(5000, "Use no máximo 5.000 caracteres."),
 });
 
+export const chatStartSchema = z.object({
+  categorySlug: z.string({ error: "Escolha o assunto da conversa." }).min(1, "Escolha o assunto da conversa.").max(50),
+  message: z.string({ error: "Escreva sua mensagem." }).trim().min(4, "Escreva um pouco mais (pelo menos 4 caracteres).").max(2000, "Use no máximo 2.000 caracteres."),
+});
+
 export const ticketDraftSchema = z.object({
   categorySlug: z.string().max(50).optional(),
   subject: z.string().trim().max(120, "Use no máximo 120 caracteres.").default(""),

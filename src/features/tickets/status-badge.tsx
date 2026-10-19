@@ -11,9 +11,16 @@ const MAP: Record<string, { tone: Tone; label: string }> = {
   cancelado: { tone: "slate", label: "Cancelado" },
 };
 
-export function TicketStatusBadge({ status }: { status: string }) {
+/** `short`: rótulos curtos para listas compactas ("Aguardando" em vez de "Aguardando você"). */
+export function TicketStatusBadge({ status, short }: { status: string; short?: boolean }) {
   const m = MAP[status] ?? { tone: "slate" as Tone, label: status };
-  return <Badge tone={m.tone}>{m.label}</Badge>;
+  const label = short && status === "aguardando_colaborador" ? "Aguardando" : m.label;
+  return (
+    <Badge tone={m.tone}>
+      {label}
+      {label !== m.label && <span className="sr-only"> sua resposta</span>}
+    </Badge>
+  );
 }
 
 export const SUBMISSION_STATUS: Record<string, { tone: Tone; label: string }> = {
