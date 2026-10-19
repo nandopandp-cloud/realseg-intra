@@ -9,8 +9,7 @@ export default function CareerLayout({ children }: { children: React.ReactNode }
         title="Minha carreira"
         subtitle="Acompanhe seu desenvolvimento e novas oportunidades na REALSEG."
         breadcrumb={[{ label: "Início", href: "/" }, { label: "Minha carreira" }]}
-        image="/images/hero-carreira.webp"
-        mobileImage="/images/mhero-carreira.webp"
+        art={{ desktop: { src: "/images/hero-carreira-ref.webp", width: 670, height: 203, share: 0.535 }, mobile: { src: "/images/mhero-carreira-ref.webp", width: 354, height: 240, share: 0.42 } }}
       >
         <CareerTabs />
       </PageHero>

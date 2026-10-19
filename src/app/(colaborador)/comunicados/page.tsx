@@ -53,8 +53,7 @@ export default async function AnnouncementsPage({ searchParams }: PageProps<"/co
         title="Comunicados"
         subtitle="Fique por dentro das novidades, avisos e informações importantes da REALSEG."
         breadcrumb={[{ label: "Início", href: "/" }, { label: "Comunicados" }]}
-        image="/images/hero-comunicados.webp"
-        mobileImage="/images/mhero-comunicados.webp"
+        art={{ desktop: { src: "/images/hero-comunicados-ref.webp", width: 531, height: 163, share: 0.424 }, mobile: { src: "/images/mhero-comunicados-ref.webp", width: 356, height: 263, share: 0.422 } }}
       />
       <PageBody>
         <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">

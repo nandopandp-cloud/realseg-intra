@@ -55,8 +55,7 @@ export default async function CoursesPage({ searchParams }: PageProps<"/cursos">
         title="Cursos"
         subtitle="Acesse conteúdos e desenvolva suas habilidades."
         breadcrumb={[{ label: "Início", href: "/" }, { label: "Cursos" }]}
-        image="/images/hero-cursos.webp"
-        mobileImage="/images/mhero-cursos.webp"
+        art={{ desktop: { src: "/images/hero-cursos-ref.webp", width: 771, height: 203, share: 0.616 }, mobile: { src: "/images/mhero-cursos-ref.webp", width: 396, height: 292, share: 0.469, coverChildren: true } }}
       >
         <SearchField label="Buscar cursos" placeholder="Buscar cursos, temas ou áreas..." defaultValue={sp.q} hidden={{ categoria: sp.categoria, filtro: sp.filtro }} size="lg" className="max-w-[41rem]" />
       </PageHero>

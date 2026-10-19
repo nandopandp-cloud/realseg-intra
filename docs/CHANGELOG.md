@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.8.1] — 2026-10-19 — Imagens de cabeçalho das referências
+### Alterado
+- Comunicados, Cursos e Minha carreira usam no cabeçalho as imagens recortadas das próprias referências (`*-ref.webp`, desktop e celular), na mesma proporção e posição, com o esfumado original. Novo `art` no `PageHero`; cabeçalho mais compacto nessas páginas, como nas referências. Imagens antigas removidas.
+
 ## [0.8.0] — 2026-10-18 — Revisão das jornadas do colaborador
 ### Alterado
 - "Fale com o RH" oculto (flag `FEATURES.talkToHr`): sai da sidebar, do "Mais", dos atalhos da Home (inclusive de preferências salvas) e a rota responde 404. Os links passam a abrir uma solicitação na categoria RH.
