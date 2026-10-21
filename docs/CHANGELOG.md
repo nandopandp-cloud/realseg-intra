@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.15.0] — 2026-10-20 — Central de ajuda, agenda, configurações e auditoria
+### Adicionado
+- `/rh/ajuda`: artigos (rascunho, publicado, arquivado) com pré-visualização, categoria, tipo, ícone/cor e área sugerida para falar com o suporte; acessos e índice de "foi útil?"; categorias.
+- `/rh/agenda`: eventos para todas as unidades ou uma unidade, com local, término opcional e comunicado relacionado; cancelar e reativar.
+- `/rh/configuracoes` (Administrador): matriz de prazos por área × prioridade em horas úteis (cada alteração cria nova versão e vale para novas solicitações), áreas de solicitação, expediente por dia da semana e feriados (cache do calendário invalidado na hora).
+- `/rh/auditoria` (Administrador): trilha com filtros por tipo de ação, pessoa, registro e período, e exportação CSV (a exportação também é auditada).
+- Painel do administrador sem permissões de RH mostra atalhos para configurações e auditoria.
+- E2E da gestão cobre todas as telas (axe), o administrador e o bloqueio do RH às telas de administração.
+
 ## [0.14.0] — 2026-10-20 — Gestão de carreira e feedbacks
 ### Adicionado
 - `/rh/carreira`: oportunidades internas (abertas, rascunhos, encerradas) com local, cargo, prazo de inscrição, destaque e elegibilidade (todos ou áreas/unidades/famílias/cargos); publicar com aviso aos elegíveis, encerrar (encerra candidaturas e avisa) e reabrir.

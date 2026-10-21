@@ -1,6 +1,6 @@
 # Status das funcionalidades
 
-Atualizado em 2026-10-18 (v0.4.0). Execução real registrada: **unitários 41/41**, **integração 70/70** (PostgreSQL 18 real), **E2E 90/90** (Chromium desktop 1440×900 + Pixel 7, com axe WCAG 2.2 A/AA), lint ✔, typecheck ✔, build de produção ✔. Nenhum teste foi pulado. Cobertura percentual não é medida.
+Atualizado em 2026-10-20 (v0.15.0). Execução real registrada: **unitários 43/43**, **integração 133/133** (PostgreSQL 18 real), **E2E 155/155** (Chromium desktop 1440×900 + Pixel 7, com axe WCAG 2.2 A/AA, inclusive todas as telas da gestão), lint ✔, typecheck ✔, build de produção ✔. Nenhum teste foi pulado. Cobertura percentual não é medida.
 
 Legenda: ✅ concluído (critérios de aceite + testes) · 🟡 parcial · ⏳ não iniciado/fase seguinte.
 
@@ -22,14 +22,18 @@ Legenda: ✅ concluído (critérios de aceite + testes) · 🟡 parcial · ⏳ n
 | Ajuda e suporte | ✅ | `learning-career`, `services-read`, E2E J | Artigos institucionais (ponto, uniforme, férias) são de demonstração; gestão de artigos — fase RH |
 | Perfil, notificações, busca | ✅ | `learning-career`, E2E B/L | Notificações por e-mail (preferência `email`) não enviadas nesta fase |
 | Fale com o RH | ⏸️ oculto | E2E F (rota 404) | Oculto em 2026-10-18 por decisão do produto (`src/lib/features.ts` → `talkToHr`). Pedidos ao RH seguem por Solicitações → categoria RH; links antigos apontam para `/solicitacoes/nova?categoria=rh` |
-| Ambiente RH/Administração — base (`/rh`, menu por permissão, painel) | ✅ | `rh-tickets.test.ts`, `api-matrix` (rotas `/rh` recusam colaborador) | Acesso por `MANAGEMENT_PERMISSIONS` (RH + ADMIN); sem permissão = 404. Gestor (equipe) ainda sem telas próprias |
+| Ambiente RH/Administração — base (`/rh`, menu por permissão, painel) | ✅ | `rh-tickets.test.ts`, `api-matrix` (rotas `/rh` recusam colaborador), E2E `rh.spec.ts` | Acesso por `MANAGEMENT_PERMISSIONS` (RH + ADMIN); sem permissão a página mostra "não encontrada" e a API responde 403 |
 | Gestão — Solicitações (fila, atendimento, notas internas, responsável, prioridade, situação) | ✅ | `rh-tickets.test.ts`, E2E `rh.spec.ts` | Respostas prontas (macros) e ações em lote não implementadas |
 | Gestão — Comunicados (editor, público-alvo, capa, anexos, agendamento, versões, arquivo, relatório de leitura/ciência + CSV) | ✅ | `rh-announcements.test.ts` | Agendados ficam visíveis na hora marcada; o aviso aos colaboradores sai na manutenção diária ou quando a gestão abre a lista (cron diário no plano Hobby). Editor de texto com marcação simples (sem editor visual) |
 | Gestão — Documentos (análise de envios, distribuição individual e em lote por matrícula, normas e manuais, versões, arquivo, remoção auditada) | ✅ | `rh-documents.test.ts`, E2E `rh.spec.ts` | Lote enviado arquivo a arquivo (limite de ~4,5 MB por requisição na Vercel). Pré-visualização de PDF depende do navegador |
 | Gestão — Colaboradores (cadastro, primeiro acesso por senha temporária ou convite, situação, desbloqueio, papéis, importação CSV) | ✅ | `rh-employees.test.ts`, E2E `rh.spec.ts` | Convite depende do e-mail corporativo (SMTP) em produção. Papéis só por quem tem `role:manage` (Administrador). Sem foto do colaborador |
 | Gestão — Estrutura (áreas, unidades, famílias e cargos) | ✅ | `rh-employees.test.ts`, E2E `rh.spec.ts` | Desativar exige não haver colaboradores ativos vinculados |
-| Gestão — demais módulos (agenda, colaboradores, estrutura, cursos, carreira, feedbacks, ajuda, configurações, auditoria) | ⏳ | — | Em construção; ocultos no menu até ficarem prontos (`pending` em `rh-nav.ts`) |
-| LGPD — exportação/eliminação | 🟡 | — | Acesso e download individuais existem; exportação consolidada e anonimização administrativa — fase RH |
+| Gestão — Central de ajuda (artigos com pré-visualização, publicação, categorias, acessos e "foi útil?") | ✅ | `rh-help-settings.test.ts`, E2E `rh.spec.ts` | — |
+| Gestão — Agenda (eventos por unidade, vínculo a comunicado, cancelar) | ✅ | `rh-help-settings.test.ts`, E2E `rh.spec.ts` | — |
+| Gestão — Configurações (prazos SLA por área × prioridade com versões, áreas de solicitação, expediente e feriados) | ✅ | `rh-help-settings.test.ts`, E2E `rh.spec.ts` | Um único calendário de atendimento para todas as áreas. Novo prazo vale só para solicitações novas |
+| Gestão — Auditoria (consulta com filtros e exportação CSV auditada) | ✅ | `rh-help-settings.test.ts`, E2E `rh.spec.ts` | Retenção de 5 anos sugerida, a validar com o jurídico |
+| Gestão — Gestor (equipe) | ⏳ | — | Papel e permissões existem (`employee:read:team`, `feedback:write:team`), sem telas próprias; o acesso à gestão hoje é para RH e Administrador |
+| LGPD — exportação/eliminação | 🟡 | — | Acesso e download individuais existem; desligamento bloqueia o acesso e preserva os registros. Exportação consolidada por titular e anonimização administrativa ainda não implementadas |
 
 ## Como reproduzir
 ```bash

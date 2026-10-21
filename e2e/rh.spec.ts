@@ -1,7 +1,8 @@
 import { asUser, expect, expectAccessible, expectNoHorizontalOverflow, test } from "./support/fixtures";
 
 /** K — Ambiente de gestão (RH): acesso, acessibilidade e jornadas principais. */
-const PAGES = ["/rh", "/rh/solicitacoes", "/rh/solicitacoes/1050", "/rh/comunicados", "/rh/comunicados/novo", "/rh/documentos", "/rh/documentos?aba=pessoais", "/rh/documentos?aba=normas", "/rh/documentos/distribuir", "/rh/documentos/distribuir?modo=lote", "/rh/documentos/normas/nova", "/rh/colaboradores", "/rh/colaboradores/novo", "/rh/colaboradores/importar", "/rh/estrutura", "/rh/estrutura?aba=unidades", "/rh/estrutura?aba=cargos", "/rh/cursos", "/rh/cursos?aba=trilhas", "/rh/cursos?aba=categorias", "/rh/cursos/novo", "/rh/carreira", "/rh/carreira?aba=faixas", "/rh/carreira?aba=desenvolvimento", "/rh/carreira/oportunidades/nova", "/rh/feedbacks", "/rh/feedbacks/novo"];
+const PAGES = ["/rh", "/rh/solicitacoes", "/rh/solicitacoes/1050", "/rh/comunicados", "/rh/comunicados/novo", "/rh/documentos", "/rh/documentos?aba=pessoais", "/rh/documentos?aba=normas", "/rh/documentos/distribuir", "/rh/documentos/distribuir?modo=lote", "/rh/documentos/normas/nova", "/rh/colaboradores", "/rh/colaboradores/novo", "/rh/colaboradores/importar", "/rh/estrutura", "/rh/estrutura?aba=unidades", "/rh/estrutura?aba=cargos", "/rh/cursos", "/rh/cursos?aba=trilhas", "/rh/cursos?aba=categorias", "/rh/cursos/novo", "/rh/carreira", "/rh/carreira?aba=faixas", "/rh/carreira?aba=desenvolvimento", "/rh/carreira/oportunidades/nova", "/rh/feedbacks", "/rh/feedbacks/novo", "/rh/ajuda", "/rh/ajuda?aba=categorias", "/rh/ajuda/artigos/novo", "/rh/agenda"];
+const ADMIN_PAGES = ["/rh", "/rh/configuracoes", "/rh/configuracoes?aba=areas", "/rh/configuracoes?aba=calendario", "/rh/auditoria"];
 
 test.describe("gestão — acesso", () => {
   test.use(asUser("carlos"));
@@ -183,5 +184,46 @@ test.describe("gestão — jornadas", () => {
     await page.getByRole("dialog").getByRole("button", { name: "Publicar" }).click();
     await expect(page.getByText("Inscrições abertas")).toBeVisible();
     await expectAccessible(page);
+  });
+});
+
+test.describe("gestão — administração", () => {
+  test.use(asUser("lucas"));
+  for (const path of ADMIN_PAGES) {
+    test(`${path} sem violações automáticas (administrador)`, async ({ page }) => {
+      await page.goto(path);
+      await expect(page.locator("main#conteudo")).toBeVisible();
+      await expectNoHorizontalOverflow(page);
+      await expectAccessible(page);
+    });
+  }
+
+  test("administrador vê só o que lhe cabe e ajusta um prazo", async ({ page }) => {
+    await page.goto("/rh");
+    const nav = page.getByRole("navigation", { name: "Seções" });
+    await expect(nav.getByRole("link", { name: "Configurações" })).toBeVisible();
+    await expect(nav.getByRole("link", { name: "Comunicados" })).toHaveCount(0);
+    await page.goto("/rh/comunicados");
+    await expect(page.getByRole("heading", { name: "Página não encontrada" })).toBeVisible();
+    await page.goto("/rh/configuracoes");
+    await page.getByRole("button", { name: "Editar prazo de RH, prioridade Urgente" }).click();
+    const dialog = page.getByRole("dialog");
+    await dialog.getByLabel("1ª resposta (horas úteis)").fill("1");
+    await dialog.getByLabel("Resolução (horas úteis)").fill("3");
+    await dialog.getByRole("button", { name: "Salvar prazo" }).click();
+    await expect(page.getByText("Prazo atualizado. Vale para novas solicitações.")).toBeVisible();
+    await page.goto("/rh/auditoria?grupo=settings");
+    await expect(page.getByRole("cell", { name: "settings.sla_policy_saved" }).first()).toBeVisible();
+  });
+});
+
+test.describe("gestão — RH não acessa administração", () => {
+  test.use(asUser("mariana"));
+  test("configurações e auditoria não abrem para o RH (página não encontrada; API recusa)", async ({ page }) => {
+    for (const path of ["/rh/configuracoes", "/rh/auditoria"]) {
+      await page.goto(path);
+      await expect(page.getByRole("heading", { name: "Página não encontrada" })).toBeVisible();
+    }
+    expect((await page.request.get("/api/v1/rh/audit/export")).status()).toBe(403);
   });
 });

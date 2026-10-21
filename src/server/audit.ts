@@ -69,7 +69,17 @@ export type AuditAction =
   | "goal.deleted"
   | "feedback.saved"
   | "feedback.published"
-  | "feedback.archived";
+  | "feedback.archived"
+  | "help.saved"
+  | "help.status_changed"
+  | "help_category.saved"
+  | "event.saved"
+  | "event.status_changed"
+  | "settings.ticket_category_saved"
+  | "settings.sla_policy_saved"
+  | "settings.calendar_saved"
+  | "settings.holiday_saved"
+  | "settings.holiday_deleted";
 
 export async function audit(
   event: {

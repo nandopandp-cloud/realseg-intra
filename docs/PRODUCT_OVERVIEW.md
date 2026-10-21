@@ -1,14 +1,14 @@
 # Visão do produto
 
 ## Objetivo
-Concentrar em um só lugar, seguro e fácil de usar, tudo o que o colaborador da REALSEG precisa no dia a dia: comunicados, documentos pessoais e institucionais, solicitações com prazo, cursos, carreira, feedbacks e ajuda — e dar ao RH ferramentas de gestão com rastreabilidade (próxima fase).
+Concentrar em um só lugar, seguro e fácil de usar, tudo o que o colaborador da REALSEG precisa no dia a dia: comunicados, documentos pessoais e institucionais, solicitações com prazo, cursos, carreira, feedbacks e ajuda — e dar ao RH ferramentas de gestão com rastreabilidade (ambiente `/rh`).
 
 ## Personas
 | Persona | Contexto | Necessidades | Implicações de design |
 | --- | --- | --- | --- |
 | **Colaborador operacional** (vigilância, transporte, apoio) | Usa principalmente o celular, em turnos, às vezes com conexão instável; familiaridade digital variada | Holerite, envio de atestado, avisos importantes, abrir chamado | Mobile-first, navegação inferior fixa, botões grandes (≥ 44 px), textos curtos, poucas etapas, foto pelo celular |
 | **Colaborador administrativo** | Desktop durante o expediente | Documentos, cursos, solicitações para TI/Facilities | Sidebar, tabelas, filtros persistentes na URL |
-| **RH / atendimento** (fase 2) | Desktop | Publicar comunicados, distribuir documentos, analisar envios, atender fila com SLA | Serviços de atendimento já prontos e testados; UI na próxima fase |
+| **RH / atendimento** | Desktop | Publicar comunicados, distribuir documentos, analisar envios, atender fila com SLA, cadastrar colaboradores, cursos e carreira | Ambiente `/rh` com menu por permissão, tabelas com filtros na URL e relatórios CSV |
 | **Gestor** (fase 2) | Desktop/celular | Feedbacks e acompanhamento da equipe | Papel e permissões já modelados |
 
 ## Escopo desta entrega (ambiente do colaborador)

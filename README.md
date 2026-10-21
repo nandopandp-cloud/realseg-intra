@@ -3,7 +3,7 @@
 Intranet corporativa da REALSEG, com dois ambientes:
 
 - **Colaborador**: implementado (Home, Comunicados, Documentos, Solicitações com SLA, Cursos, Minha carreira, Feedbacks, Ajuda, Fale com o RH, Notificações, Perfil e Busca).
-- **RH/Administração**: próxima fase. Os papéis, as permissões granulares e os serviços de atendimento já existem e estão testados no backend.
+- **Gestão (RH/Administração)** em `/rh`: painel, solicitações (fila e atendimento), comunicados e agenda, documentos (análise de envios, distribuição individual e em lote, normas), colaboradores e estrutura, cursos e trilhas, carreira, feedbacks, central de ajuda, configurações de prazo e calendário e auditoria. Cada tela exige a sua permissão. Atalho "Painel de gestão" no menu da conta.
 
 Mobile-first, fiel às referências visuais em `referencias/`, acessível (WCAG 2.2 AA verificado por testes) e com autorização feita no servidor em toda leitura e escrita.
 
@@ -31,7 +31,7 @@ pnpm db:reset:demo                # em outro terminal, na 1ª vez: recria o banc
 
 Alternativa em terminais separados: `pnpm db:dev` (banco), depois `pnpm db:migrate` e `pnpm dev`.
 
-**Acesso de demonstração (local)**: matrícula `100231` (Carlos Silva) ou `carlos.silva@demo.realseg.invalid`, senha `Realseg@2026`. Outros: `100198` (Ana, outra unidade) e `100402` (João, sem histórico, para ver os estados vazios). Todos os dados são fictícios (domínio reservado `@demo.realseg.invalid`).
+**Acesso de demonstração (local)**: matrícula `100231` (Carlos Silva) ou `carlos.silva@demo.realseg.invalid`, senha `Realseg@2026`. Outros: `100198` (Ana, outra unidade), `100402` (João, sem histórico, para ver os estados vazios), `100012` (Mariana, **RH**: acessa a gestão) e `100077` (Lucas, **Administrador**: configurações e auditoria). Todos os dados são fictícios (domínio reservado `@demo.realseg.invalid`).
 
 **Na homologação** as mesmas contas existem, mas a senha é o segredo `DEMO_PASSWORD` configurado na Vercel. A senha local acima não vale lá.
 
@@ -86,7 +86,7 @@ Utilitários de desenvolvimento, em `scripts/dev/`:
 ## Estrutura
 
 ```
-src/app/            rotas: (auth) login e senha · (colaborador) telas · api/v1 REST · api/cron
+src/app/            rotas: (auth) login e senha · (colaborador) telas · (rh) gestão em /rh · api/v1 REST (api/v1/rh = gestão) · api/cron
 src/components/     UI reutilizável (ui/) e layout (sidebar, topbar, navegação mobile)
 src/features/       componentes de cada módulo
 src/lib/            utilitários e schemas Zod compartilhados entre cliente e servidor

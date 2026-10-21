@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "@/components/ui/app-link";
-import { AlarmClock, CircleCheck, FileClock, GraduationCap, Headphones, Megaphone, UserRoundX, UsersRound, Briefcase } from "lucide-react";
+import { AlarmClock, CircleCheck, FileClock, GraduationCap, Headphones, Megaphone, UserRoundX, UsersRound, Briefcase, ScrollText, Settings2 } from "lucide-react";
 import { AdminPage } from "@/components/admin/page-header";
 import { StatTile } from "@/components/admin/stat-tile";
 import { rhHref } from "@/components/layout/rh-nav";
@@ -8,7 +8,7 @@ import { Card, EmptyState, SectionHeader } from "@/components/ui/primitives";
 import { SlaMeter } from "@/features/tickets/sla-meter";
 import { SubmissionStatusBadge } from "@/features/tickets/status-badge";
 import { fmtRelative, fmtTicketNumber, plural } from "@/lib/format";
-import { displayName } from "@/server/auth/actor";
+import { can, displayName } from "@/server/auth/actor";
 import { requireRhCtx } from "@/server/auth/rh";
 import { rhDashboard } from "@/server/services/rh/dashboard";
 
@@ -30,6 +30,30 @@ export default async function RhDashboardPage() {
         <p className="mt-1.5 text-base text-muted">O que precisa da sua atenção hoje na intranet.</p>
       </header>
 
+      {!t && !d.submissions && !d.people && !d.content && !d.learning && !d.career && (
+        <Card className="mb-6 p-5" aria-labelledby="admin-atalhos">
+          <h2 id="admin-atalhos" className="text-lg font-bold text-ink">
+            Administração
+          </h2>
+          <p className="mt-1 text-[0.9375rem] text-muted">Seu acesso de gestão é de administração do sistema.</p>
+          <ul className="mt-4 grid gap-2 sm:grid-cols-2">
+            {can(ctx.actor, "sla:configure") && (
+              <li>
+                <Link href="/rh/configuracoes" className="flex min-h-14 items-center gap-3 rounded-xl border border-line px-4 font-semibold text-ink hover:bg-canvas">
+                  <Settings2 className="size-5 text-brand-600" aria-hidden /> Prazos, áreas e calendário
+                </Link>
+              </li>
+            )}
+            {can(ctx.actor, "audit:read") && (
+              <li>
+                <Link href="/rh/auditoria" className="flex min-h-14 items-center gap-3 rounded-xl border border-line px-4 font-semibold text-ink hover:bg-canvas">
+                  <ScrollText className="size-5 text-brand-600" aria-hidden /> Trilha de auditoria
+                </Link>
+              </li>
+            )}
+          </ul>
+        </Card>
+      )}
       <h2 className="sr-only">Indicadores</h2>
       <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {t && (

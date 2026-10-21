@@ -92,5 +92,14 @@ Legenda de status: ✅ implementado e testado nesta fase · 🟡 parcial · ⏳ 
 ## RF-PERF — Perfil e notificações
 - Dados cadastrais somente leitura (correção via RH); preferências de notificação por categoria (segurança da conta não pode ser desligada); notificações com leitura individual, "marcar todas" e filtro de não lidas; notificações sem dados sensíveis.
 
-## RF-RH — Ambiente RH/Administração ⏳
-Próxima fase. Já existem: papéis RH/GESTOR/ADMIN e permissões granulares, serviços de atendimento de tickets (`agentReply`, `agentChangeStatus`, `agentAssign`, `agentChangePriority`) e monitor de SLA com testes.
+## RF-RH — Ambiente RH/Administração ✅
+Implementado em `/rh` (v0.9–v0.15). Cada tela e cada rota de API exige a sua permissão (matriz em `SECURITY.md`); o menu mostra só o permitido.
+- **Painel**: indicadores de atendimento (abertas, fora do prazo, em risco, % no prazo), documentos para analisar, pessoas, comunicados, cursos obrigatórios atrasados e candidaturas.
+- **Solicitações**: fila com abas e filtros, atendimento com notas internas, anexos, responsável, prioridade (recalcula o prazo) e situação.
+- **Comunicados**: editor completo, público-alvo, capa, anexos, publicação imediata ou agendada, versões (nova ciência), arquivo e relatório de leitura/ciência com CSV. **Agenda** de eventos.
+- **Documentos**: análise de envios (aceitar/recusar com motivo), distribuição individual e em lote por matrícula, normas e manuais com vigência e versões, remoção auditada.
+- **Colaboradores**: cadastro com senha temporária ou convite, situação (desligado bloqueia na hora), desbloqueio, papéis (somente Administrador), importação CSV. **Estrutura**: áreas, unidades, famílias e cargos.
+- **Cursos**: catálogo, módulos e aulas, público, atribuição com prazo, participantes com CSV, trilhas e categorias.
+- **Carreira**: oportunidades e candidaturas, faixas salariais com visibilidade, planos de desenvolvimento. **Feedbacks**: registrar, publicar, editar (nova leitura), arquivar.
+- **Central de ajuda**: artigos e categorias. **Configurações** (Administrador): prazos SLA versionados, áreas de solicitação, expediente e feriados. **Auditoria** (Administrador): consulta e CSV.
+- Pendente: telas do Gestor para a própria equipe.

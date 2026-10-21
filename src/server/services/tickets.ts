@@ -65,6 +65,12 @@ export async function loadCalendar(calendarId: string, db: Executor = getDb()): 
   return cal;
 }
 
+/** Descarta o cache após mudança de expediente/feriados (configurações da gestão). */
+export function invalidateCalendar(calendarId?: string) {
+  if (calendarId) calendarCache.delete(calendarId);
+  else calendarCache.clear();
+}
+
 export async function defaultCalendar() {
   const [row] = await getDb().select().from(slaCalendars).orderBy(asc(slaCalendars.createdAt)).limit(1);
   if (!row) return null;

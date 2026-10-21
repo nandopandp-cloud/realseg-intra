@@ -303,3 +303,56 @@ export const feedbackSchema = z.object({
   showAuthor: z.boolean(),
 });
 export const feedbackCreateSchema = feedbackSchema.extend({ publish: z.boolean() });
+
+// ── Central de ajuda, agenda e configurações ─────────────────────────────────
+
+export const articleSchema = z.object({
+  title: z.string({ error: "Informe o título." }).trim().min(4, "Informe o título.").max(140),
+  summary: z.string({ error: "Escreva um resumo." }).trim().min(10, "O resumo precisa ter pelo menos 10 caracteres.").max(300),
+  body: z.string({ error: "Escreva o artigo." }).trim().min(10, "Escreva pelo menos 10 caracteres.").max(20000),
+  categorySlug: z.string({ error: "Escolha a categoria." }).min(1, "Escolha a categoria.").max(50),
+  type: z.enum(["artigo", "tutorial", "faq"]),
+  icon: z.string().min(1).max(40),
+  color: z.enum(TONES),
+  ticketCategorySlug: z.string().max(50).nullish().transform((v) => v || null),
+});
+export const articleStatusSchema = z.object({ status: z.enum(["draft", "published", "archived"]) });
+export const helpCategorySchema = z.object({
+  name: z.string({ error: "Informe o nome." }).trim().min(2, "Informe o nome.").max(60),
+  description: z.string({ error: "Descreva a categoria." }).trim().min(3, "Descreva a categoria.").max(140),
+  color: z.enum(TONES),
+  icon: z.string().min(1).max(40),
+});
+export const eventSchema = z.object({
+  title: z.string({ error: "Informe o título." }).trim().min(3, "Informe o título.").max(120),
+  description: z.string().trim().max(1000).nullish().transform((v) => v || null),
+  location: z.string().trim().max(120).nullish().transform((v) => v || null),
+  startsAt: z.iso.datetime({ offset: true, error: "Informe data e hora de início." }),
+  endsAt: z.iso.datetime({ offset: true }).nullish().transform((v) => v ?? null),
+  unitId: z.uuid().nullish().transform((v) => v ?? null),
+  announcementId: z.uuid().nullish().transform((v) => v ?? null),
+});
+export const eventStatusSchema = z.object({ status: z.enum(["scheduled", "cancelled"]) });
+export const ticketCategorySchema = z.object({
+  name: z.string({ error: "Informe o nome." }).trim().min(2, "Informe o nome.").max(40),
+  description: z.string({ error: "Descreva a área." }).trim().min(3, "Descreva a área.").max(80),
+  color: z.enum(TONES),
+  icon: z.string().min(1).max(40),
+  defaultPriority: z.enum(TICKET_PRIORITIES),
+  active: z.boolean(),
+});
+export const slaPolicySchema = z.object({
+  categoryId: z.uuid(),
+  priority: z.enum(TICKET_PRIORITIES),
+  firstResponseMinutes: z.number().int().min(1, "Mínimo 1 minuto.").max(100_000),
+  resolutionMinutes: z.number().int().min(1, "Mínimo 1 minuto.").max(100_000),
+  warnAtPercent: z.number().int().min(10).max(99),
+});
+const hhmm = z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/, "Use HH:mm.");
+export const workingHoursSchema = z.object({
+  workingHours: z.partialRecord(z.enum(["0", "1", "2", "3", "4", "5", "6"]), z.array(z.tuple([hhmm, hhmm])).max(3)),
+});
+export const holidaySchema = z.object({
+  date: z.string({ error: "Informe a data." }).regex(/^\d{4}-\d{2}-\d{2}$/, "Informe a data."),
+  name: z.string({ error: "Informe o nome." }).trim().min(2, "Informe o nome.").max(80),
+});
