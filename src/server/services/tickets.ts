@@ -112,7 +112,7 @@ async function findTicketForRequester(ctx: Ctx, number: number, db: Executor = g
   return row;
 }
 
-const listFields = {
+export const ticketListFields = {
   id: tickets.id,
   number: tickets.number,
   subject: tickets.subject,
@@ -132,7 +132,7 @@ const listFields = {
   category: { slug: ticketCategories.slug, name: ticketCategories.name, color: ticketCategories.color, icon: ticketCategories.icon },
 };
 
-async function withSla<T extends { calendarId: string | null; status: TicketStatus; createdAt: Date; resolutionMinutes: number | null; resolutionDueAt: Date | null; firstResponseDueAt: Date | null; firstRespondedAt: Date | null; resolvedAt: Date | null; pausedAt: Date | null; pausedBusinessMinutes: number }>(rows: T[], now = new Date()) {
+export async function withSla<T extends { calendarId: string | null; status: TicketStatus; createdAt: Date; resolutionMinutes: number | null; resolutionDueAt: Date | null; firstResponseDueAt: Date | null; firstRespondedAt: Date | null; resolvedAt: Date | null; pausedAt: Date | null; pausedBusinessMinutes: number }>(rows: T[], now = new Date()) {
   const out = [];
   for (const r of rows) {
     const cal = r.calendarId ? await loadCalendar(r.calendarId) : null;
@@ -166,7 +166,7 @@ export async function listMyTickets(
   const db = getDb();
   const [rows, [{ total }], [counts]] = await Promise.all([
     db
-      .select(listFields)
+      .select(ticketListFields)
       .from(tickets)
       .innerJoin(ticketCategories, eq(ticketCategories.id, tickets.categoryId))
       .leftJoin(slaPolicies, eq(slaPolicies.id, tickets.slaPolicyId))
@@ -193,7 +193,7 @@ export async function listMyTickets(
 export async function openTicketsSummary(ctx: Ctx, limit = 3) {
   requirePermission(ctx.actor, "ticket:read:own");
   const rows = await getDb()
-    .select(listFields)
+    .select(ticketListFields)
     .from(tickets)
     .innerJoin(ticketCategories, eq(ticketCategories.id, tickets.categoryId))
     .leftJoin(slaPolicies, eq(slaPolicies.id, tickets.slaPolicyId))
@@ -348,7 +348,7 @@ export async function listTicketCategories() {
     .orderBy(asc(ticketCategories.position));
 }
 
-type UploadFile = { name: string; bytes: Uint8Array };
+export type UploadFile = { name: string; bytes: Uint8Array };
 
 async function attachFiles(tx: Executor, ctx: Ctx, ticketId: string, messageId: string | null, files: UploadFile[]) {
   for (const f of files) {
@@ -581,10 +581,15 @@ async function requesterUserId(tx: Executor, employeeId: string) {
   return row?.userId;
 }
 
-export async function agentReply(ctx: Ctx, number: number, input: { body: string; internal?: boolean; setStatus?: TicketStatus }) {
+export async function agentReply(ctx: Ctx, number: number, input: { body: string; internal?: boolean; setStatus?: TicketStatus; files?: UploadFile[] }) {
+  if ((input.files?.length ?? 0) > MAX_ATTACHMENTS) throw validation(`Anexe no máximo ${MAX_ATTACHMENTS} arquivos.`);
   await getDb().transaction(async (tx) => {
     const t = await findTicketForAgent(ctx, number, tx);
-    await tx.insert(ticketMessages).values({ ticketId: t.id, authorUserId: ctx.actor.userId, body: input.body, isInternal: !!input.internal });
+    if (t.status === "fechado" || t.status === "cancelado") throw invalidTransition("Esta solicitação está encerrada e não aceita novas mensagens.");
+    const [msg] = await tx.insert(ticketMessages).values({ ticketId: t.id, authorUserId: ctx.actor.userId, body: input.body, isInternal: !!input.internal }).returning();
+    if (input.files?.length) await attachFiles(tx, ctx, t.id, msg.id, input.files);
+    await tx.insert(ticketEvents).values({ ticketId: t.id, type: "message_added", actorUserId: ctx.actor.userId, note: input.internal ? "Nota interna" : null });
+    await audit({ action: "ticket.message_added", actorUserId: ctx.actor.userId, entityType: "ticket", entityId: t.id, metadata: { internal: !!input.internal, attachments: input.files?.length ?? 0, by: "agent" }, meta: ctx.meta }, tx);
     let current = t;
     if (!input.internal && !t.firstRespondedAt) {
       const [u] = await tx.update(tickets).set({ firstRespondedAt: new Date() }).where(eq(tickets.id, t.id)).returning();
@@ -608,9 +613,12 @@ export async function agentChangeStatus(ctx: Ctx, number: number, to: TicketStat
   });
 }
 
-export async function agentAssign(ctx: Ctx, number: number, assigneeUserId: string) {
+/** Atribui (ou remove o responsável, com `null`). O responsável precisa poder atender solicitações. */
+export async function agentAssign(ctx: Ctx, number: number, assigneeUserId: string | null) {
   await getDb().transaction(async (tx) => {
     const t = await findTicketForAgent(ctx, number, tx);
+    if (assigneeUserId && !(await isAgent(tx, assigneeUserId))) throw validation("Escolha um responsável da equipe de atendimento.");
+    if (assigneeUserId === t.assigneeUserId) return;
     const [updated] = await tx
       .update(tickets)
       .set({ assigneeUserId, updatedAt: new Date(), version: sql`${tickets.version} + 1` })
@@ -618,7 +626,21 @@ export async function agentAssign(ctx: Ctx, number: number, assigneeUserId: stri
       .returning();
     if (!updated) throw conflict("A solicitação foi atualizada por outra pessoa.");
     await tx.insert(ticketEvents).values({ ticketId: t.id, type: "assigned", fromValue: t.assigneeUserId, toValue: assigneeUserId, actorUserId: ctx.actor.userId });
+    if (assigneeUserId && assigneeUserId !== ctx.actor.userId) {
+      await notify([assigneeUserId], { category: "solicitacoes", title: `Solicitação #${t.number} atribuída a você`, link: `/rh/solicitacoes/${t.number}`, entityType: "ticket", entityId: t.id }, tx);
+    }
   });
+}
+
+/** Usuário ativo com permissão de atender solicitações (via papéis). */
+export async function isAgent(db: Executor, userId: string): Promise<boolean> {
+  const r = await db.execute(sql`
+    SELECT 1 FROM ${users} u
+    JOIN user_roles ur ON ur.user_id = u.id
+    JOIN role_permissions rp ON rp.role_id = ur.role_id
+    WHERE u.id = ${userId} AND u.status = 'active' AND u.deleted_at IS NULL AND rp.permission_key = 'ticket:manage'
+    LIMIT 1`);
+  return r.rows.length > 0;
 }
 
 export async function agentChangePriority(ctx: Ctx, number: number, priority: TicketPriority) {

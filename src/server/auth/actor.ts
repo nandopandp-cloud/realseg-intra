@@ -1,5 +1,5 @@
 import { forbidden } from "../errors";
-import type { Permission, RoleKey } from "./permissions";
+import { MANAGEMENT_PERMISSIONS, type Permission, type RoleKey } from "./permissions";
 
 /** Identidade autenticada usada por toda a camada de serviços (nunca vem do cliente). */
 export type Actor = {
@@ -36,6 +36,11 @@ export function can(actor: Actor, permission: Permission): boolean {
 
 export function requirePermission(actor: Actor, permission: Permission): void {
   if (!can(actor, permission)) throw forbidden();
+}
+
+/** Acesso ao ambiente de gestão (RH/Administração). */
+export function canManage(actor: Actor): boolean {
+  return MANAGEMENT_PERMISSIONS.some((p) => actor.permissions.has(p));
 }
 
 /** Ações do colaborador exigem vínculo de colaborador (employee). */

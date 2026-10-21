@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.9.0] — 2026-10-20 — Ambiente de gestão (RH): base, painel e fila de solicitações
+### Adicionado
+- Ambiente de gestão em `/rh` com layout próprio (menu escuro agrupado por Operação, Conteúdo, Pessoas e Administração; faixa rolável no celular). Cada item do menu e cada tela exigem a sua permissão; sem acesso, a resposta é 404. Atalho "Painel de gestão" ↔ "Área do colaborador" no menu da conta.
+- Painel com indicadores por permissão: solicitações abertas, fora do prazo e em risco, % resolvidas no prazo, documentos para analisar, colaboradores ativos/afastados, comunicados, cursos obrigatórios atrasados e candidaturas.
+- Fila de atendimento (`/rh/solicitacoes`): abas (abertas, sem responsável, comigo, aguardando colaborador, fora do prazo, concluídas), busca por protocolo/assunto/nome/matrícula, filtros de área e prioridade, ordenação por urgência e prazo.
+- Atendimento (`/rh/solicitacoes/[numero]`): conversa completa com notas internas (nunca exibidas ao colaborador), resposta com anexos e mudança de situação, responsável ("Assumir solicitação"), prioridade (recalcula o prazo), dados do colaborador, outras solicitações dele, prazo e histórico.
+- API `/api/v1/rh/tickets/[number]/{messages,status,assign,priority,attachments/[id]}`.
+### Alterado
+- `agentReply` aceita anexos, registra auditoria e bloqueia mensagens em solicitações encerradas; `agentAssign` aceita remover o responsável, valida que o responsável pertence à equipe de atendimento e notifica quem recebe.
+
 ## [0.8.2] — 2026-10-19 — Ajuda e suporte fiel à referência
 ### Alterado
 - Ajuda e suporte conforme `referencias/Central de Ajuda REALSEG.png` e `Portal de Ajuda e Suporte REALSEG.png`: imagem do cabeçalho recortada da referência (desktop e celular), atalhos com títulos em duas linhas e setas na cor de cada atalho, categorias e artigos compactos, "Chat com o suporte" com o mesmo ícone da referência, horário de atendimento com ícone em destaque e selo "Online", solicitações recentes compactas e "Não encontrou o que precisa?" com ícone.

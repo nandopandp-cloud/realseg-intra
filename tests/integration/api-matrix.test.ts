@@ -39,14 +39,33 @@ describe("matriz de autenticação da API", () => {
 
   it("recursos inexistentes/alheios respondem 404 (nunca 500) com sessão válida", async () => {
     const cookie = await sessionCookie(people.carlos.user.id);
+    // Rotas da gestão são verificadas com quem tem acesso a elas (RH).
+    const rhCookie = await sessionCookie(people.mariana.user.id);
     const failures: string[] = [];
     for (const [file, load] of entries) {
       if (!/\[(id|number|slug|fileId)\]/.test(file)) continue;
       const mod = (await load()) as Record<string, (req: unknown, ctx: unknown) => Promise<Response>>;
       if (!mod.GET) continue;
       const path = routePath(file).replace(/\[(\w+)\]/g, (_, k: keyof typeof FAKE) => FAKE[k] ?? "x");
-      const res = await mod.GET(apiRequest(`/api/v1${path}`, { cookie }), { params: Promise.resolve(FAKE) });
+      const res = await mod.GET(apiRequest(`/api/v1${path}`, { cookie: path.startsWith("/rh/") ? rhCookie : cookie }), { params: Promise.resolve(FAKE) });
       if (res.status !== 404) failures.push(`GET ${path} → ${res.status}`);
+    }
+    expect(failures).toEqual([]);
+  });
+
+  it("rotas da gestão (/rh) recusam colaborador sem permissão (403, sem executar nada)", async () => {
+    const cookie = await sessionCookie(people.carlos.user.id);
+    const failures: string[] = [];
+    const rhEntries = entries.filter(([f]) => routePath(f).startsWith("/rh/"));
+    expect(rhEntries.length).toBeGreaterThan(0);
+    for (const [file, load] of rhEntries) {
+      const mod = (await load()) as Record<string, (req: unknown, ctx: unknown) => Promise<Response>>;
+      for (const m of METHODS) {
+        if (!mod[m]) continue;
+        const path = routePath(file).replace(/\[(\w+)\]/g, (_, k: keyof typeof FAKE) => FAKE[k] ?? "x");
+        const res = await mod[m](apiRequest(`/api/v1${path}`, { method: m, cookie }), { params: Promise.resolve(FAKE) });
+        if (res.status !== 403) failures.push(`${m} ${path} → ${res.status}`);
+      }
     }
     expect(failures).toEqual([]);
   });

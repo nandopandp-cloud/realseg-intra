@@ -100,6 +100,9 @@ const RH: Permission[] = [
 
 const ADMIN: Permission[] = ["sla:configure", "audit:read", "role:manage"];
 
+/** Qualquer uma destas permissões dá acesso ao ambiente de gestão (/rh); cada tela exige a sua. */
+export const MANAGEMENT_PERMISSIONS: Permission[] = [...RH, ...ADMIN];
+
 /** Permissões padrão por papel (seed). Papéis são cumulativos: um RH também é COLABORADOR. */
 export const DEFAULT_ROLE_PERMISSIONS: Record<RoleKey, Permission[]> = {
   COLABORADOR,

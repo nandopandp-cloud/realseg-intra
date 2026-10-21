@@ -2,6 +2,7 @@ import { BottomNav } from "@/components/layout/bottom-nav";
 import { Sidebar } from "@/components/layout/sidebar";
 import { Topbar } from "@/components/layout/topbar";
 import { DemoBanner } from "@/components/ui/primitives";
+import { canManage } from "@/server/auth/actor";
 import { requireCtx } from "@/server/auth/current";
 import { unreadCount } from "@/server/services/notifications";
 import { getPreferences } from "@/server/services/profile";
@@ -21,7 +22,7 @@ export default async function ColaboradorLayout({ children }: LayoutProps<"/">) 
       <Sidebar initialCollapsed={prefs.sidebarCollapsed} />
       <div className="flex min-w-0 flex-1 flex-col">
         {demo && <DemoBanner />}
-        <Topbar name={name} roleLabel="Colaborador" unread={unread} />
+        <Topbar name={name} roleLabel="Colaborador" unread={unread} switchTo={canManage(ctx.actor) ? { href: "/rh", label: "Painel de gestão", kind: "rh" } : undefined} />
         <main id="conteudo" tabIndex={-1} className="flex-1 pb-28 outline-none lg:pb-12">
           {children}
         </main>

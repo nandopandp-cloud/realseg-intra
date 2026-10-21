@@ -3,7 +3,7 @@
 import Link from "@/components/ui/app-link";
 import { useRouter } from "next/navigation";
 import { useEffect, useId, useRef, useState, type ReactNode } from "react";
-import { Bell, ChevronDown, KeyRound, LogOut, UserRound } from "lucide-react";
+import { Bell, ChevronDown, House, KeyRound, LayoutDashboard, LogOut, UserRound } from "lucide-react";
 import { Avatar } from "@/components/ui/primitives";
 import { cn } from "@/lib/cn";
 import { fmtRelative } from "@/lib/format";
@@ -132,7 +132,10 @@ export function NotificationBell({ unread }: { unread: number }) {
   );
 }
 
-export function UserMenu({ name, roleLabel }: { name: string; roleLabel: string }) {
+/** Atalho entre a área do colaborador e o ambiente de gestão (só aparece para quem tem acesso). */
+export type SwitchLink = { href: string; label: string; kind: "rh" | "colaborador" };
+
+export function UserMenu({ name, roleLabel, switchTo }: { name: string; roleLabel: string; switchTo?: SwitchLink }) {
   const { open, setOpen, ref, buttonRef } = usePopover();
   const id = useId();
   const [leaving, setLeaving] = useState(false);
@@ -170,6 +173,13 @@ export function UserMenu({ name, roleLabel }: { name: string; roleLabel: string 
           <span className="block text-sm text-muted">{roleLabel}</span>
         </p>
         <ul>
+          {switchTo && (
+            <li className="mb-1 border-b border-line pb-1">
+              <Link href={switchTo.href} onClick={() => setOpen(false)} className="flex min-h-11 items-center gap-3 rounded-lg px-3 text-[0.9375rem] font-semibold text-brand-700 hover:bg-brand-50">
+                {switchTo.kind === "rh" ? <LayoutDashboard className="size-5" aria-hidden /> : <House className="size-5" aria-hidden />} {switchTo.label}
+              </Link>
+            </li>
+          )}
           <li>
             <Link href="/perfil" onClick={() => setOpen(false)} className="flex min-h-11 items-center gap-3 rounded-lg px-3 text-[0.9375rem] text-ink hover:bg-canvas">
               <UserRound className="size-5 text-muted" aria-hidden /> Meu perfil

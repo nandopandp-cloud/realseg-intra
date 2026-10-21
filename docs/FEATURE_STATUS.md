@@ -22,7 +22,9 @@ Legenda: ✅ concluído (critérios de aceite + testes) · 🟡 parcial · ⏳ n
 | Ajuda e suporte | ✅ | `learning-career`, `services-read`, E2E J | Artigos institucionais (ponto, uniforme, férias) são de demonstração; gestão de artigos — fase RH |
 | Perfil, notificações, busca | ✅ | `learning-career`, E2E B/L | Notificações por e-mail (preferência `email`) não enviadas nesta fase |
 | Fale com o RH | ⏸️ oculto | E2E F (rota 404) | Oculto em 2026-10-18 por decisão do produto (`src/lib/features.ts` → `talkToHr`). Pedidos ao RH seguem por Solicitações → categoria RH; links antigos apontam para `/solicitacoes/nova?categoria=rh` |
-| Ambiente RH/Administração | ⏳ | — | Próxima fase: painel, colaboradores, comunicados, documentos, filas, SLA, cursos, carreira, feedbacks, relatórios, lote, auditoria (matriz E2E K) |
+| Ambiente RH/Administração — base (`/rh`, menu por permissão, painel) | ✅ | `rh-tickets.test.ts`, `api-matrix` (rotas `/rh` recusam colaborador) | Acesso por `MANAGEMENT_PERMISSIONS` (RH + ADMIN); sem permissão = 404. Gestor (equipe) ainda sem telas próprias |
+| Gestão — Solicitações (fila, atendimento, notas internas, responsável, prioridade, situação) | ✅ | `rh-tickets.test.ts` | Sem E2E próprio ainda. Respostas prontas (macros) e ações em lote não implementadas |
+| Gestão — demais módulos (comunicados, agenda, documentos, colaboradores, estrutura, cursos, carreira, feedbacks, ajuda, configurações, auditoria) | ⏳ | — | Em construção; ocultos no menu até ficarem prontos (`pending` em `rh-nav.ts`) |
 | LGPD — exportação/eliminação | 🟡 | — | Acesso e download individuais existem; exportação consolidada e anonimização administrativa — fase RH |
 
 ## Como reproduzir
