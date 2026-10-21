@@ -150,3 +150,54 @@ export const documentMetaSchema = z
 export const versionFieldsSchema = z.object({ changeNote: z.string().trim().max(300, "Use no máximo 300 caracteres.").optional(), notify: boolField });
 export const batchPreviewSchema = z.object({ names: z.array(z.string().max(255)).min(1).max(300) });
 export const removeReasonSchema = z.object({ reason: z.string({ error: "Informe o motivo." }).trim().min(3, "Informe o motivo.").max(200, "Use no máximo 200 caracteres.") });
+
+// ── Colaboradores e estrutura ────────────────────────────────────────────────
+
+export const EXTRA_ROLES = ["RH", "GESTOR", "ADMIN"] as const;
+
+export const employeeSchema = z.object({
+  fullName: z.string({ error: "Informe o nome completo." }).trim().min(3, "Informe o nome completo.").max(120, "Use no máximo 120 caracteres."),
+  preferredName: z.string().trim().max(60, "Use no máximo 60 caracteres.").nullish(),
+  registrationNumber: z.string({ error: "Informe a matrícula." }).trim().regex(/^\d{3,12}$/, "A matrícula deve ter só números (3 a 12 dígitos)."),
+  email: z.email({ error: "Informe um e-mail válido." }).trim().max(160),
+  departmentId: z.uuid({ error: "Escolha a área." }),
+  unitId: z.uuid({ error: "Escolha a unidade." }),
+  jobPositionId: z.uuid({ error: "Escolha o cargo." }),
+  managerEmployeeId: z.uuid().nullish(),
+  admissionDate: z.string({ error: "Informe a data de admissão." }).regex(/^\d{4}-\d{2}-\d{2}$/, "Informe a data de admissão."),
+});
+export const createEmployeeSchema = employeeSchema.extend({
+  access: z.enum(["temp", "invite"]),
+  roles: z.array(z.enum(EXTRA_ROLES)).max(3).default([]),
+});
+export const employeeStatusSchema = z.object({ status: z.enum(["ativo", "afastado", "desligado"]) });
+export const accessResetSchema = z.object({ mode: z.enum(["temp", "invite"]) });
+export const rolesSchema = z.object({ roles: z.array(z.enum(EXTRA_ROLES)).max(3) });
+export const importSchema = z.object({ csv: z.string().min(1, "Selecione a planilha.").max(600_000, "Planilha muito grande (máx. 500 linhas)."), dryRun: z.boolean() });
+
+export const departmentSchema = z.object({
+  code: z.string({ error: "Informe o código." }).trim().regex(/^[A-Za-z0-9_-]{2,20}$/, "Use 2 a 20 letras, números, - ou _."),
+  name: z.string({ error: "Informe o nome." }).trim().min(2, "Informe o nome.").max(80, "Use no máximo 80 caracteres."),
+  parentId: z.uuid().nullish(),
+  active: z.boolean(),
+});
+export const unitSchema = z.object({
+  name: z.string({ error: "Informe o nome." }).trim().min(2, "Informe o nome.").max(80, "Use no máximo 80 caracteres."),
+  city: z.string({ error: "Informe a cidade." }).trim().min(2, "Informe a cidade.").max(80),
+  state: z.string({ error: "Informe a UF." }).trim().regex(/^[A-Za-z]{2}$/, "Use a sigla com 2 letras (ex.: SP)."),
+  active: z.boolean(),
+});
+export const familySchema = z.object({
+  name: z.string({ error: "Informe o nome." }).trim().min(2, "Informe o nome.").max(80, "Use no máximo 80 caracteres."),
+  description: z.string().trim().max(500, "Use no máximo 500 caracteres.").nullish(),
+});
+export const positionSchema = z.object({
+  title: z.string({ error: "Informe o cargo." }).trim().min(2, "Informe o cargo.").max(100, "Use no máximo 100 caracteres."),
+  familyId: z.uuid({ error: "Escolha a família." }),
+  level: z.coerce.number({ error: "Informe o nível." }).int().min(1, "Nível mínimo 1.").max(20, "Nível máximo 20."),
+  levelLabel: z.string({ error: "Informe o rótulo do nível." }).trim().min(1, "Ex.: Júnior, Pleno, I, II.").max(40),
+  description: z.string().trim().max(1000).nullish(),
+  requirements: z.string().trim().max(2000).nullish(),
+  progressionCriteria: z.string().trim().max(2000).nullish(),
+  active: z.boolean(),
+});

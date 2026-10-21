@@ -46,7 +46,15 @@ export type AuditAction =
   | "document.version_added"
   | "document.archived"
   | "document.removed"
-  | "submission.reviewed";
+  | "submission.reviewed"
+  | "employee.created"
+  | "employee.updated"
+  | "employee.status_changed"
+  | "employee.access_reset"
+  | "employee.roles_changed"
+  | "employee.imported"
+  | "org.created"
+  | "org.updated";
 
 export async function audit(
   event: {

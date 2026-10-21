@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.12.0] — 2026-10-20 — Gestão de colaboradores e estrutura
+### Adicionado
+- `/rh/colaboradores`: lista por situação (ativos, afastados, desligados) com busca por nome, e-mail ou matrícula e filtros de área, unidade, cargo e papel; último acesso e bloqueio visíveis.
+- Cadastro com primeiro acesso por senha temporária (exibida uma única vez, troca obrigatória) ou convite por e-mail (link válido por 72 h); edição de dados e vínculo (cargo, área, unidade, gestor, admissão).
+- Situação do vínculo: afastado mantém o acesso; desligado bloqueia na hora (sessões revogadas) e preserva o histórico. Nova senha temporária/convite também desbloqueia a conta.
+- Papéis RH, Gestor e Administrador concedidos só por quem tem `role:manage`; o administrador não remove o próprio papel.
+- Importação de colaboradores por planilha CSV (modelo para download), com conferência linha a linha antes de gravar e convite automático.
+- `/rh/estrutura`: áreas (código, área superior), unidades, famílias profissionais e cargos (nível, rótulo, requisitos e critérios de progressão); desativar só sem colaboradores ativos.
+
 ## [0.11.0] — 2026-10-20 — Gestão de documentos
 ### Adicionado
 - `/rh/documentos` com três seções: envios dos colaboradores (para analisar, aceitos, recusados), documentos distribuídos (com situação da ciência) e normas e manuais (vigentes e arquivados, com % de ciência).

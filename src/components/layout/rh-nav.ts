@@ -43,8 +43,8 @@ export const RH_NAV: RhNavGroup[] = [
   {
     label: "Pessoas",
     items: [
-      { href: "/rh/colaboradores", label: "Colaboradores", icon: UsersRound, permission: "employee:read:any", match: starts("/rh/colaboradores"), pending: true },
-      { href: "/rh/estrutura", label: "Estrutura", icon: Network, permission: "employee:manage", match: starts("/rh/estrutura"), pending: true },
+      { href: "/rh/colaboradores", label: "Colaboradores", icon: UsersRound, permission: "employee:read:any", match: starts("/rh/colaboradores") },
+      { href: "/rh/estrutura", label: "Estrutura", icon: Network, permission: "employee:manage", match: starts("/rh/estrutura") },
       { href: "/rh/carreira", label: "Carreira", icon: ChartColumn, permission: "career:manage", match: starts("/rh/carreira"), pending: true },
       { href: "/rh/feedbacks", label: "Feedbacks", icon: MessageSquareHeart, permission: "feedback:write:any", match: starts("/rh/feedbacks"), pending: true },
     ],
