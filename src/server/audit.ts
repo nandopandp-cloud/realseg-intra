@@ -54,7 +54,12 @@ export type AuditAction =
   | "employee.roles_changed"
   | "employee.imported"
   | "org.created"
-  | "org.updated";
+  | "org.updated"
+  | "course.created"
+  | "course.updated"
+  | "course.status_changed"
+  | "course.assigned"
+  | "learning_path.updated";
 
 export async function audit(
   event: {

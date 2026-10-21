@@ -1,7 +1,7 @@
 import { asUser, expect, expectAccessible, expectNoHorizontalOverflow, test } from "./support/fixtures";
 
 /** K — Ambiente de gestão (RH): acesso, acessibilidade e jornadas principais. */
-const PAGES = ["/rh", "/rh/solicitacoes", "/rh/solicitacoes/1050", "/rh/comunicados", "/rh/comunicados/novo", "/rh/documentos", "/rh/documentos?aba=pessoais", "/rh/documentos?aba=normas", "/rh/documentos/distribuir", "/rh/documentos/distribuir?modo=lote", "/rh/documentos/normas/nova", "/rh/colaboradores", "/rh/colaboradores/novo", "/rh/colaboradores/importar", "/rh/estrutura", "/rh/estrutura?aba=unidades", "/rh/estrutura?aba=cargos"];
+const PAGES = ["/rh", "/rh/solicitacoes", "/rh/solicitacoes/1050", "/rh/comunicados", "/rh/comunicados/novo", "/rh/documentos", "/rh/documentos?aba=pessoais", "/rh/documentos?aba=normas", "/rh/documentos/distribuir", "/rh/documentos/distribuir?modo=lote", "/rh/documentos/normas/nova", "/rh/colaboradores", "/rh/colaboradores/novo", "/rh/colaboradores/importar", "/rh/estrutura", "/rh/estrutura?aba=unidades", "/rh/estrutura?aba=cargos", "/rh/cursos", "/rh/cursos?aba=trilhas", "/rh/cursos?aba=categorias", "/rh/cursos/novo"];
 
 test.describe("gestão — acesso", () => {
   test.use(asUser("carlos"));
@@ -124,5 +124,32 @@ test.describe("gestão — jornadas", () => {
     await dialog.getByRole("button", { name: "Salvar" }).click();
     await expect(page.getByRole("cell", { name: "Unidade Campinas", exact: true })).toBeVisible();
     await expect(page.getByRole("cell", { name: "Campinas/SP" })).toBeVisible();
+  });
+
+  test("cursos: criar, adicionar aula, publicar e aparecer no catálogo do colaborador", async ({ page, browser }) => {
+    await page.goto("/rh/cursos/novo");
+    await page.getByLabel("Título").fill("Primeiros socorros básicos");
+    await page.getByLabel("Resumo").fill("Como agir nos primeiros minutos de uma emergência.");
+    await page.getByLabel("Sobre o curso").fill("Curso introdutório de primeiros socorros para todas as equipes.");
+    await page.getByLabel("Categoria").selectOption({ index: 1 });
+    await page.getByRole("button", { name: "Criar curso" }).click();
+    await page.waitForURL(/\/rh\/cursos\/[0-9a-f-]{36}\?aba=conteudo$/);
+    await page.getByRole("button", { name: "Adicionar aula" }).click();
+    const dialog = page.getByRole("dialog");
+    await dialog.getByLabel("Título").fill("Avaliação da cena");
+    await dialog.getByLabel("Conteúdo").fill("Verifique se o local é seguro antes de se aproximar.");
+    await dialog.getByRole("button", { name: "Salvar aula" }).click();
+    await expect(page.getByText("1. Avaliação da cena")).toBeVisible();
+    await expectAccessible(page);
+    await page.getByRole("button", { name: "Publicar" }).click();
+    await expect(page.getByText("Curso publicado no catálogo.")).toBeVisible();
+    await page.getByRole("link", { name: /Participantes/ }).click();
+    await expect(page.getByText("Pessoas", { exact: true })).toBeVisible();
+    await expectAccessible(page);
+    const ctx = await browser.newContext({ storageState: "e2e/.auth/carlos.json" });
+    const p2 = await ctx.newPage();
+    await p2.goto("/cursos?q=socorros");
+    await expect(p2.getByText("Primeiros socorros básicos").first()).toBeVisible();
+    await ctx.close();
   });
 });

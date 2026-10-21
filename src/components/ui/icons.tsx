@@ -71,6 +71,9 @@ const MAP: Record<string, LucideIcon> = {
   wrench: Wrench,
 };
 
+/** Chaves disponíveis para escolha na gestão (categorias, trilhas). */
+export const ICON_KEYS = Object.keys(MAP);
+
 export function iconFor(key: string | null | undefined): LucideIcon {
   return (key && MAP[key]) || FileText;
 }

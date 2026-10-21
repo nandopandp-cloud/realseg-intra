@@ -201,3 +201,51 @@ export const positionSchema = z.object({
   progressionCriteria: z.string().trim().max(2000).nullish(),
   active: z.boolean(),
 });
+
+// ── Cursos ───────────────────────────────────────────────────────────────────
+
+export const TONES = ["teal", "blue", "indigo", "purple", "amber", "red", "orange", "slate", "green"] as const;
+
+export const courseSchema = z
+  .object({
+    title: z.string({ error: "Informe o título." }).trim().min(3, "Informe o título.").max(140, "Use no máximo 140 caracteres."),
+    slug: z.string({ error: "Informe o endereço." }).regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "Use letras minúsculas, números e hífens.").max(80),
+    summary: z.string({ error: "Escreva um resumo." }).trim().min(10, "O resumo precisa ter pelo menos 10 caracteres.").max(300, "Use no máximo 300 caracteres."),
+    description: z.string({ error: "Descreva o curso." }).trim().min(10, "A descrição precisa ter pelo menos 10 caracteres.").max(5000, "Use no máximo 5.000 caracteres."),
+    categorySlug: z.string({ error: "Escolha a categoria." }).min(1, "Escolha a categoria.").max(50),
+    coverImage: z.string().regex(COVER_RE, "Imagem de capa inválida.").nullish().transform((v) => v || null),
+    isMandatory: z.boolean(),
+    mandatoryDueDays: z.number().int().min(1, "Mínimo 1 dia.").max(365, "Máximo 365 dias.").nullable(),
+    issuesCertificate: z.boolean(),
+    audience: audienceSchema,
+  })
+  .refine((v) => !v.isMandatory || v.mandatoryDueDays, { message: "Informe o prazo (em dias) para concluir.", path: ["mandatoryDueDays"] });
+
+export const courseStatusSchema = z.object({ status: z.enum(["draft", "published", "archived"]) });
+export const moduleSchema = z.object({ title: z.string({ error: "Dê um nome ao módulo." }).trim().min(2, "Dê um nome ao módulo.").max(120) });
+export const moveSchema = z.object({ dir: z.union([z.literal(-1), z.literal(1)]) });
+export const lessonSchema = z.object({
+  title: z.string({ error: "Dê um título à aula." }).trim().min(2, "Dê um título à aula.").max(140),
+  type: z.enum(["texto", "video", "material"]),
+  content: z.string().max(20000, "Use no máximo 20.000 caracteres.").default(""),
+  videoUrl: z.string().trim().max(500).nullish().transform((v) => v || null),
+  durationMinutes: z.number({ error: "Informe a duração." }).int().min(1, "Mínimo 1 minuto.").max(600, "Máximo 600 minutos."),
+});
+export const assignSchema = z.object({
+  target: z.enum(["audience", "employees"]),
+  employeeIds: z.array(z.uuid()).max(500).optional(),
+  dueDays: z.number().int().min(1).max(365).nullable(),
+});
+export const pathSchema = z.object({
+  title: z.string({ error: "Dê um nome à trilha." }).trim().min(3, "Dê um nome à trilha.").max(100),
+  description: z.string().trim().max(500, "Use no máximo 500 caracteres.").default(""),
+  color: z.enum(TONES),
+  icon: z.string().min(1).max(40),
+  jobFamilyId: z.uuid().nullish().transform((v) => v ?? null),
+  courseIds: z.array(z.uuid()).max(50),
+});
+export const courseCategorySchema = z.object({
+  name: z.string({ error: "Informe o nome." }).trim().min(2, "Informe o nome.").max(60),
+  color: z.enum(TONES),
+  icon: z.string().min(1).max(40),
+});

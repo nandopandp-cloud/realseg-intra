@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.13.0] — 2026-10-20 — Gestão de cursos
+### Adicionado
+- `/rh/cursos`: lista por situação com conteúdo (aulas e duração) e taxa de conclusão/atrasos; trilhas de aprendizagem (cursos em ordem, cor, ícone e família profissional) e categorias.
+- Curso: dados do catálogo (título, endereço, resumo, descrição, categoria, capa), obrigatoriedade com prazo, certificado e público-alvo; publicar, arquivar e voltar para rascunho (publicar exige ao menos uma aula).
+- Conteúdo: módulos e aulas (texto, vídeo do YouTube/Vimeo convertido para o player sem rastreamento, material), com reordenação; aulas já concluídas por alguém não podem ser excluídas; o progresso das matrículas é recalculado quando o conteúdo muda.
+- Participantes: público e matriculados com progresso, prazo e atrasados (filtros e busca), exportação CSV auditada e atribuição do curso ao público ou a pessoas escolhidas com prazo (avisa os novos matriculados).
+
 ## [0.12.0] — 2026-10-20 — Gestão de colaboradores e estrutura
 ### Adicionado
 - `/rh/colaboradores`: lista por situação (ativos, afastados, desligados) com busca por nome, e-mail ou matrícula e filtros de área, unidade, cargo e papel; último acesso e bloqueio visíveis.
