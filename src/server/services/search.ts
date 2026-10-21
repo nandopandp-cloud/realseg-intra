@@ -1,7 +1,8 @@
-import { and, desc, eq, lte, sql } from "drizzle-orm";
+import { and, desc, eq } from "drizzle-orm";
 import type { Ctx } from "../auth/actor";
 import { getDb } from "../db/client";
 import { announcementAudiences, announcements, documentCategories, documents, helpArticles, tickets } from "../db/schema";
+import { isLiveAnnouncement } from "./announcements";
 import { audienceMatch, textSearch } from "./audience";
 import { listCourses } from "./courses";
 
@@ -24,7 +25,7 @@ export async function globalSearch(ctx: Ctx, q: string): Promise<SearchResult[]>
       ? db
           .select({ id: announcements.id, title: announcements.title, summary: announcements.summary })
           .from(announcements)
-          .where(and(eq(announcements.status, "published"), lte(announcements.publishedAt, sql`now()`), audienceMatch(announcementAudiences, announcementAudiences.announcementId, announcements.id, ctx.actor), textSearch([announcements.title, announcements.summary, announcements.body], term)))
+          .where(and(isLiveAnnouncement(), audienceMatch(announcementAudiences, announcementAudiences.announcementId, announcements.id, ctx.actor), textSearch([announcements.title, announcements.summary, announcements.body], term)))
           .orderBy(desc(announcements.publishedAt))
           .limit(LIMIT)
       : [],

@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.10.0] — 2026-10-20 — Gestão de comunicados
+### Adicionado
+- `/rh/comunicados`: lista por situação (publicados, agendados, rascunhos, arquivados) com busca, categoria e progresso de leitura/ciência de cada comunicado.
+- Editor completo: título, resumo, texto com pré-visualização, "Quando começa a valer?", "O que muda" (até 6 itens), capa (biblioteca ou envio de JPG/PNG), anexos, categoria, assinatura, importante, exige ciência, destaque, área para dúvidas, tags e público-alvo (todos ou áreas, unidades, famílias e cargos).
+- Publicação imediata (com aviso na intranet para o público) ou agendada; arquivar, restaurar como rascunho, duplicar e excluir rascunho.
+- Alteração relevante em comunicado publicado gera nova versão: leituras e ciências recomeçam e o público é avisado.
+- Relatório de leitura e ciência por colaborador (pendentes primeiro, filtros e busca) com exportação CSV auditada (`report.exported`).
+- Capas enviadas pela gestão em `/api/v1/media/[id]`: servidas só a usuários autenticados e só se estiverem em uso como capa.
+### Alterado
+- Comunicado agendado fica visível ao colaborador na data marcada (`publish_at`); a manutenção diária marca como publicado e avisa o público.
+
 ## [0.9.0] — 2026-10-20 — Ambiente de gestão (RH): base, painel e fila de solicitações
 ### Adicionado
 - Ambiente de gestão em `/rh` com layout próprio (menu escuro agrupado por Operação, Conteúdo, Pessoas e Administração; faixa rolável no celular). Cada item do menu e cada tela exigem a sua permissão; sem acesso, a resposta é 404. Atalho "Painel de gestão" ↔ "Área do colaborador" no menu da conta.

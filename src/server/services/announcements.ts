@@ -22,11 +22,14 @@ import { audienceMatch, textSearch, ref } from "./audience";
 
 export type AnnouncementTab = "todos" | "importantes" | "nao-lidos" | "favoritos";
 
+/** Publicado, ou agendado cuja data (`publish_at`) já chegou — visível na hora certa, mesmo antes do job marcar como publicado. */
+export const isLiveAnnouncement = (): SQL =>
+  or(and(eq(announcements.status, "published"), lte(announcements.publishedAt, sql`now()`)), and(eq(announcements.status, "scheduled"), lte(announcements.publishAt, sql`now()`)))!;
+
 /** Visível ao ator: publicado, já liberado e destinado ao seu público. Sempre aplicado na query. */
 function visibleTo(ctx: Ctx): SQL {
   return and(
-    eq(announcements.status, "published"),
-    lte(announcements.publishedAt, sql`now()`),
+    isLiveAnnouncement(),
     audienceMatch(announcementAudiences, announcementAudiences.announcementId, announcements.id, ctx.actor),
   )!;
 }

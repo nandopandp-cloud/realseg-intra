@@ -33,7 +33,7 @@ export const RH_NAV: RhNavGroup[] = [
   {
     label: "Conteúdo",
     items: [
-      { href: "/rh/comunicados", label: "Comunicados", icon: Megaphone, permission: "announcement:manage", match: starts("/rh/comunicados"), pending: true },
+      { href: "/rh/comunicados", label: "Comunicados", icon: Megaphone, permission: "announcement:manage", match: starts("/rh/comunicados") },
       { href: "/rh/agenda", label: "Agenda", icon: CalendarDays, permission: "announcement:manage", match: starts("/rh/agenda"), pending: true },
       { href: "/rh/documentos", label: "Documentos", icon: FileText, permission: "document:manage", match: starts("/rh/documentos"), pending: true },
       { href: "/rh/cursos", label: "Cursos", icon: GraduationCap, permission: "course:manage", match: starts("/rh/cursos"), pending: true },

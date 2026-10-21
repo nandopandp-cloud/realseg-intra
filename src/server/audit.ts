@@ -32,7 +32,15 @@ export type AuditAction =
   | "feedback.viewed"
   | "feedback.acknowledged"
   | "salary_band.viewed"
-  | "profile.preferences_updated";
+  | "profile.preferences_updated"
+  // Gestão (RH/Administração)
+  | "announcement.created"
+  | "announcement.updated"
+  | "announcement.published"
+  | "announcement.scheduled"
+  | "announcement.archived"
+  | "announcement.deleted"
+  | "report.exported";
 
 export async function audit(
   event: {

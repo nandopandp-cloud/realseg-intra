@@ -24,7 +24,8 @@ Legenda: ✅ concluído (critérios de aceite + testes) · 🟡 parcial · ⏳ n
 | Fale com o RH | ⏸️ oculto | E2E F (rota 404) | Oculto em 2026-10-18 por decisão do produto (`src/lib/features.ts` → `talkToHr`). Pedidos ao RH seguem por Solicitações → categoria RH; links antigos apontam para `/solicitacoes/nova?categoria=rh` |
 | Ambiente RH/Administração — base (`/rh`, menu por permissão, painel) | ✅ | `rh-tickets.test.ts`, `api-matrix` (rotas `/rh` recusam colaborador) | Acesso por `MANAGEMENT_PERMISSIONS` (RH + ADMIN); sem permissão = 404. Gestor (equipe) ainda sem telas próprias |
 | Gestão — Solicitações (fila, atendimento, notas internas, responsável, prioridade, situação) | ✅ | `rh-tickets.test.ts` | Sem E2E próprio ainda. Respostas prontas (macros) e ações em lote não implementadas |
-| Gestão — demais módulos (comunicados, agenda, documentos, colaboradores, estrutura, cursos, carreira, feedbacks, ajuda, configurações, auditoria) | ⏳ | — | Em construção; ocultos no menu até ficarem prontos (`pending` em `rh-nav.ts`) |
+| Gestão — Comunicados (editor, público-alvo, capa, anexos, agendamento, versões, arquivo, relatório de leitura/ciência + CSV) | ✅ | `rh-announcements.test.ts` | Agendados ficam visíveis na hora marcada; o aviso aos colaboradores sai na manutenção diária ou quando a gestão abre a lista (cron diário no plano Hobby). Editor de texto com marcação simples (sem editor visual) |
+| Gestão — demais módulos (agenda, documentos, colaboradores, estrutura, cursos, carreira, feedbacks, ajuda, configurações, auditoria) | ⏳ | — | Em construção; ocultos no menu até ficarem prontos (`pending` em `rh-nav.ts`) |
 | LGPD — exportação/eliminação | 🟡 | — | Acesso e download individuais existem; exportação consolidada e anonimização administrativa — fase RH |
 
 ## Como reproduzir
