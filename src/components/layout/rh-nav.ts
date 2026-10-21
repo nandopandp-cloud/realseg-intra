@@ -35,7 +35,7 @@ export const RH_NAV: RhNavGroup[] = [
     items: [
       { href: "/rh/comunicados", label: "Comunicados", icon: Megaphone, permission: "announcement:manage", match: starts("/rh/comunicados") },
       { href: "/rh/agenda", label: "Agenda", icon: CalendarDays, permission: "announcement:manage", match: starts("/rh/agenda"), pending: true },
-      { href: "/rh/documentos", label: "Documentos", icon: FileText, permission: "document:manage", match: starts("/rh/documentos"), pending: true },
+      { href: "/rh/documentos", label: "Documentos", icon: FileText, permission: "document:manage", match: starts("/rh/documentos") },
       { href: "/rh/cursos", label: "Cursos", icon: GraduationCap, permission: "course:manage", match: starts("/rh/cursos"), pending: true },
       { href: "/rh/ajuda", label: "Central de ajuda", icon: BookOpenText, permission: "help:manage", match: starts("/rh/ajuda"), pending: true },
     ],

@@ -88,3 +88,65 @@ export const announcementPublishSchema = z
     message: "Escolha uma data e hora futuras para agendar.",
     path: ["publishAt"],
   });
+
+// ── Documentos ───────────────────────────────────────────────────────────────
+
+const boolField = z
+  .enum(["true", "false"])
+  .optional()
+  .transform((v) => v === "true");
+const dateField = z
+  .string()
+  .regex(/^\d{4}-\d{2}-\d{2}$/, "Data inválida.")
+  .optional()
+  .or(z.literal("").transform(() => undefined))
+  .nullish();
+const periodField = z
+  .string()
+  .regex(/^\d{4}-(0[1-9]|1[0-2])$/, "Use o formato mês/ano.")
+  .optional()
+  .or(z.literal("").transform(() => undefined))
+  .nullish();
+
+export const submissionReviewSchema = z.object({
+  action: z.enum(["start", "accept", "refuse"]),
+  note: z.string().trim().max(1000, "Use no máximo 1.000 caracteres.").optional(),
+  version: z.number().int().min(1),
+});
+
+/** Campos do formulário (multipart) de distribuição de documento pessoal. */
+export const distributeFieldsSchema = z.object({
+  employeeId: z.uuid({ error: "Escolha o colaborador." }),
+  categorySlug: z.string({ error: "Escolha o tipo de documento." }).min(1, "Escolha o tipo de documento.").max(50),
+  title: z.string().trim().max(140, "Use no máximo 140 caracteres.").optional(),
+  description: z.string().trim().max(1000, "Use no máximo 1.000 caracteres.").optional(),
+  referencePeriod: periodField,
+  requiresAck: boolField,
+});
+
+export const institutionalFieldsSchema = z
+  .object({
+    categorySlug: z.string({ error: "Escolha o tipo." }).min(1, "Escolha o tipo.").max(50),
+    title: z.string({ error: "Informe o título." }).trim().min(3, "Use pelo menos 3 caracteres.").max(140, "Use no máximo 140 caracteres."),
+    description: z.string().trim().max(1000, "Use no máximo 1.000 caracteres.").optional(),
+    requiresAck: boolField,
+    notify: boolField,
+    effectiveFrom: dateField,
+    effectiveUntil: dateField,
+  })
+  .refine((v) => !v.effectiveFrom || !v.effectiveUntil || v.effectiveUntil >= v.effectiveFrom, { message: "O fim da vigência deve ser depois do início.", path: ["effectiveUntil"] });
+
+export const documentMetaSchema = z
+  .object({
+    title: z.string({ error: "Informe o título." }).trim().min(3, "Use pelo menos 3 caracteres.").max(140, "Use no máximo 140 caracteres."),
+    description: z.string().trim().max(1000, "Use no máximo 1.000 caracteres.").nullish(),
+    referencePeriod: periodField,
+    requiresAck: z.boolean(),
+    effectiveFrom: dateField,
+    effectiveUntil: dateField,
+  })
+  .refine((v) => !v.effectiveFrom || !v.effectiveUntil || v.effectiveUntil >= v.effectiveFrom, { message: "O fim da vigência deve ser depois do início.", path: ["effectiveUntil"] });
+
+export const versionFieldsSchema = z.object({ changeNote: z.string().trim().max(300, "Use no máximo 300 caracteres.").optional(), notify: boolField });
+export const batchPreviewSchema = z.object({ names: z.array(z.string().max(255)).min(1).max(300) });
+export const removeReasonSchema = z.object({ reason: z.string({ error: "Informe o motivo." }).trim().min(3, "Informe o motivo.").max(200, "Use no máximo 200 caracteres.") });

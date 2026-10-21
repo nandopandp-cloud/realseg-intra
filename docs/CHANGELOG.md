@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.11.0] — 2026-10-20 — Gestão de documentos
+### Adicionado
+- `/rh/documentos` com três seções: envios dos colaboradores (para analisar, aceitos, recusados), documentos distribuídos (com situação da ciência) e normas e manuais (vigentes e arquivados, com % de ciência).
+- Análise de envio: visualizar/baixar o arquivo (auditado), iniciar análise, aceitar ou recusar com motivo obrigatório; o colaborador é avisado e vê o retorno.
+- Distribuição de documento pessoal para um colaborador (busca por nome ou matrícula) e em lote: cada arquivo vai para a matrícula que aparece no nome, com prévia que recusa nomes sem matrícula, ambíguos ou repetidos e progresso por arquivo.
+- Normas e manuais: publicação com vigência e aviso a todos; nova versão do arquivo (reinicia a ciência), edição dos dados, arquivar/restaurar e remoção de documento enviado por engano (motivo na auditoria).
+- E2E da gestão (`e2e/rh.spec.ts`, `e2e/rh.mobile.spec.ts`): acesso negado ao colaborador, axe em todas as telas da gestão e jornadas de atendimento, comunicado e análise de envio.
+### Corrigido
+- Datas de calendário (ex.: vigência, data de referência de atestado, prazo de meta) apareciam um dia antes por conversão de fuso; agora são exibidas como o dia gravado.
+
 ## [0.10.0] — 2026-10-20 — Gestão de comunicados
 ### Adicionado
 - `/rh/comunicados`: lista por situação (publicados, agendados, rascunhos, arquivados) com busca, categoria e progresso de leitura/ciência de cada comunicado.

@@ -5,7 +5,18 @@ import { ptBR } from "date-fns/locale";
 /** Fuso de exibição padrão (a maioria das unidades). Datas são armazenadas em UTC. */
 export const DISPLAY_TZ = "America/Sao_Paulo";
 
-const z = (d: Date | string) => new TZDate(typeof d === "string" ? new Date(d) : d, DISPLAY_TZ);
+/**
+ * Instantes (Date/ISO) são convertidos para o fuso de exibição. Datas de calendário ("2026-01-01", colunas `date`)
+ * não têm fuso: são montadas como esse dia no fuso de exibição — sem isso viravam o dia anterior (UTC−3).
+ */
+const z = (d: Date | string) => {
+  if (typeof d === "string") {
+    const m = d.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if (m) return new TZDate(Number(m[1]), Number(m[2]) - 1, Number(m[3]), DISPLAY_TZ);
+    return new TZDate(new Date(d), DISPLAY_TZ);
+  }
+  return new TZDate(d, DISPLAY_TZ);
+};
 
 /** "08 de out. de 2026" (padrão das referências) */
 export const fmtDateLong = (d: Date | string) => format(z(d), "dd 'de' MMM'.' 'de' yyyy", { locale: ptBR });

@@ -40,7 +40,13 @@ export type AuditAction =
   | "announcement.scheduled"
   | "announcement.archived"
   | "announcement.deleted"
-  | "report.exported";
+  | "report.exported"
+  | "document.distributed"
+  | "document.updated"
+  | "document.version_added"
+  | "document.archived"
+  | "document.removed"
+  | "submission.reviewed";
 
 export async function audit(
   event: {
