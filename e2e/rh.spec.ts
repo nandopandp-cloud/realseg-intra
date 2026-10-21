@@ -1,7 +1,7 @@
 import { asUser, expect, expectAccessible, expectNoHorizontalOverflow, test } from "./support/fixtures";
 
 /** K — Ambiente de gestão (RH): acesso, acessibilidade e jornadas principais. */
-const PAGES = ["/rh", "/rh/solicitacoes", "/rh/solicitacoes/1050", "/rh/comunicados", "/rh/comunicados/novo", "/rh/documentos", "/rh/documentos?aba=pessoais", "/rh/documentos?aba=normas", "/rh/documentos/distribuir", "/rh/documentos/distribuir?modo=lote", "/rh/documentos/normas/nova", "/rh/colaboradores", "/rh/colaboradores/novo", "/rh/colaboradores/importar", "/rh/estrutura", "/rh/estrutura?aba=unidades", "/rh/estrutura?aba=cargos", "/rh/cursos", "/rh/cursos?aba=trilhas", "/rh/cursos?aba=categorias", "/rh/cursos/novo"];
+const PAGES = ["/rh", "/rh/solicitacoes", "/rh/solicitacoes/1050", "/rh/comunicados", "/rh/comunicados/novo", "/rh/documentos", "/rh/documentos?aba=pessoais", "/rh/documentos?aba=normas", "/rh/documentos/distribuir", "/rh/documentos/distribuir?modo=lote", "/rh/documentos/normas/nova", "/rh/colaboradores", "/rh/colaboradores/novo", "/rh/colaboradores/importar", "/rh/estrutura", "/rh/estrutura?aba=unidades", "/rh/estrutura?aba=cargos", "/rh/cursos", "/rh/cursos?aba=trilhas", "/rh/cursos?aba=categorias", "/rh/cursos/novo", "/rh/carreira", "/rh/carreira?aba=faixas", "/rh/carreira?aba=desenvolvimento", "/rh/carreira/oportunidades/nova", "/rh/feedbacks", "/rh/feedbacks/novo"];
 
 test.describe("gestão — acesso", () => {
   test.use(asUser("carlos"));
@@ -151,5 +151,37 @@ test.describe("gestão — jornadas", () => {
     await p2.goto("/cursos?q=socorros");
     await expect(p2.getByText("Primeiros socorros básicos").first()).toBeVisible();
     await ctx.close();
+  });
+
+  test("feedbacks: registrar e publicar; o colaborador lê em Avaliações", async ({ page, browser }) => {
+    await page.goto("/rh/feedbacks/novo");
+    await page.getByRole("combobox", { name: "Colaborador", exact: true }).fill("João");
+    await page.getByRole("option", { name: /João Pereira/ }).click();
+    await page.getByLabel("Título").fill("Ótima integração");
+    await page.getByLabel("Texto").fill("Parabéns pela dedicação nas primeiras semanas.");
+    await page.getByRole("button", { name: "Publicar para o colaborador" }).click();
+    await page.getByRole("dialog").getByRole("button", { name: "Publicar" }).click();
+    await page.waitForURL(/\/rh\/feedbacks\/[0-9a-f-]{36}$/);
+    await expect(page.getByText("leitura pendente", { exact: false })).toBeVisible();
+    await expectAccessible(page);
+    const ctx = await browser.newContext({ storageState: "e2e/.auth/joao.json" });
+    const p2 = await ctx.newPage();
+    await p2.goto("/carreira/avaliacoes");
+    await expect(p2.getByText("Ótima integração")).toBeVisible();
+    await ctx.close();
+  });
+
+  test("carreira: criar e publicar oportunidade interna", async ({ page }) => {
+    await page.goto("/rh/carreira/oportunidades/nova");
+    await page.getByLabel("Título da vaga").fill("Líder de Turno");
+    await page.getByLabel("Área (rótulo)").fill("Operações");
+    await page.getByLabel("Descrição").fill("Coordenar a equipe do turno noturno.");
+    await page.getByLabel("Requisitos").fill("Experiência com equipes.");
+    await page.getByRole("button", { name: "Criar oportunidade" }).click();
+    await page.waitForURL(/\/rh\/carreira\/oportunidades\/[0-9a-f-]{36}$/);
+    await page.getByRole("button", { name: "Publicar" }).click();
+    await page.getByRole("dialog").getByRole("button", { name: "Publicar" }).click();
+    await expect(page.getByText("Inscrições abertas")).toBeVisible();
+    await expectAccessible(page);
   });
 });

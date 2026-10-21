@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.14.0] — 2026-10-20 — Gestão de carreira e feedbacks
+### Adicionado
+- `/rh/carreira`: oportunidades internas (abertas, rascunhos, encerradas) com local, cargo, prazo de inscrição, destaque e elegibilidade (todos ou áreas/unidades/famílias/cargos); publicar com aviso aos elegíveis, encerrar (encerra candidaturas e avisa) e reabrir.
+- Candidaturas por oportunidade: colaborador, mensagem, data e situação; marcar em análise ou encerrar (o candidato é avisado).
+- Faixas salariais por cargo com vigência e visibilidade (o colaborador só vê faixas visíveis e vigentes; não há salário individual).
+- Planos de desenvolvimento: etapas por colaborador (prazo, curso relacionado, situação), exibidas em Minha carreira › Próximas etapas.
+- `/rh/feedbacks`: reconhecimentos, feedbacks e avaliações por colaborador (rascunho, publicado, leitura pendente, arquivado); a notificação nunca traz o conteúdo; editar um publicado reinicia a confirmação de leitura. Atalho "Registrar feedback" no perfil do colaborador.
+
 ## [0.13.0] — 2026-10-20 — Gestão de cursos
 ### Adicionado
 - `/rh/cursos`: lista por situação com conteúdo (aulas e duração) e taxa de conclusão/atrasos; trilhas de aprendizagem (cursos em ordem, cor, ícone e família profissional) e categorias.

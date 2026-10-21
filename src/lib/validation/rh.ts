@@ -249,3 +249,57 @@ export const courseCategorySchema = z.object({
   color: z.enum(TONES),
   icon: z.string().min(1).max(40),
 });
+
+// ── Carreira ─────────────────────────────────────────────────────────────────
+
+const optUuid = z.uuid().nullish().transform((v) => v ?? null);
+const optDate = z
+  .string()
+  .regex(/^\d{4}-\d{2}-\d{2}$/, "Data inválida.")
+  .nullish()
+  .or(z.literal("").transform(() => null))
+  .transform((v) => v || null);
+
+export const opportunitySchema = z.object({
+  title: z.string({ error: "Informe o título." }).trim().min(3, "Informe o título.").max(120),
+  areaLabel: z.string({ error: "Informe a área." }).trim().min(2, "Informe a área.").max(60),
+  description: z.string({ error: "Descreva a oportunidade." }).trim().min(10, "Descreva com pelo menos 10 caracteres.").max(5000),
+  requirements: z.string({ error: "Informe os requisitos." }).trim().min(3, "Informe os requisitos.").max(3000),
+  jobPositionId: optUuid,
+  departmentId: optUuid,
+  unitId: optUuid,
+  isHighlighted: z.boolean(),
+  closesAt: z.iso.datetime({ offset: true }).nullish().transform((v) => v ?? null),
+  eligibility: audienceSchema,
+});
+export const opportunityStatusSchema = z.object({ status: z.enum(["draft", "published", "closed"]), notify: z.boolean().optional() });
+export const applicationStatusSchema = z.object({ status: z.enum(["em_analise", "encerrada"]) });
+export const bandSchema = z.object({
+  jobPositionId: z.uuid({ error: "Escolha o cargo." }),
+  minCents: z.number({ error: "Informe o mínimo." }).int().min(0),
+  maxCents: z.number({ error: "Informe o máximo." }).int().min(0),
+  effectiveFrom: z.string({ error: "Informe o início da vigência." }).regex(/^\d{4}-\d{2}-\d{2}$/, "Informe o início da vigência."),
+  effectiveUntil: optDate,
+  visibleToEmployees: z.boolean(),
+});
+export const goalSchema = z.object({
+  title: z.string({ error: "Dê um título à etapa." }).trim().min(3, "Dê um título à etapa.").max(140),
+  description: z.string().trim().max(1000).nullish().transform((v) => v || null),
+  startsOn: optDate,
+  dueDate: optDate,
+  courseId: optUuid,
+  status: z.enum(["pendente", "em_andamento", "concluida"]),
+});
+
+// ── Feedbacks ────────────────────────────────────────────────────────────────
+
+export const feedbackSchema = z.object({
+  employeeId: z.uuid({ error: "Escolha o colaborador." }),
+  type: z.enum(["feedback", "avaliacao", "reconhecimento"]),
+  title: z.string({ error: "Dê um título." }).trim().min(3, "Dê um título.").max(140),
+  cycle: z.string().trim().max(60).nullish().transform((v) => v || null),
+  body: z.string({ error: "Escreva o feedback." }).trim().min(10, "Escreva pelo menos 10 caracteres.").max(10000),
+  authorContext: z.string({ error: "Informe quem assina." }).trim().min(2, "Informe quem assina.").max(80),
+  showAuthor: z.boolean(),
+});
+export const feedbackCreateSchema = feedbackSchema.extend({ publish: z.boolean() });

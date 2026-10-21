@@ -59,7 +59,17 @@ export type AuditAction =
   | "course.updated"
   | "course.status_changed"
   | "course.assigned"
-  | "learning_path.updated";
+  | "learning_path.updated"
+  | "opportunity.saved"
+  | "opportunity.status_changed"
+  | "application.status_changed"
+  | "salary_band.saved"
+  | "salary_band.deleted"
+  | "goal.saved"
+  | "goal.deleted"
+  | "feedback.saved"
+  | "feedback.published"
+  | "feedback.archived";
 
 export async function audit(
   event: {

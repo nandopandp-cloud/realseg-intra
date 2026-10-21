@@ -31,3 +31,16 @@ export async function searchEmployees(ctx: Ctx, q: string, limit = 8) {
     .orderBy(asc(employees.fullName))
     .limit(limit);
 }
+
+/** Dados mínimos de um colaborador para pré-preencher seletores (ex.: "Registrar feedback" a partir do perfil). */
+export async function employeeBrief(ctx: Ctx, id: string) {
+  const a = ctx.actor;
+  if (!can(a, "employee:read:any") && !can(a, "feedback:write:any") && !can(a, "career:manage")) throw forbidden();
+  const [e] = await getDb()
+    .select({ id: employees.id, name: employees.fullName, registration: employees.registrationNumber, position: jobPositions.title, unit: units.name })
+    .from(employees)
+    .innerJoin(jobPositions, eq(jobPositions.id, employees.jobPositionId))
+    .innerJoin(units, eq(units.id, employees.unitId))
+    .where(and(eq(employees.id, id), ne(employees.status, "desligado")));
+  return e ?? null;
+}
