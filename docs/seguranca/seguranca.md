@@ -1,5 +1,7 @@
 # Segurança
 
+Modelo de ameaças, permissões, sessões, auditoria e resposta a incidentes. Relacionados: [Privacidade e LGPD](privacidade-lgpd.md) · [Serviços](../arquitetura/servicos.md) · [ADR-0003](../arquitetura/adr/0003-sessoes-opacas.md) · [ADR-0004](../arquitetura/adr/0004-rbac-escopo.md)
+
 ## Modelo de ameaças (resumo)
 | Ameaça | Mitigação implementada | Teste |
 | --- | --- | --- |
@@ -33,7 +35,7 @@ Permissões definidas em `src/server/auth/permissions.ts` e semeadas no banco (c
 Regras de escopo (além da permissão): documentos/feedbacks/envios — somente do próprio vínculo; tickets — solicitante ou participante explícito (participante só lê); comunicados/cursos — público-alvo; oportunidades — elegibilidade + publicação + prazo; faixas salariais — somente publicadas e vigentes.
 
 ## Sessões
-- Expiração absoluta `SESSION_ABSOLUTE_HOURS` (padrão 12 h); inatividade `SESSION_IDLE_MINUTES` (padrão 60 min); atualização de `last_seen_at` limitada a 1/min.
+- Expiração absoluta `SESSION_ABSOLUTE_HOURS` (padrão 12 h); inatividade `SESSION_IDLE_MINUTES` (padrão 60 min); atualização de `last_seen_at` limitada a uma a cada 5 min (reduz escritas no banco).
 - Logout, redefinição e troca de senha revogam sessões; desativar o usuário invalida todas imediatamente.
 - O usuário vê e encerra sessões em **Perfil › Senha e segurança**.
 

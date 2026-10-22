@@ -1,7 +1,7 @@
 /**
  * Dados de REFERÊNCIA (configuração), aplicáveis a qualquer ambiente e idempotentes.
  * Não contém pessoas nem conteúdo fictício. Valores de SLA são a configuração INICIAL proposta
- * e devem ser validados pelo RH (ver docs/REQUIREMENTS.md §SLA).
+ * e devem ser validados pelo RH (ver docs/produto/requisitos.md §SLA).
  */
 import { and, eq, isNull, sql } from "drizzle-orm";
 import type { Database } from "@/server/db/client";

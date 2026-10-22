@@ -7,7 +7,7 @@ const nextConfig: NextConfig = {
   serverExternalPackages: ["pg", "embedded-postgres", "nodemailer"],
   images: {
     // Imagens já otimizadas (WebP) e servidas pela CDN como arquivos estáticos — sem transformações
-    // da Vercel Image Optimization (limite de 5 mil/mês no Hobby). docs/COST_OPTIMIZATION.md §2.
+    // da Vercel Image Optimization (limite de 5 mil/mês no Hobby). docs/operacao/otimizacao-de-custos.md §2.
     unoptimized: true,
   },
   turbopack: {
@@ -30,7 +30,7 @@ const nextConfig: NextConfig = {
       securityHeaders.push({ key: "Strict-Transport-Security", value: "max-age=63072000; includeSubDomains" });
     }
     // Arquivos públicos versionados por nome: cache longo no navegador e na CDN (menos Edge Requests).
-    // Ao alterar uma imagem/logo, publique com NOVO nome de arquivo. docs/COST_OPTIMIZATION.md §3.
+    // Ao alterar uma imagem/logo, publique com NOVO nome de arquivo. docs/operacao/otimizacao-de-custos.md §3.
     const longCache = [{ key: "Cache-Control", value: "public, max-age=2592000, stale-while-revalidate=86400" }];
     return [
       { source: "/:path*", headers: securityHeaders },

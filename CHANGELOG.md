@@ -117,7 +117,7 @@
 - Busca saiu do cabeçalho no celular (continua em tablets e no "Mais").
 
 ## [0.4.0] — 2026-10-18 — Otimização de custos (Vercel + Neon)
-Detalhes, motivos e medições em `docs/COST_OPTIMIZATION.md`.
+Detalhes, motivos e medições em [Otimização de custos](docs/operacao/otimizacao-de-custos.md).
 ### Alterado
 - Prefetch automático desligado em todos os links (`app-link.tsx`): 0 prefetches no servidor (antes 3 por sessão típica).
 - Imagens em WebP (318 KB → 144 KB) servidas sem Image Optimization; migration de dados `0002_course_covers_webp`.
@@ -127,7 +127,7 @@ Detalhes, motivos e medições em `docs/COST_OPTIMIZATION.md`.
 - Build de Preview não toca no banco; commits só de documentação/testes não geram deploy.
 ### Adicionado
 - Cron diário da Vercel (`/api/cron/daily`, `CRON_SECRET`) com a manutenção (SLA, fechamento automático, limpeza).
-- `docs/COST_OPTIMIZATION.md` e utilitário `scripts/dev/measure.mjs`; README reescrito.
+- [Otimização de custos](docs/operacao/otimizacao-de-custos.md) e utilitário `scripts/dev/measure.mjs`; README reescrito.
 
 ## [0.3.0] — 2026-10-18 — Logo oficial
 ### Alterado

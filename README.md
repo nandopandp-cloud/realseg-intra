@@ -2,7 +2,7 @@
 
 Intranet corporativa da REALSEG, com dois ambientes:
 
-- **Colaborador**: implementado (Home, Comunicados, Documentos, Solicitações com SLA, Cursos, Minha carreira, Feedbacks, Ajuda, Fale com o RH, Notificações, Perfil e Busca).
+- **Colaborador**: Home, Comunicados, Documentos, Solicitações com SLA e chat com o suporte, Cursos, Minha carreira, Feedbacks, Ajuda, Notificações, Perfil e Busca.
 - **Gestão (RH/Administração)** em `/rh`: painel, solicitações (fila e atendimento), comunicados e agenda, documentos (análise de envios, distribuição individual e em lote, normas), colaboradores e estrutura, cursos e trilhas, carreira, feedbacks, central de ajuda, configurações de prazo e calendário e auditoria. Cada tela exige a sua permissão. Atalho "Painel de gestão" no menu da conta.
 
 Mobile-first, fiel às referências visuais em `referencias/`, acessível (WCAG 2.2 AA verificado por testes) e com autorização feita no servidor em toda leitura e escrita.
@@ -11,12 +11,39 @@ Mobile-first, fiel às referências visuais em `referencias/`, acessível (WCAG 
 | --- | --- |
 | **Homologação** | https://realseg-intra-seven.vercel.app (Vercel, região `gru1`, São Paulo) |
 | **Banco** | Neon PostgreSQL (`aws-sa-east-1`, São Paulo) |
+| **Arquivos** | Cloudflare R2 (bucket privado) |
 | **Repositório** | `main` publica automaticamente na Vercel |
-| **Versão** | ver [`docs/CHANGELOG.md`](docs/CHANGELOG.md) |
+| **Versão** | 0.15.0 — ver [Changelog](CHANGELOG.md) |
+
+## Documentação
+
+Índice completo, com guia de leitura por objetivo: **[docs/README.md](docs/README.md)**.
+
+| Área | Documento | O que você encontra |
+| --- | --- | --- |
+| **Produto** | [Visão do produto](docs/produto/visao-do-produto.md) | Objetivo, personas, escopo entregue, próximas fases, princípios |
+| | [Requisitos](docs/produto/requisitos.md) | Requisitos funcionais e não funcionais, máquina de estados, SLA inicial |
+| | [Mapa de telas](docs/produto/mapa-de-telas.md) | Todas as rotas do colaborador e da gestão, com a permissão de cada tela |
+| | [Status das funcionalidades](docs/produto/status-das-funcionalidades.md) | Pronto, parcial e pendente, com os testes de cada módulo |
+| | [Changelog](CHANGELOG.md) | Histórico de versões |
+| **Arquitetura** | [Visão geral](docs/arquitetura/visao-geral.md) | Contexto, camadas, limites de confiança, organização do código, fluxos |
+| | [Serviços de domínio](docs/arquitetura/servicos.md) | Catálogo dos serviços (colaborador e gestão): funções, permissões, tabelas |
+| | [API REST](docs/arquitetura/api.md) | Convenções, erros e todas as rotas `/api/v1` e `/api/v1/rh` |
+| | [Decisões (ADRs)](docs/arquitetura/adr/README.md) | As 11 decisões de arquitetura e como registrar novas |
+| **Dados** | [Modelo de dados](docs/dados/modelo-de-dados.md) | ERD, dicionário das 63 tabelas, enums, retenção |
+| | [Migrações e seeds](docs/dados/migracoes.md) | Histórico das migrações, como criar, regras e modos de seed |
+| **Design** | [Design system](docs/design/design-system.md) | Marca, cores, tipografia, componentes, acessibilidade |
+| | [Referências visuais](docs/design/referencias-visuais.md) | Mockup de cada tela (desktop e celular) e divergências intencionais |
+| **Segurança** | [Segurança](docs/seguranca/seguranca.md) | Ameaças, matriz de permissões, sessões, auditoria, incidentes |
+| | [Privacidade e LGPD](docs/seguranca/privacidade-lgpd.md) | Dados pessoais, bases legais, retenção, direitos dos titulares |
+| **Operação** | [Infraestrutura e serviços externos](docs/operacao/infraestrutura.md) | GitHub, Vercel, Neon, R2, SMTP; ambientes; variáveis de ambiente |
+| | [Runbook](docs/operacao/runbook.md) | Deploy, reversão, backups, operações comuns, troubleshooting |
+| | [Otimização de custos](docs/operacao/otimizacao-de-custos.md) | Limites dos planos gratuitos e como respeitá-los |
+| **Qualidade** | [Estratégia de testes](docs/qualidade/estrategia-de-testes.md) | Pirâmide, critérios de release, matriz E2E |
 
 ## Stack
 
-Next.js 16 (App Router, Turbopack) · React 19 · TypeScript estrito · Tailwind CSS 4 · PostgreSQL · Drizzle ORM · Zod 4 · lucide-react · Vitest · Playwright + axe. As decisões estão em [`docs/ADR`](docs/ADR) e a arquitetura em [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
+Next.js 16 (App Router, Turbopack) · React 19 · TypeScript estrito · Tailwind CSS 4 · PostgreSQL · Drizzle ORM · Zod 4 · lucide-react · Vitest · Playwright + axe. Decisões em [ADRs](docs/arquitetura/adr/README.md), arquitetura em [Visão geral](docs/arquitetura/visao-geral.md).
 
 ## Rodar localmente
 
@@ -39,26 +66,17 @@ Alternativa em terminais separados: `pnpm db:dev` (banco), depois `pnpm db:migra
 
 Fluxo: commit no `main` → push → a Vercel publica.
 
-- **Build:** a Vercel executa `pnpm run vercel-build` (`scripts/vercel-build.mjs`):
-  - em **Production**: aplica as migrações no Neon pela conexão direta (`DATABASE_URL_UNPOOLED`), roda o seed idempotente (dados de referência sempre; demonstração só com `SEED_DEMO=true` e uma única vez) e compila;
-  - em **Preview**: só compila, sem tocar no banco (que é o de produção).
-- **Deploy pulado:** commits que alteram só documentação, testes ou referências não geram deploy (`ignoreCommand` em `vercel.json`).
-- **Cron diário:** às 06:00 de Brasília, executa a manutenção (`/api/cron/daily`, protegido por `CRON_SECRET`).
-- **Variáveis na Vercel:** a integração Neon cria `DATABASE_URL` (pooler) e `DATABASE_URL_UNPOOLED` (direta). As demais (`APP_ENV`, `APP_URL`, `IP_HASH_SECRET`, `DEMO_PASSWORD`, `SEED_DEMO`, `MAIL_DRIVER`, `TRUST_PROXY`, `CRON_SECRET`) estão descritas em [`docs/RUNBOOK.md`](docs/RUNBOOK.md).
+- **Production**: o build (`scripts/vercel-build.mjs`) aplica as migrações no Neon, roda o seed idempotente e compila. **Preview**: só compila, sem tocar no banco (que é o de produção).
+- Commits que alteram só documentação, testes ou referências não geram deploy (`ignoreCommand` em `vercel.json`).
+- Cron diário às 06:00 de Brasília: manutenção em `/api/cron/daily`, protegida por `CRON_SECRET`.
+- O plano Hobby da Vercel é só para uso não comercial; a produção da empresa exige o plano Pro.
 
-**Custos:** a configuração é pensada para caber nos planos gratuitos. Leia [`docs/COST_OPTIMIZATION.md`](docs/COST_OPTIMIZATION.md) antes de mudar navegação, imagens, jobs ou conexões com o banco. O plano Hobby da Vercel é só para uso não comercial; a produção da empresa exige o plano Pro.
+Detalhes em [Infraestrutura](docs/operacao/infraestrutura.md) e [Runbook](docs/operacao/runbook.md). Antes de mudar navegação, imagens, jobs ou conexões com o banco, leia [Otimização de custos](docs/operacao/otimizacao-de-custos.md).
 
-## Banco de dados e migrações
+## Banco de dados e variáveis de ambiente
 
-- Esquema em `src/server/db/schema` (Drizzle) e migrações versionadas em `drizzle/`, aplicadas automaticamente no deploy de produção.
-- **Mudança de estrutura** (tabela, coluna, índice): altere o esquema e rode `pnpm db:generate --name <descricao>`.
-- **Correção ou transformação de dados existentes**: migration SQL personalizada, com `pnpm db:generate --custom --name <descricao>` (exemplo: `drizzle/0002_course_covers_webp.sql`).
-- **Configuração inicial** (papéis, permissões, categorias, calendário de SLA): seed de referência idempotente (`scripts/seed/reference.ts`).
-- Nunca edite uma migration já aplicada. Remoções e renomeações são feitas em dois deploys (*expand/contract*).
-
-## Variáveis de ambiente
-
-Veja [`.env.example`](.env.example). As principais: `DATABASE_URL`, `DATABASE_URL_UNPOOLED`, `APP_URL`, `APP_ENV`, `IP_HASH_SECRET`, `SESSION_*`, `STORAGE_DIR`, `UPLOAD_MAX_MB`, `MAIL_DRIVER`/`SMTP_*`, `SEED_DEMO`, `DEMO_PASSWORD` e `CRON_SECRET`. A aplicação valida tudo na inicialização e **recusa** configurações inseguras em produção (`APP_ENV=production`), como e-mail em modo outbox, segredo padrão ou URL sem HTTPS.
+- Esquema em `src/server/db/schema` (Drizzle) e migrações versionadas em `drizzle/`. Mudança de estrutura: `pnpm db:generate --name <descricao>`. Nunca edite uma migração já aplicada. Procedimento completo em [Migrações e seeds](docs/dados/migracoes.md).
+- Variáveis: modelo em [`.env.example`](.env.example) e tabela completa em [Infraestrutura › Variáveis de ambiente](docs/operacao/infraestrutura.md#variáveis-de-ambiente). A aplicação valida tudo na inicialização e **recusa** configurações inseguras em produção (`APP_ENV=production`).
 
 ## Comandos
 
@@ -72,8 +90,8 @@ Veja [`.env.example`](.env.example). As principais: `DATABASE_URL`, `DATABASE_UR
 | `pnpm test:e2e` | Playwright em desktop e mobile, com axe. Requer `pnpm build` antes |
 | `pnpm check` | lint + tipos + unitários + integração + build |
 | `pnpm db:dev` | Sobe o PostgreSQL local (porta 54320) |
-| `pnpm db:generate` | Gera migration a partir do esquema |
-| `pnpm db:migrate` | Aplica as migrations versionadas |
+| `pnpm db:generate` | Gera migração a partir do esquema |
+| `pnpm db:migrate` | Aplica as migrações versionadas |
 | `pnpm db:seed` | Somente dados de referência (qualquer ambiente) |
 | `pnpm db:seed:demo` / `pnpm db:reset:demo` | Dados de demonstração (proibido em produção) |
 | `pnpm jobs:run` | Executa manualmente a manutenção diária (a mesma do cron) |
@@ -83,21 +101,19 @@ Utilitários de desenvolvimento, em `scripts/dev/`:
 - `crawl.mjs`: percorre todos os links e aponta erros e rolagem horizontal;
 - `measure.mjs`: requisições e bytes de uma sessão típica, para conferir custos.
 
-## Estrutura
+## Estrutura do repositório
 
 ```
 src/app/            rotas: (auth) login e senha · (colaborador) telas · (rh) gestão em /rh · api/v1 REST (api/v1/rh = gestão) · api/cron
-src/components/     UI reutilizável (ui/) e layout (sidebar, topbar, navegação mobile)
+src/components/     UI reutilizável (ui/), layout (sidebar, topbar, navegação mobile) e componentes da gestão (admin/)
 src/features/       componentes de cada módulo
 src/lib/            utilitários e schemas Zod compartilhados entre cliente e servidor
-src/server/         env, db (esquema), auth, http, services (regras + autorização), sla, files, jobs
-drizzle/            migrations versionadas
+src/server/         env, db (esquema), auth, http, services (regras + autorização; services/rh = gestão), sla, files, jobs
+drizzle/            migrações versionadas
 scripts/            migrate, seeds, build da Vercel, servidor E2E, utilitários de dev
 tests/ · e2e/       Vitest (unitários/integração) · Playwright
+docs/               documentação (índice em docs/README.md)
 public/logo/        logo oficial (símbolo SVG + wordmark) · public/images/: imagens WebP
-referencias/        mockups de referência (desktop e mobile)
+referencias/        mockups de referência (desktop e mobile), indexados em docs/design/referencias-visuais.md
+CHANGELOG.md        histórico de versões
 ```
-
-## Documentação
-
-[Visão do produto](docs/PRODUCT_OVERVIEW.md) · [Requisitos](docs/REQUIREMENTS.md) · [Arquitetura](docs/ARCHITECTURE.md) · [Modelo de dados](docs/DATA_MODEL.md) · [Segurança](docs/SECURITY.md) · [LGPD](docs/PRIVACY_LGPD.md) · [API](docs/API.md) · [Design system](docs/DESIGN_SYSTEM.md) · [Testes](docs/TEST_STRATEGY.md) · [Runbook](docs/RUNBOOK.md) · [Otimização de custos](docs/COST_OPTIMIZATION.md) · [Status das funcionalidades](docs/FEATURE_STATUS.md) · [Changelog](docs/CHANGELOG.md)

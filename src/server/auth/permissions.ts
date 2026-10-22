@@ -1,7 +1,7 @@
 /**
  * Catálogo de permissões (fonte da verdade para seeds e checagens).
  * Formato: recurso:ação[:escopo]. "own" = apenas registros do próprio usuário.
- * Matriz documentada em docs/SECURITY.md.
+ * Matriz documentada em docs/seguranca/seguranca.md.
  */
 export const PERMISSIONS = {
   // Colaborador

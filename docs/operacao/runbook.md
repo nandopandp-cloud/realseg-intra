@@ -1,5 +1,7 @@
 # Runbook
 
+Procedimentos de operação: deploy, migração, reversão, backup, observabilidade, operações comuns e incidentes. Serviços externos, ambientes e variáveis estão em [Infraestrutura](infraestrutura.md).
+
 ## Deploy
 1. Provisionar PostgreSQL ≥ 15 (recomendado 18) gerenciado, com TLS, backups automáticos e PITR. Extensão `unaccent` deve ser permitida (aplicada pela migração 0001).
 2. Configurar variáveis (ver `.env.example`) no gerenciador de segredos: `APP_ENV=production`, `APP_URL=https://…`, `DATABASE_URL`, `IP_HASH_SECRET` (aleatório, 32+ bytes), `MAIL_DRIVER=smtp` + `SMTP_*`, `STORAGE_DIR` em volume persistente e com backup, `TRUST_PROXY=true` somente atrás de proxy reverso confiável.
@@ -7,7 +9,7 @@
 4. `pnpm db:migrate` (antes de subir a nova versão; migrações são aditivas — ver Reversão).
 5. `pnpm db:seed` (somente dados de referência; idempotente). **Nunca** `db:seed:demo` em produção (bloqueado).
 6. `pnpm start` (porta via `PORT`). Atrás de proxy com HTTPS e HSTS.
-7. Manutenção diária: na Vercel já agendada por `vercel.json` (`/api/cron/daily`, requer `CRON_SECRET`). Em outra hospedagem, agende `pnpm jobs:run` 1x por dia. Não aumente a frequência sem ler `docs/COST_OPTIMIZATION.md` §7.
+7. Manutenção diária: na Vercel já agendada por `vercel.json` (`/api/cron/daily`, requer `CRON_SECRET`). Em outra hospedagem, agende `pnpm jobs:run` 1x por dia. Não aumente a frequência sem ler [Otimização de custos §7](otimizacao-de-custos.md).
 8. Verificar: `/login` responde 200 com header `Content-Security-Policy`; login com usuário de teste; logs `http.request` chegando.
 
 ## Deploy na Vercel + Neon (homologação atual)
@@ -22,9 +24,7 @@
 - Ao migrar para produção real: `APP_ENV=production`, SMTP configurado, `SEED_DEMO` removido e base recriada sem dados de demonstração.
 
 ## Migrações
-- Gerar: altere `src/server/db/schema`, rode `pnpm db:generate --name <descricao>`, revise o SQL e commite.
-- Estratégia **expand/contract**: adicionar colunas/tabelas (compatível com a versão anterior) → publicar código → remover o antigo em release posterior.
-- Nunca editar migração já aplicada; nunca usar `drizzle-kit push` em produção.
+Procedimento completo, histórico e regras em [Migrações e seeds](../dados/migracoes.md). Em resumo: gere com `pnpm db:generate --name <descricao>`, use *expand/contract*, nunca edite migração aplicada e nunca use `drizzle-kit push` em produção.
 
 ## Reversão segura
 - Código: reimplantar a versão anterior (as migrações aditivas continuam compatíveis).
@@ -42,12 +42,12 @@
 ## Operações comuns
 | Situação | Ação |
 | --- | --- |
-| Revogar acesso (desligamento) | `update users set status='inactive' where email=…; update employees set status='desligado' where user_id=…` — efeito imediato |
+| Revogar acesso (desligamento) | Gestão › Colaboradores › Situação: **Desligado** (revoga as sessões na hora). Sem acesso à interface: `update users set status='inactive' where email=…; update employees set status='desligado' where user_id=…` |
 | Encerrar todas as sessões de um usuário | `update sessions set revoked_at=now() where user_id=… and revoked_at is null` |
-| Desbloquear conta após bloqueio | Aguardar 15 min ou `update users set failed_login_count=0, locked_until=null where …` e `delete from rate_limits where key like 'login:id:%'` (chave é hash do identificador) |
+| Desbloquear conta após bloqueio | Gestão › Colaboradores › Novo acesso, ou aguardar 15 min, ou `update users set failed_login_count=0, locked_until=null where …` e `delete from rate_limits where key like 'login:id:%'` (chave é hash do identificador) |
 | Forçar troca de senha | `update users set must_change_password=true where …` |
-| Feriado estadual/municipal | inserir em `sla_holidays` (UI de configuração na fase 2) |
-| Alterar prazo de SLA | inserir nova linha em `sla_policies` e marcar a anterior com `superseded_at=now()` (tickets abertos mantêm a política original) |
+| Feriado estadual/municipal | Gestão › Configurações › Expediente e feriados (`sla:configure`) |
+| Alterar prazo de SLA | Gestão › Configurações › Prazos (cria nova versão; solicitações abertas mantêm a política original) |
 | Antivírus | implementar `MalwareScanner` e registrar com `setMalwareScanner` na inicialização; arquivos passam a `clean`/bloqueados |
 
 ## Troubleshooting

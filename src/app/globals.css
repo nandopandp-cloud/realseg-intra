@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 /*
- * Design tokens REALSEG (docs/DESIGN_SYSTEM.md).
+ * Design tokens REALSEG (docs/design/design-system.md).
  * Cores amostradas das referências visuais e ajustadas para contraste WCAG 2.2 AA.
  */
 @theme {

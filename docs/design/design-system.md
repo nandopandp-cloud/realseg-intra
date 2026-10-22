@@ -1,11 +1,11 @@
 # Design system
 
-Derivado das referências em `referencias/` (16 telas desktop e mobile). Tokens centralizados em `src/app/globals.css` (`@theme` do Tailwind 4 → CSS variables).
+Derivado das referências em `referencias/` (16 telas desktop e mobile, ver [Referências visuais](referencias-visuais.md)). O ambiente de gestão (`/rh`) não tem referência própria e usa os mesmos tokens e componentes. Tokens centralizados em `src/app/globals.css` (`@theme` do Tailwind 4 → CSS variables).
 
 ## Marca
 - Logo oficial = **símbolo + wordmark "REALSEG"** (sem tagline), via componente `BrandLogo` (`src/components/ui/brand-logo.tsx`). Símbolo: SVG oficial `public/logo/symbol.svg` recolorido nas cores oficiais — `symbol-on-dark.svg` (#1CC4A8, sobre fundos escuros) e `symbol-on-light.svg` (#009488, sobre fundos claros). Wordmark: PNGs oficiais `wordmark-white.png` / `wordmark-midnight.png` (2x). Ícones do app gerados do mesmo SVG (`src/app/icon.svg`, `src/app/apple-icon.png`). Pendência opcional: wordmark em SVG.
 - Fotografias decorativas (heroes, capas) em `public/images`, em **WebP** e servidas sem otimizador de imagens (cache de 30 dias): ao trocar uma imagem, use um novo nome de arquivo. São provisórias (ADR-0010). Sempre `alt=""`/`aria-hidden` quando decorativas.
-- Links: use `@/components/ui/app-link` (prefetch desligado), nunca `next/link` direto — ver `COST_OPTIMIZATION.md`.
+- Links: use `@/components/ui/app-link` (prefetch desligado), nunca `next/link` direto — ver [Otimização de custos](../operacao/otimizacao-de-custos.md).
 
 ## Cores (com contraste medido sobre branco salvo indicação)
 | Token | Valor | Uso | Contraste |
@@ -48,6 +48,8 @@ Padrão Tailwind: `sm` 640, `md` 768, `lg` 1024 (sidebar/topbar desktop a partir
 | RowMenu (⋮) | `ui/row-menu.tsx` | Disclosure com Esc/clique fora |
 | FileIcon, RichText, IconByKey | `ui/*` | RichText sem HTML bruto |
 | Sidebar, Topbar, BottomNav, menus, PageHero | `layout/*` | Link "Pular para o conteúdo"; landmarks `header/nav/main/aside` |
+| Menu da gestão (desktop e celular) | `layout/rh-nav.ts`, `layout/rh-mobile-nav.tsx` | Itens filtrados por permissão; no celular, faixa rolável "Seções da gestão" |
+| PageHeader, StatTile, tabela da gestão | `admin/*` | Tabelas com cabeçalhos reais (`th scope`), indicadores com rótulo em texto |
 
 ## Estados
 Todas as listas têm estado vazio orientando o próximo passo; carregamento com `loading.tsx` (skeleton + `role="status"`); erros com `error.tsx` (tentar novamente + código para suporte); 404 com `h1`.

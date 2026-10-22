@@ -1,5 +1,7 @@
 # Privacidade e LGPD
 
+Dados pessoais tratados pela intranet, bases legais sugeridas, retenção e atendimento aos direitos dos titulares. Relacionados: [Segurança](seguranca.md) · [Modelo de dados](../dados/modelo-de-dados.md)
+
 ## Inventário de dados pessoais
 | Dado | Onde | Finalidade | Base legal sugerida* | Quem acessa |
 | --- | --- | --- | --- | --- |
@@ -8,7 +10,7 @@
 | Atestados médicos (**dado sensível de saúde**) | `document_submissions` | Justificativa de ausência | Art. 11, II, "a" e "b" | Próprio colaborador; RH com `submission:review` |
 | Advertências, feedbacks, avaliações | `documents`, `feedbacks` | Gestão do desempenho e disciplina | Execução de contrato / legítimo interesse | Próprio colaborador; autor; RH autorizado |
 | Mensagens e anexos de solicitações | `ticket_*` | Atendimento | Execução de contrato | Solicitante, participantes, atendentes |
-| Registros de leitura/ciência, downloads | `announcement_reads/acknowledgements`, `document_acknowledgements`, `audit_events` | Comprovar ciência; segurança | Legítimo interesse / obrigação legal | Próprio colaborador (seu histórico); RH (relatórios — fase 2); ADMIN (auditoria) |
+| Registros de leitura/ciência, downloads | `announcement_reads/acknowledgements`, `document_acknowledgements`, `audit_events` | Comprovar ciência; segurança | Legítimo interesse / obrigação legal | Próprio colaborador (seu histórico); RH (relatório de leitura/ciência em `/rh/comunicados`, com `announcement:report`); ADMIN (auditoria) |
 | Progresso em cursos, certificados | `enrollments`, `certificates` | Capacitação obrigatória e desenvolvimento | Obrigação legal (NRs) / contrato | Próprio colaborador; RH (relatórios) |
 | Candidaturas internas | `opportunity_applications` | Recrutamento interno | Legítimo interesse | Próprio colaborador; RH |
 | Sessões (user agent, IP pseudonimizado) | `sessions`, `audit_events` | Segurança | Legítimo interesse | Próprio colaborador (lista); ADMIN |
@@ -23,7 +25,7 @@
 - Logs com redação automática; auditoria sem conteúdo dos documentos ou mensagens.
 
 ## Controle de acesso
-Ver `SECURITY.md` (RBAC + escopo no servidor + 404 para recursos alheios). Feedbacks e documentos individuais nunca são visíveis a outros colaboradores.
+Ver [Segurança](seguranca.md) (RBAC + escopo no servidor + 404 para recursos alheios). Feedbacks e documentos individuais nunca são visíveis a outros colaboradores.
 
 ## Retenção (proposta — validar com jurídico/RH)
 | Categoria | Sugestão | Observação |
@@ -40,10 +42,10 @@ Pendência: job de expurgo por categoria após a definição dos prazos.
 
 ## Direitos dos titulares (art. 18)
 - **Acesso e confirmação**: o colaborador vê seus dados no Perfil, seus documentos, envios, solicitações, cursos e feedbacks.
-- **Correção**: via "Fale com o RH" (solicitação registrada com protocolo).
-- **Portabilidade/cópia**: download individual de documentos. Pendência: exportação consolidada (JSON/PDF) pelo RH — fase 2.
-- **Eliminação/anonimização**: quando legalmente cabível, executada pelo RH/ADMIN respeitando obrigações de guarda (procedimento no RUNBOOK). Pendência: ferramenta administrativa na fase 2.
+- **Correção**: por Solicitações, na área RH (registrada com protocolo). O RH corrige o cadastro em `/rh/colaboradores`.
+- **Portabilidade/cópia**: download individual de documentos. Pendência: exportação consolidada (JSON/PDF) pelo RH — ainda não implementada.
+- **Eliminação/anonimização**: quando legalmente cabível, executada pelo RH/ADMIN respeitando obrigações de guarda (procedimento no [Runbook](../operacao/runbook.md)). Pendência: ferramenta administrativa de anonimização — ainda não implementada.
 - **Informação sobre compartilhamento**: não há compartilhamento com terceiros nesta versão (e-mail/antivírus futuros serão operadores — registrar contratos).
 
 ## Incidentes
-Procedimento em `SECURITY.md`/`RUNBOOK.md`; notificação à ANPD e titulares avaliada pelo DPO.
+Procedimento em [Segurança](seguranca.md)/[Runbook](../operacao/runbook.md); notificação à ANPD e titulares avaliada pelo DPO.

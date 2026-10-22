@@ -9,7 +9,7 @@ import type { Permission, RoleKey } from "./permissions";
 export const SESSION_COOKIE = "rs_session";
 /**
  * Evita escrita a cada requisição: last_seen_at só é atualizado após este intervalo.
- * 5 min mantém a expiração por inatividade (60 min) com folga e reduz writes no Neon (docs/COST_OPTIMIZATION.md §4).
+ * 5 min mantém a expiração por inatividade (60 min) com folga e reduz writes no Neon (docs/operacao/otimizacao-de-custos.md §4).
  */
 const TOUCH_INTERVAL_MS = 5 * 60_000;
 

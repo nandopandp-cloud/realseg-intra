@@ -1,6 +1,8 @@
 # Requisitos
 
-Legenda de status: ✅ implementado e testado nesta fase · 🟡 parcial · ⏳ próxima fase. Detalhes de testes em `FEATURE_STATUS.md`.
+Requisitos funcionais (RF) e não funcionais (RNF) com critérios de aceite. Relacionados: [Visão do produto](visao-do-produto.md) · [Mapa de telas](mapa-de-telas.md) · [Status das funcionalidades](status-das-funcionalidades.md)
+
+Legenda de status: ✅ implementado e testado · 🟡 parcial · ⏳ próxima fase. Detalhes de testes em [Status das funcionalidades](status-das-funcionalidades.md).
 
 ## Requisitos não funcionais
 | ID | Requisito | Critério de aceite | Status |
@@ -13,7 +15,7 @@ Legenda de status: ✅ implementado e testado nesta fase · 🟡 parcial · ⏳ 
 | RNF-06 | Proteções web | CSRF por Origin, CSP com nonce, rate limit, validação Zod, uploads verificados por conteúdo | ✅ |
 | RNF-07 | Auditoria | Login, downloads/visualizações de documentos sensíveis, ciência, transições de ticket | ✅ |
 | RNF-08 | Logs sem dados sensíveis | Logger com redação de campos; metadados de auditoria sem conteúdo | ✅ |
-| RNF-09 | Desempenho | Listas paginadas (máx. 50), consultas com índices, imagens pré-otimizadas em WebP com cache de 30 dias, sem prefetch automático de rotas dinâmicas (ver `COST_OPTIMIZATION.md`) | ✅ |
+| RNF-09 | Desempenho | Listas paginadas (máx. 50), consultas com índices, imagens pré-otimizadas em WebP com cache de 30 dias, sem prefetch automático de rotas dinâmicas (ver [Otimização de custos](../operacao/otimizacao-de-custos.md)) | ✅ |
 
 ## RF-AUTH — Autenticação e conta
 - Login por e-mail **ou** matrícula; mensagem genérica de erro; bloqueio após 5 falhas por 15 min (mesma resposta para contas inexistentes).
@@ -93,7 +95,7 @@ Legenda de status: ✅ implementado e testado nesta fase · 🟡 parcial · ⏳ 
 - Dados cadastrais somente leitura (correção via RH); preferências de notificação por categoria (segurança da conta não pode ser desligada); notificações com leitura individual, "marcar todas" e filtro de não lidas; notificações sem dados sensíveis.
 
 ## RF-RH — Ambiente RH/Administração ✅
-Implementado em `/rh` (v0.9–v0.15). Cada tela e cada rota de API exige a sua permissão (matriz em `SECURITY.md`); o menu mostra só o permitido.
+Implementado em `/rh` (v0.9–v0.15). Cada tela e cada rota de API exige a sua permissão (matriz em [Segurança](../seguranca/seguranca.md)); o menu mostra só o permitido.
 - **Painel**: indicadores de atendimento (abertas, fora do prazo, em risco, % no prazo), documentos para analisar, pessoas, comunicados, cursos obrigatórios atrasados e candidaturas.
 - **Solicitações**: fila com abas e filtros, atendimento com notas internas, anexos, responsável, prioridade (recalcula o prazo) e situação.
 - **Comunicados**: editor completo, público-alvo, capa, anexos, publicação imediata ou agendada, versões (nova ciência), arquivo e relatório de leitura/ciência com CSV. **Agenda** de eventos.

@@ -9,4 +9,4 @@
 ## Decisão
 - Mutações e downloads via `/api/v1/*` (Route Handlers) com um wrapper único (`server/http/route.ts`) que: resolve a sessão, valida origem (CSRF), valida payload com Zod, aplica rate limit, padroniza erros `{ error: { code, message, details? } }` e registra log estruturado com `requestId`.
 - Páginas (Server Components) leem dados chamando diretamente os mesmos serviços — sem round-trip HTTP interno — e passam a cada componente cliente só os campos necessários.
-- Endpoints GET de coleções existem para os recursos principais (paginação `page`/`pageSize`, filtros e ordenação documentados em `docs/API.md`).
+- Endpoints GET de coleções existem para os recursos principais (paginação `page`/`pageSize`, filtros e ordenação documentados em [API](../api.md)).

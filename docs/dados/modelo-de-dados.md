@@ -1,6 +1,10 @@
 # Modelo de dados
 
-Fonte da verdade: `src/server/db/schema/*.ts`. Migrações versionadas em `drizzle/` (`0000_initial_schema`, `0001_search_extensions`). Convenções: PK `uuid` (`gen_random_uuid()`), `timestamptz` em UTC, nomes em `snake_case`, FKs explícitas com política de exclusão documentada, enums PostgreSQL para estados.
+Estrutura do banco PostgreSQL: 63 tabelas em 9 domínios, com finalidade, chaves, acesso, retenção e dados pessoais de cada uma.
+
+Fonte da verdade: `src/server/db/schema/*.ts`. Migrações versionadas em `drizzle/` — histórico e procedimento em [Migrações e seeds](migracoes.md). Relacionados: [Serviços](../arquitetura/servicos.md) (quem lê e grava cada tabela) · [Privacidade e LGPD](../seguranca/privacidade-lgpd.md) · [ADR-0002](../arquitetura/adr/0002-postgresql-drizzle.md).
+
+Convenções: PK `uuid` (`gen_random_uuid()`), `timestamptz` em UTC, nomes em `snake_case`, FKs explícitas com política de exclusão documentada, enums PostgreSQL para estados.
 
 ## ERD (visão por domínio)
 
@@ -70,7 +74,7 @@ Colunas `created_at`/`updated_at` existem em quase todas as tabelas e não são 
 ### Identidade e acesso
 | Tabela | Finalidade | Campos principais | Chaves/índices | Acesso | Retenção | DP |
 | --- | --- | --- | --- | --- | --- | --- |
-| `users` | Conta de acesso | `email` (único, `lower()`), `password_hash` (scrypt), `status` (active/inactive), `failed_login_count`, `locked_until`, `must_change_password`, `last_login_at`, `deleted_at` | PK id; UQ `lower(email)` | Próprio usuário (perfil); RH/ADMIN (fase 2) | Desativar no desligamento; excluir/anonimizar conforme política legal | Sim |
+| `users` | Conta de acesso | `email` (único, `lower()`), `password_hash` (scrypt), `status` (active/inactive), `failed_login_count`, `locked_until`, `must_change_password`, `last_login_at`, `deleted_at` | PK id; UQ `lower(email)` | Próprio usuário (perfil); RH (`employee:manage`) e ADMIN (papéis) em `/rh/colaboradores` | Desativar no desligamento; excluir/anonimizar conforme política legal | Sim |
 | `roles`, `permissions`, `role_permissions` | RBAC configurável | `roles.key`, `permissions.key` | UQ key | Somente ADMIN (`role:manage`) | Permanente | Não |
 | `user_roles` | Papéis do usuário com escopo opcional de setor | `scope_department_id`, `granted_by_user_id` | UQ (user, role, setor) NULLS NOT DISTINCT | ADMIN | Enquanto vigente | Não |
 | `sessions` | Sessões opacas | `id` = SHA-256 do token, `expires_at`, `last_seen_at`, `revoked_at`, `user_agent` (200 chars), `ip_hash` | idx user, expires | Próprio usuário (lista/revoga) | Job remove 30 dias após expirar/revogar | Pseudonimizado |
@@ -137,6 +141,38 @@ Colunas `created_at`/`updated_at` existem em quase todas as tabelas e não são 
 ### Ajuda
 `help_categories`, `help_articles` (`view_count` agregado e anônimo), `help_article_feedback` (PK artigo×usuário — evita voto duplicado; relatórios só agregados).
 
+## Enums (estados)
+
+| Enum | Valores | Usado em |
+| --- | --- | --- |
+| `user_status` | `active`, `inactive` | `users.status` |
+| `employee_status` | `ativo`, `afastado`, `desligado` | `employees.status` (desligado bloqueia o acesso) |
+| `audience_type` | `all`, `department`, `unit`, `job_position`, `job_family` | público-alvo de comunicados, cursos e oportunidades |
+| `announcement_status` | `draft`, `scheduled`, `published`, `archived` | `announcements.status` |
+| `event_status` | `scheduled`, `cancelled` | `events.status` |
+| `document_category_kind` | `personal`, `institutional`, `submission` | `document_categories.kind` |
+| `document_scope` | `personal`, `institutional` | `documents.scope` |
+| `document_status` | `active`, `archived` | `documents.status` |
+| `submission_status` | `enviado`, `em_analise`, `aceito`, `recusado`, `cancelado` | `document_submissions.status` |
+| `file_scan_status` | `pending`, `clean`, `infected`, `skipped` | `file_assets.scan_status` |
+| `ticket_status` | `aberto`, `em_andamento`, `aguardando_colaborador`, `respondido`, `resolvido`, `fechado`, `cancelado` | `tickets.status` ([transições](../produto/requisitos.md#rf-tkt--solicitações-e-sla)) |
+| `ticket_priority` | `baixa`, `normal`, `alta`, `urgente` | `tickets.priority`, `sla_policies.priority` |
+| `ticket_channel` | `portal`, `chat` | `tickets.channel` |
+| `ticket_event_type` | `created`, `status_changed`, `assigned`, `priority_changed`, `sla_paused`, `sla_resumed`, `sla_warning`, `sla_breached`, `message_added` | `ticket_events.type` |
+| `course_status` | `draft`, `published`, `archived` | `courses.status` |
+| `lesson_type` | `texto`, `video`, `material` | `lessons.type` |
+| `enrollment_source` | `self`, `assigned` | `enrollments.source` (matrícula própria ou atribuída pelo RH) |
+| `enrollment_status` | `em_andamento`, `concluido` | `enrollments.status` |
+| `development_goal_status` | `pendente`, `em_andamento`, `concluida` | `development_goals.status` |
+| `achievement_kind` | `auto`, `manual` | `achievements.kind` |
+| `opportunity_status` | `draft`, `published`, `closed` | `internal_opportunities.status` |
+| `application_status` | `enviada`, `em_analise`, `encerrada`, `retirada` | `opportunity_applications.status` |
+| `feedback_type` | `feedback`, `avaliacao`, `reconhecimento` | `feedbacks.type` |
+| `feedback_status` | `rascunho`, `publicado`, `arquivado` | `feedbacks.status` |
+| `help_article_type` | `artigo`, `tutorial`, `faq` | `help_articles.type` |
+| `help_article_status` | `draft`, `published`, `archived` | `help_articles.status` |
+| `notification_category` | `comunicados`, `documentos`, `solicitacoes`, `cursos`, `carreira`, `feedbacks`, `conta` | `notifications.category`, `notification_preferences.category` |
+
 ## Denormalizações justificadas
 - `enrollments.progress_percent`: evita contagem em todas as listas; recalculado na mesma transação de `lesson_progress` (com `SELECT … FOR UPDATE`).
 - `tickets.resolution_due_at`/`paused_business_minutes`: evitam recalcular histórico de pausas em listas; mantidos pelas transições.
@@ -147,10 +183,10 @@ Extensão `unaccent` + função `f_unaccent` (IMMUTABLE) para busca sem acento e
 
 ## Exclusão e retenção
 - Documentos e usuários usam exclusão lógica; arquivos referenciados têm FK `restrict`.
-- Prazos legais de retenção por categoria de documento ficam em `document_categories.retention_months` — **a definir com o jurídico/RH** (pendência em `PRIVACY_LGPD.md`).
+- Prazos legais de retenção por categoria de documento ficam em `document_categories.retention_months` — **a definir com o jurídico/RH** (pendência em [Privacidade e LGPD](../seguranca/privacidade-lgpd.md#retenção-proposta--validar-com-jurídicorh)).
 
 ### Conteúdo estruturado do comunicado (migration 0003)
-Campos opcionais em `announcements`, usados pela página de leitura (`referencias/Colado 2026-10-18 às 12.08.10.png`):
+Campos opcionais em `announcements`, usados pela página de leitura (`referencias/Colado 2026-10-18 às 12.08.10.png`, ver [Referências visuais](../design/referencias-visuais.md)):
 - `cover_image`: capa (caminho em `/images`; no futuro, chave do R2). Sem capa, a interface usa a cor/ícone da categoria.
 - `effective_note`: texto do quadro "Quando começa a valer?".
 - `highlights` (jsonb `[{icon, title, text}]`): seção "O que muda". Ícones aceitos: `shirt`, `badge`, `boot`, `shield`, `clock`, `calendar`, `alert`, `check`.

@@ -6,7 +6,7 @@ import { runSlaMonitor } from "../services/tickets";
 import { publishDueAnnouncements } from "../services/rh/announcements";
 
 /**
- * Manutenção diária (docs/COST_OPTIMIZATION.md §7): uma única execução por dia acorda o banco uma vez,
+ * Manutenção diária (docs/operacao/otimizacao-de-custos.md §7): uma única execução por dia acorda o banco uma vez,
  * em vez de um job a cada poucos minutos manter o Neon ligado 24 h.
  * - Monitor de SLA (violações e fechamento automático de resolvidos há mais de 7 dias).
  * - Comunicados agendados cuja data chegou: status "publicado" e aviso ao público.

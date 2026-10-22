@@ -3,7 +3,7 @@ import type { TicketStatus } from "../db/schema/tickets";
 export type TicketActorKind = "requester" | "agent" | "system";
 
 /**
- * Transições válidas e quem pode executá-las (documentado em docs/REQUIREMENTS.md §Solicitações).
+ * Transições válidas e quem pode executá-las (documentado em docs/produto/requisitos.md §Solicitações).
  * Qualquer transição ausente é inválida.
  */
 const TRANSITIONS: Record<TicketStatus, Partial<Record<TicketStatus, TicketActorKind[]>>> = {

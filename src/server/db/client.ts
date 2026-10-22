@@ -12,7 +12,7 @@ export type Executor = Database | Parameters<Parameters<Database["transaction"]>
 const globalForDb = globalThis as unknown as { __realsegPool?: Pool; __realsegDb?: Database };
 
 /**
- * Pool pequeno e de vida curta (docs/COST_OPTIMIZATION.md §5):
+ * Pool pequeno e de vida curta (docs/operacao/otimizacao-de-custos.md §5):
  * - na Vercel, `DATABASE_URL` aponta para o pooler do Neon (PgBouncer), então poucas conexões por instância bastam;
  * - conexões ociosas fecham em 5 s e `attachDatabasePool` as libera antes de a função ser suspensa (Fluid Compute),
  *   evitando conexões presas que mantêm a computação do Neon ativa.

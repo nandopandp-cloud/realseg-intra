@@ -1,4 +1,4 @@
-// Build na Vercel (script "vercel-build"). docs/COST_OPTIMIZATION.md §6.
+// Build na Vercel (script "vercel-build"). docs/operacao/otimizacao-de-custos.md §6.
 // - Production: aplica migrações + seed idempotente no Neon e depois compila.
 // - Preview: NÃO toca no banco (ele é o de produção até existir um branch Neon por preview),
 //   a menos que PREVIEW_DB_TASKS=true esteja definido para o ambiente Preview.

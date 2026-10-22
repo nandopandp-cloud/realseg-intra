@@ -11,4 +11,7 @@
 - Nesta fase só o papel COLABORADOR tem UI; GESTOR/RH/ADMIN existem no modelo para a próxima fase.
 
 ## Consequências
-- Matriz de permissões documentada em `docs/SECURITY.md` e testada (testes de autorização negativa).
+- Matriz de permissões documentada em [Segurança](../../seguranca/seguranca.md#rbac--matriz-de-permissões) e testada (testes de autorização negativa).
+
+## Revisão 2026-10-20
+O ambiente de gestão (`/rh`) foi entregue para os papéis RH e ADMIN. O acesso ao ambiente exige ao menos uma permissão de `MANAGEMENT_PERMISSIONS`; cada página exige a sua (`requireRhCtx`) e cada rota `/api/v1/rh/*` a permissão da ação, verificada antes de ler o corpo da requisição. Sem permissão: a página responde "não encontrada" e a API responde 403. O papel GESTOR continua sem telas próprias.

@@ -49,7 +49,7 @@ export function NotificationBell({ unread }: { unread: number }) {
   const { open, setOpen, ref, buttonRef } = usePopover();
   const id = useId();
   const router = useRouter();
-  // Lista carregada sob demanda (ao abrir), não em toda navegação — docs/COST_OPTIMIZATION.md §4.
+  // Lista carregada sob demanda (ao abrir), não em toda navegação — docs/operacao/otimizacao-de-custos.md §4.
   const [items, setItems] = useState<BellItem[] | null>(null);
   const [failed, setFailed] = useState(false);
 

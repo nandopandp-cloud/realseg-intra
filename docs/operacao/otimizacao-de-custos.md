@@ -2,7 +2,7 @@
 
 Registro do **que** foi otimizado, **por que** e **como**, para manter a intranet dentro dos planos gratuitos (Vercel Hobby e Neon Free) e para consulta antes de qualquer mudança que possa aumentar o consumo.
 
-Versão: 0.4.0 · 2026-10-18 · Medições feitas com `scripts/dev/measure.mjs` em build de produção local.
+Versão: 0.4.0 · 2026-10-18 (revisado em 2026-10-22) · Medições feitas com `scripts/dev/measure.mjs` em build de produção local.
 
 ## Limites que importam (planos gratuitos)
 
@@ -67,14 +67,14 @@ Versão: 0.4.0 · 2026-10-18 · Medições feitas com `scripts/dev/measure.mjs` 
 
 ## 7. Jobs: uma execução por dia
 
-- **O quê:** a manutenção (monitor de SLA, fechamento automático de solicitações resolvidas há 7 dias e limpeza de sessões, links de redefinição e rate limit) roda **1x por dia** via Vercel Cron (`vercel.json` → `/api/cron/daily`, 09:00 UTC = 06:00 em Brasília), protegida por `CRON_SECRET`.
+- **O quê:** a manutenção (monitor de SLA, fechamento automático de solicitações resolvidas há 7 dias, publicação dos comunicados agendados cuja data chegou e limpeza de sessões, links de redefinição e rate limit) roda **1x por dia** via Vercel Cron (`vercel.json` → `/api/cron/daily`, 09:00 UTC = 06:00 em Brasília), protegida por `CRON_SECRET`.
 - **Por quê:** um job a cada 5 min manteria o Neon ligado 24 h (cerca de 180 CU-h/mês com 0,25 CU), acima dos 100 CU-h do plano. O Hobby também só permite cron diário.
 - **Como:** lógica única em `src/server/jobs/maintenance.ts`, usada pela rota do cron e por `pnpm jobs:run`.
-- **Quando revisar:** na fase RH, alertas de SLA em tempo real exigirão execuções mais frequentes. Nesse caso, agende só no horário comercial (ex.: a cada 30 min, de seg. a sex., das 08h às 18h, via GitHub Actions chamando a mesma rota) e reavalie o consumo de CU-hora.
+- **Quando revisar:** hoje o monitor de SLA roda 1x por dia, e a fila da gestão calcula a situação do prazo a cada acesso. Se o atendimento precisar de alertas de SLA em tempo real (notificação de risco ou de violação no mesmo instante), serão necessárias execuções mais frequentes. Nesse caso, agende só no horário comercial (ex.: a cada 30 min, de seg. a sex., das 08h às 18h, via GitHub Actions chamando a mesma rota) e reavalie o consumo de CU-hora.
 
 ## 8. Região única
 
-As funções da Vercel (`gru1`) e o Neon (`aws-sa-east-1`) estão em São Paulo. Cada página faz várias consultas, e com o banco em outro continente cada uma custaria cerca de 120 ms a mais de CPU e de duração. Na mesma região, a latência cai para poucos milissegundos (ver `docs/RUNBOOK.md`).
+As funções da Vercel (`gru1`) e o Neon (`aws-sa-east-1`) estão em São Paulo. Cada página faz várias consultas, e com o banco em outro continente cada uma custaria cerca de 120 ms a mais de CPU e de duração. Na mesma região, a latência cai para poucos milissegundos (ver [Runbook](runbook.md)).
 
 ---
 
@@ -90,8 +90,8 @@ As funções da Vercel (`gru1`) e o Neon (`aws-sa-east-1`) estão em São Paulo.
 | Momento | Otimização planejada |
 | --- | --- |
 | Driver Cloudflare R2 | Download: autorizar e auditar na função e responder com **redirect 302 para URL pré-assinada do R2** (validade curta), para os bytes não passarem pela Vercel (Fast Origin Transfer) e saírem do R2, cujo egress é gratuito. Upload direto ao R2 com URL pré-assinada, validando o conteúdo depois. |
-| Ambiente RH | Relatórios e exportações paginados ou assíncronos; nunca listas sem limite. |
-| Crescimento de dados | Política de retenção de `audit_events` e `notifications`, com arquivamento ou expurgo pelo job diário quando os prazos forem definidos (ver `PRIVACY_LGPD.md`). |
+| Ambiente RH (entregue na v0.15) | Exportações CSV hoje são síncronas; se o volume crescer, torná-las paginadas ou assíncronas. Nunca listas sem limite. |
+| Crescimento de dados | Política de retenção de `audit_events` e `notifications`, com arquivamento ou expurgo pelo job diário quando os prazos forem definidos (ver [Privacidade e LGPD](../seguranca/privacidade-lgpd.md)). |
 
 ## Como medir
 
